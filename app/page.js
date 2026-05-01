@@ -1,17 +1,14 @@
-import dynamic from "next/dynamic"
 import { getProducts } from "@/features/product/api"
 import ProductGrid from "@/features/product/ProductGrid"
 import CategoryGrid from "@/components/home/CategoryGrid"
+import TrustSection from "@/components/home/TrustSection"
+import SetupIdeas from "@/components/home/SetupIdeas"
+import BrandStrip from "@/components/home/BrandStrip"
+import Newsletter from "@/components/home/Newsletter"
 import HeroSlider from "@/components/home/HeroSlider"
+import DiscountBanner from "@/components/home/DiscountBanner"
 import { bannerService } from "@/lib/services/banner.service"
-
-// Optimized Heavy Components
-const SetupIdeas = dynamic(() => import("@/components/home/SetupIdeas"), { ssr: false })
-const BrandStrip = dynamic(() => import("@/components/home/BrandStrip"), { ssr: false })
-const Newsletter = dynamic(() => import("@/components/home/Newsletter"), { ssr: false })
-const TrustSection = dynamic(() => import("@/components/home/TrustSection"), { ssr: false })
-const DiscountBanner = dynamic(() => import("@/components/home/DiscountBanner"), { ssr: false })
-const PromotionSlider = dynamic(() => import("@/components/home/PromotionSlider"), { ssr: false })
+import PromotionSlider from "@/components/home/PromotionSlider"
 
 export const revalidate = 3600 // Cache for 1 hour to protect Firestore from high traffic
 
