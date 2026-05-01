@@ -1,0 +1,16 @@
+{
+  "go_home": "Домой",
+  "setup": "Собрать компьютер",
+  "catalog": "Каталог",
+  "accessories": "Аксессуары",
+
+  "products_information": "Информация",
+  "clear": "Очистить",
+  "all_products_count": "Общее количество продуктов",
+  "discount": "Скидка",
+  "delivery": "Доставка",
+  "status": "Бесплатно",
+  "total_price": "Итоговая цена",
+  "count": "шт.",
+  "go_order": "ОФОРМИТЬ ЗАКАЗ"
+}

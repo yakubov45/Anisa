@@ -1,0 +1,20 @@
+{
+  "go_home": "Home",
+  "cart": "Cart",
+  "cart_empty": "Cart is empty",
+  "go_shopping": "Start Shopping",
+
+  "products": "PRODUCTS",
+  "product_count": "PRODUCT COUNT",
+  "product_price": "PRICE",
+  "all": "TOTAL",
+
+  "products_information": "Information",
+  "all_products_count": "Total number of products",
+  "discount": "Discount",
+  "delivery": "Delivery",
+  "status": "Free",
+  "total_price": "Total Price",
+  "count": "pcs",
+  "go_order": "CHECKOUT"
+}

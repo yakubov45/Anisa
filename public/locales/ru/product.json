@@ -1,0 +1,10 @@
+{
+  "category": "Категория",
+  "brand": "Бренд",
+  "discount": "Скидка",
+  "color": "Цвет",
+  "to_cart": "В корзину",
+  "buy": "Купить",
+  "technical_informations": "Техническая информация",
+  "no_technical_informations": "Технические данные отсутствуют."
+}

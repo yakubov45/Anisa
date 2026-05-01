@@ -1,0 +1,67 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { orderService } from "@/lib/services/order.service";
+import { formatPrice, formatDate } from "@/lib/utils";
+import { useUser } from "@/lib/UserContext";
+import Link from 'next/link';
+
+export default function UserOrdersPage() {
+    const { user } = useUser();
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (user?.uid) {
+            const fetch = async () => {
+                const data = await orderService.getUserOrders(user.uid);
+                setOrders(data);
+                setLoading(false);
+            };
+            fetch();
+        }
+    }, [user]);
+
+    return (
+        <div className="space-y-10">
+            <div className="space-y-1">
+                <h1 className="text-3xl font-black text-surface-900 tracking-tighter">My Orders</h1>
+                <p className="text-surface-500 font-medium text-sm">Track your hardware acquisitions and shipment progress.</p>
+            </div>
+
+            {loading ? (
+                <div className="animate-pulse space-y-6">
+                    {[1, 2, 3].map(i => <div key={i} className="bg-surface-100 h-24 rounded-3xl" />)}
+                </div>
+            ) : orders.length === 0 ? (
+                <div className="bg-surface p-20 rounded-[2.5rem] shadow-premium text-center space-y-4">
+                    <div className="text-5xl opacity-20 grayscale">📦</div>
+                    <h3 className="text-xl font-bold text-surface-900">No orders yet</h3>
+                    <p className="text-surface-500 font-medium">Your setup is waiting to be built.</p>
+                    <Link href="/products" className="inline-block bg-primary text-white font-black px-10 py-4 rounded-xl shadow-lg shadow-primary/20 mt-4">Start Shopping</Link>
+                </div>
+            ) : (
+                <div className="space-y-6">
+                    {orders.map(o => (
+                        <div key={o.id} className="bg-surface p-8 rounded-3xl shadow-premium border border-surface-50 flex items-center justify-between hover:border-primary/20 transition-all group">
+                            <div className="flex gap-8 items-center">
+                                <div className="w-16 h-16 bg-surface-50 rounded-2xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>
+                                </div>
+                                <div>
+                                    <p className="text-xs font-black text-surface-400 uppercase tracking-widest mb-1">Order #{o.id.slice(-6).toUpperCase()}</p>
+                                    <h4 className="text-lg font-black text-surface-900">{formatPrice(o.totalAmount || o.total)}</h4>
+                                    <p className="text-xs text-surface-400 font-bold">{formatDate(o.createdAt)}</p>
+                                </div>
+                            </div>
+                            <div className="flex flex-col items-end gap-3">
+                                <span className="bg-yellow-50 text-yellow-600 text-[10px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest">{o.status}</span>
+                                <Link href={`/user/orders/${o.id}`} className="text-primary font-bold text-sm hover:underline">Track Shipment</Link>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}

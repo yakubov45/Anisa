@@ -1,0 +1,86 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && getUserData().role == 'admin';
+    }
+    
+    function isDelivery() {
+       return isSignedIn() && getUserData().role == 'delivery';
+    }
+
+    // [USERS]
+    match /users/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow list: if isAdmin();
+      allow update: if isSignedIn() && request.auth.uid == userId;
+      allow create: if isSignedIn();
+    }
+
+    // [PRODUCTS]
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if true; // Temporarily open for seeding
+    }
+
+    // [PRE-BUILTS]
+    match /preBuiltSystems/{systemId} {
+      allow read: if true;
+      allow write: if true; // Temporarily open for seeding
+    }
+
+    // [BRANDS]
+    match /brands/{brandId} {
+      allow read: if true;
+      allow write: if true; // Temporarily open for seeding
+    }
+
+    // [CATEGORIES]
+    match /categories/{catId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // [ORDERS]
+    match /orders/{orderId} {
+      allow create: if isSignedIn();
+      allow get: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin() || isDelivery());
+      allow list: if isSignedIn(); 
+    }
+
+    // [REVIEWS]
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+    }
+    
+    // [COUPONS]
+    match /coupons/{couponId} {
+      allow get: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // [CARTS]
+    match /carts/{userId} {
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // [ACTIVITY_LOGS]
+    match /activity_logs/{logId} {
+      allow create: if isSignedIn();
+      allow get, list: if isAdmin();
+    }
+  }
+}

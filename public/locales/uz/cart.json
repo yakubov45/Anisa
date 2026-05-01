@@ -1,0 +1,20 @@
+{
+  "go_home": "Bosh sahifa",
+  "cart": "Savatcha",
+  "cart_empty": "Savatcha boʻsh",
+  "go_shopping": "Xaridni boshlang",
+
+  "products": "MAHSULOTLAR",
+  "product_count": "MAHSULOT SONI",
+  "product_price": "NARXI",
+  "all": "JAMI",
+
+  "products_information": "Ma'lumotlar",
+  "all_products_count": "Umumiy mahsulotlar soni",
+  "discount": "Chegirma",
+  "delivery": "Yetkazib berish",
+  "status": "Bepul",
+  "total_price": "Umumiy summa",
+  "count": "ta",
+  "go_order": "RASMIYLASHTIRISH"
+}

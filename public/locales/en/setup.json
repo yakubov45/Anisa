@@ -1,0 +1,16 @@
+{
+  "go_home": "Home",
+  "setup": "Build a Computer",
+  "catalog": "Catalog",
+  "accessories": "Accessories",
+
+  "products_information": "Information",
+  "clear": "Clear",
+  "all_products_count": "Total number of products",
+  "discount": "Discount",
+  "delivery": "Delivery",
+  "status": "Free",
+  "total_price": "Total Price",
+  "count": "pcs",
+  "go_order": "CHECKOUT"
+}

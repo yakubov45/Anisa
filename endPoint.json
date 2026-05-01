@@ -1,0 +1,502 @@
+{
+    "auth": [
+        {
+            "endpoint": "POST /api/auth/register",
+            "description": "Yangi user yaratish",
+            "body": [
+                "email",
+                "password",
+                "name"
+            ],
+            "response": "user object + access_token + refresh_token"
+        },
+        {
+            "endpoint": "POST /api/auth/login",
+            "description": "User login qilish",
+            "body": [
+                "email",
+                "password"
+            ],
+            "response": "user object + access_token + refresh_token"
+        },
+        {
+            "endpoint": "GET /api/auth/me",
+            "description": "Hozirgi userni olish",
+            "headers": [
+                "Authorization token"
+            ],
+            "response": "user object"
+        },
+        {
+            "endpoint": "POST /api/auth/logout",
+            "description": "User logout qilish (tokenlarni yaroqsiz qilish)",
+            "response": "success message"
+        },
+        {
+            "endpoint": "POST /api/auth/refresh-token",
+            "description": "Yangi access token olish (sessiyani uzaytirish)",
+            "body": [
+                "refreshToken"
+            ],
+            "response": "new access_token"
+        },
+        {
+            "endpoint": "POST /api/auth/forgot-password",
+            "description": "Parolni tiklash uchun emailga havola jo'natish",
+            "body": [
+                "email"
+            ],
+            "response": "success message"
+        },
+        {
+            "endpoint": "PUT /api/auth/reset-password/:token",
+            "description": "Yangi parolni o'rnatish",
+            "body": [
+                "newPassword"
+            ],
+            "response": "success message"
+        }
+    ],
+    "users": [
+        {
+            "endpoint": "GET /api/users",
+            "description": "Barcha userlar (pagination, search)",
+            "auth": "admin"
+        },
+        {
+            "endpoint": "GET /api/users/:id",
+            "description": "Bitta userni olish",
+            "auth": "admin"
+        },
+        {
+            "endpoint": "PUT /api/users/:id",
+            "description": "User rolini yoki statusini o'zgartirish",
+            "body": [
+                "role",
+                "isActive"
+            ],
+            "auth": "admin"
+        },
+        {
+            "endpoint": "DELETE /api/users/:id",
+            "description": "Userni tizimdan o‘chirish yoki bloklash",
+            "auth": "admin"
+        },
+        {
+            "endpoint": "PUT /api/users/profile",
+            "description": "User o'z profilini tahrirlashi",
+            "body": [
+                "name",
+                "avatar",
+                "phoneNumber"
+            ],
+            "auth": "user"
+        },
+        {
+            "endpoint": "PUT /api/users/password",
+            "description": "User o'z parolini yangilashi",
+            "body": [
+                "oldPassword",
+                "newPassword"
+            ],
+            "auth": "user"
+        },
+        {
+            "endpoint": "GET /api/users/addresses",
+            "description": "Userning saqlangan manzillari",
+            "auth": "user"
+        },
+        {
+            "endpoint": "POST /api/users/addresses",
+            "description": "Yangi manzil saqlash (yetkazib berish uchun)",
+            "body": [
+                "region",
+                "city",
+                "street",
+                "zipCode",
+                "isDefault"
+            ],
+            "auth": "user"
+        },
+        {
+            "endpoint": "DELETE /api/users/addresses/:addressId",
+            "description": "Saqlangan manzilni o'chirish",
+            "auth": "user"
+        }
+    ],
+    "categories": [
+        {
+            "endpoint": "GET /api/categories",
+            "description": "Barcha categorylar (daraxtsimon - parent/child)",
+            "response": "categories array"
+        },
+        {
+            "endpoint": "POST /api/categories",
+            "description": "Yangi category qo‘shish",
+            "body": [
+                "name",
+                "slug",
+                "parentId",
+                "icon"
+            ],
+            "auth": "admin only"
+        },
+        {
+            "endpoint": "PUT /api/categories/:id",
+            "description": "Category update qilish",
+            "body": [
+                "name",
+                "slug",
+                "parentId",
+                "icon"
+            ],
+            "auth": "admin only"
+        },
+        {
+            "endpoint": "DELETE /api/categories/:id",
+            "description": "Category o‘chirish",
+            "auth": "admin only"
+        }
+    ],
+    "products": [
+        {
+            "endpoint": "GET /api/products",
+            "description": "Barcha productlar (pagination + filter + sort)",
+            "query": [
+                "page",
+                "limit",
+                "category",
+                "minPrice",
+                "maxPrice",
+                "brand",
+                "sort"
+            ],
+            "response": "products array + totalCount"
+        },
+        {
+            "endpoint": "GET /api/products/search",
+            "description": "Product qidirish (nomi yoki description bo'yicha)",
+            "query": [
+                "q",
+                "limit"
+            ],
+            "response": "matched products"
+        },
+        {
+            "endpoint": "GET /api/products/:id",
+            "description": "Bitta productni to'liq ma'lumoti bilan olish",
+            "response": "product object"
+        },
+        {
+            "endpoint": "GET /api/products/:id/related",
+            "description": "O'xshash mahsulotlarni tavsiya qilish",
+            "response": "products array"
+        },
+        {
+            "endpoint": "POST /api/products",
+            "description": "Yangi product qo‘shish",
+            "body": [
+                "name",
+                "description",
+                "price",
+                "images",
+                "category",
+                "brand",
+                "specs",
+                "countInStock",
+                "variants"
+            ],
+            "auth": "admin only"
+        },
+        {
+            "endpoint": "PUT /api/products/:id",
+            "description": "Productni yangilash",
+            "body": [
+                "name",
+                "description",
+                "price",
+                "images",
+                "category",
+                "brand",
+                "specs",
+                "countInStock",
+                "variants"
+            ],
+            "auth": "admin only"
+        },
+        {
+            "endpoint": "DELETE /api/products/:id",
+            "description": "Productni o‘chirish (yoki soft-delete)",
+            "auth": "admin only"
+        }
+    ],
+    "reviews": [
+        {
+            "endpoint": "GET /api/products/:id/reviews",
+            "description": "Mahsulot izohlarini o'qish",
+            "query": [
+                "page",
+                "limit"
+            ],
+            "response": "reviews array + averageRating"
+        },
+        {
+            "endpoint": "POST /api/products/:id/reviews",
+            "description": "Mahsulotga izoh va reyting qoldirish",
+            "body": [
+                "rating",
+                "comment"
+            ],
+            "auth": "user (faqat sotib olganlar yozishi mumkin)"
+        },
+        {
+            "endpoint": "DELETE /api/reviews/:id",
+            "description": "Noto'g'ri izohni o'chirish",
+            "auth": "admin"
+        }
+    ],
+    "cart": [
+        {
+            "endpoint": "GET /api/cart",
+            "description": "User savatchasini olish",
+            "auth": "user"
+        },
+        {
+            "endpoint": "POST /api/cart/add",
+            "description": "Savatga product qo‘shish",
+            "body": [
+                "productId",
+                "quantity",
+                "variantId"
+            ],
+            "auth": "user"
+        },
+        {
+            "endpoint": "PUT /api/cart/update",
+            "description": "Savatdagi mahsulot sonini o‘zgartirish",
+            "body": [
+                "productId",
+                "quantity",
+                "variantId"
+            ],
+            "auth": "user"
+        },
+        {
+            "endpoint": "DELETE /api/cart/remove/:productId",
+            "description": "Savatdan bitta productni o‘chirish",
+            "auth": "user"
+        },
+        {
+            "endpoint": "DELETE /api/cart/clear",
+            "description": "Savatni to'liq tozalash",
+            "auth": "user"
+        },
+        {
+            "endpoint": "POST /api/cart/apply-coupon",
+            "description": "Savatga promokod qo'llash va yangi narxni hisoblash",
+            "body": [
+                "code"
+            ],
+            "auth": "user"
+        }
+    ],
+    "wishlist": [
+        {
+            "endpoint": "GET /api/wishlist",
+            "description": "Saqlangan (yoqtirgan) mahsulotlarni olish",
+            "auth": "user"
+        },
+        {
+            "endpoint": "POST /api/wishlist/add",
+            "description": "Wishlistga qo‘shish",
+            "body": [
+                "productId"
+            ],
+            "auth": "user"
+        },
+        {
+            "endpoint": "DELETE /api/wishlist/remove/:productId",
+            "description": "Wishlistdan o‘chirish",
+            "auth": "user"
+        }
+    ],
+    "orders": [
+        {
+            "endpoint": "POST /api/orders",
+            "description": "Savatdagi narsalardan buyurtma yaratish",
+            "body": [
+                "shippingAddressId",
+                "paymentMethod",
+                "itemsPrice",
+                "shippingPrice",
+                "totalPrice"
+            ],
+            "auth": "user"
+        },
+        {
+            "endpoint": "GET /api/orders",
+            "description": "Userning o'z buyurtmalari tarixi",
+            "auth": "user"
+        },
+        {
+            "endpoint": "GET /api/orders/:id",
+            "description": "Bitta buyurtma tafsilotlari",
+            "auth": "user/admin"
+        },
+        {
+            "endpoint": "PUT /api/orders/:id/cancel",
+            "description": "Buyurtmani bekor qilish (faqat jo'natilmagan bo'lsa)",
+            "auth": "user"
+        },
+        {
+            "endpoint": "GET /api/admin/orders",
+            "description": "Barcha buyurtmalarni ko'rish (filter: status bo'yicha)",
+            "auth": "admin"
+        },
+        {
+            "endpoint": "PUT /api/orders/:id/status",
+            "description": "Order statusini o'zgartirish (Pending, Processing, Shipped, Delivered, Cancelled)",
+            "body": [
+                "status"
+            ],
+            "auth": "admin/delivery"
+        }
+    ],
+    "payments": [
+        {
+            "endpoint": "POST /api/payments/create-intent",
+            "description": "To'lov sessiyasini yaratish (Click/Payme/Uzum url yaratish)",
+            "body": [
+                "orderId",
+                "paymentMethod"
+            ],
+            "auth": "user"
+        },
+        {
+            "endpoint": "POST /api/payments/webhook",
+            "description": "To'lov tizimidan keladigan avtomatik javob (to'landi/bekor qilindi)",
+            "headers": [
+                "Webhook Signature"
+            ],
+            "response": "200 OK (Buyurtma statusi 'Paid' ga o'zgaradi)"
+        }
+    ],
+    "coupons": [
+        {
+            "endpoint": "GET /api/coupons",
+            "description": "Faol promokodlarni ko'rish",
+            "auth": "admin"
+        },
+        {
+            "endpoint": "POST /api/coupons",
+            "description": "Yangi promokod yaratish",
+            "body": [
+                "code",
+                "discountPercent",
+                "expirationDate",
+                "maxUses"
+            ],
+            "auth": "admin"
+        },
+        {
+            "endpoint": "DELETE /api/coupons/:id",
+            "description": "Promokodni o'chirish/kuchdan qoldirish",
+            "auth": "admin"
+        }
+    ],
+    "delivery": [
+        {
+            "endpoint": "GET /api/delivery/orders",
+            "description": "Kuryer uchun tayyorlangan va unga biriktirilgan orderlar",
+            "auth": "delivery"
+        },
+        {
+            "endpoint": "PUT /api/delivery/:id/status",
+            "description": "Kuryer order statusini 'Delivered' ga o'zgartirishi",
+            "body": [
+                "status",
+                "deliveryNotes"
+            ],
+            "auth": "delivery"
+        },
+        {
+            "endpoint": "GET /api/delivery/history",
+            "description": "Kuryerning yetkazib bergan barcha orderlari tarixi",
+            "auth": "delivery"
+        }
+    ],
+    "dashboard": [
+        {
+            "endpoint": "GET /api/admin/stats",
+            "description": "Admin panel uchun umumiy statistika (Grafiklar uchun)",
+            "query": [
+                "period (daily, weekly, monthly)"
+            ],
+            "response": {
+                "totalRevenue": "number",
+                "totalOrders": "number",
+                "newUsers": "number",
+                "salesChartData": "array",
+                "topProducts": "array"
+            },
+            "auth": "admin"
+        }
+    ],
+    "brands": [
+        {
+            "endpoint": "GET /api/brands",
+            "description": "Hamkor brendlar ro'yxatini olish (maksimal 14 ta brend)",
+            "response": "brands array"
+        },
+        {
+            "endpoint": "POST /api/brands",
+            "description": "Yangi brend logotipini qo'shish (MongoDB bazasiga)",
+            "body": [
+                "name",
+                "image"
+            ],
+            "auth": "admin"
+        },
+        {
+            "endpoint": "DELETE /api/brands?id=:id",
+            "description": "Brendni o'chirish (id orqali)",
+            "auth": "admin"
+        }
+    ],
+    "banners": [
+        {
+            "endpoint": "Firestore: banners",
+            "description": "Bosh sahifadagi asosiy va kichiq bannerlarni boshqarish",
+            "fields": [
+                "image",
+                "title",
+                "link",
+                "order"
+            ],
+            "auth": "admin"
+        }
+    ],
+    "currency": [
+        {
+            "endpoint": "Firestore: settings/currency",
+            "description": "Saytdagi USD/UZS kursini boshqarish (barcha narxlarga ta'sir qiladi)",
+            "fields": [
+                "rate",
+                "lastUpdated"
+            ],
+            "auth": "admin"
+        }
+    ],
+    "upload": [
+        {
+            "endpoint": "POST /api/upload",
+            "description": "Rasmlarni serverning /public/uploads papkasiga yuklash",
+            "body": "FormData: file",
+            "response": {
+                "success": true,
+                "url": "/uploads/filename.png"
+            },
+            "auth": "admin/user"
+        }
+    ]
+}

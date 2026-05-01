@@ -1,0 +1,21 @@
+{
+    "go_home": "Домой",
+    "cart": "Корзина",
+    "cart_empty": "Корзина пуста",
+    "go_shopping": "Начать покупки",
+  
+    "products": "ПРОДУКТЫ",
+    "product_count": "КОЛИЧЕСТВО ПРОДУКТОВ",
+    "product_price": "ЦЕНА",
+    "all": "ОБЩИЙ",
+  
+    "products_information": "Информация",
+    "all_products_count": "Общее количество продуктов",
+    "discount": "Скидка",
+    "delivery": "Доставка",
+    "status": "Бесплатно",
+    "total_price": "Итоговая цена",
+    "count": "шт.",
+    "go_order": "ОФОРМИТЬ ЗАКАЗ"
+  }
+  

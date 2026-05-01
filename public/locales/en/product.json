@@ -1,0 +1,10 @@
+{
+  "category": "Category",
+  "brand": "Brand",
+  "discount": "Discount",
+  "color": "Color",
+  "to_cart": "To Cart",
+  "buy": "Buy",
+  "technical_informations": "Technical Information",
+  "no_technical_informations": "No technical details available."
+}
