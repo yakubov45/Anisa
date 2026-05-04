@@ -71,6 +71,34 @@ export async function getPreBuiltSystems() {
 }
 
 export async function getPreBuiltById(id) {
+    if (!id) return null;
+
+    if (typeof window === "undefined") {
+        try {
+            const url = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/preBuiltSystems/${id}`;
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                console.error(`REST API error: ${response.status} for pre-built ${id}`);
+                return null;
+            }
+
+            const d = await response.json();
+            if (d && d.fields) {
+                const fields = d.fields;
+                const result = { id: d.name.split('/').pop() };
+                for (const key in fields) {
+                    const valueObj = fields[key];
+                    const typeKey = Object.keys(valueObj)[0];
+                    result[key] = typeKey === 'integerValue' || typeKey === 'doubleValue' ? Number(valueObj[typeKey]) : valueObj[typeKey];
+                }
+                return result;
+            }
+        } catch (error) {
+            console.error("Error in getPreBuiltById REST:", error?.message || error);
+        }
+    }
+
     try {
         const docRef = doc(db, "preBuiltSystems", id);
         const docSnap = await getDoc(docRef);
@@ -79,7 +107,7 @@ export async function getPreBuiltById(id) {
         }
         return null;
     } catch (error) {
-        console.error("Error fetching build by ID:", error.message);
+        console.error("Error fetching build by ID SDK:", error.message);
         return null;
     }
 }

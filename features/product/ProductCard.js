@@ -14,7 +14,7 @@ export default function ProductCard({ product, badge = null, rating = null }) {
 
     return (
         <>
-            <div className="bg-surface border border-border-alpha rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 p-2.5 md:p-5 flex flex-col h-full group relative overflow-hidden animate-slide-up">
+            <div className="product-card rounded-2xl p-2.5 md:p-5 flex flex-col h-full group relative overflow-hidden animate-slide-up">
 
                 {/* Precision Badge */}
                 <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
