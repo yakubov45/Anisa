@@ -88,7 +88,7 @@ export default function DiscountBanner() {
     if (isExpired || products.length === 0) return null;
 
     return (
-        <section className="relative overflow-hidden rounded-[3rem] bg-[#0A0A0B] border border-white/5 shadow-2xl shadow-primary/10 mx-4 md:mx-8 animate-fade-in">
+        <section className="relative overflow-hidden rounded-3xl md:rounded-[3rem] bg-[#0A0A0B] border border-white/5 shadow-2xl shadow-primary/10 mx-4 md:mx-8 animate-fade-in">
             {/* Background Gradients */}
             <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent opacity-50" />
             <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-primary/10 rounded-full blur-[100px]" />
@@ -108,7 +108,7 @@ export default function DiscountBanner() {
                     </div>
 
                     {/* Countdown Timer */}
-                    <div className="flex items-center gap-6 bg-white/5 p-6 rounded-[2rem] border border-white/10 backdrop-blur-md">
+                    <div className="flex items-center gap-4 md:gap-6 bg-white/5 p-4 md:p-6 rounded-2xl md:rounded-[2rem] border border-white/10 backdrop-blur-md">
                         <div className="flex flex-col items-center">
                             <span className="text-3xl font-black text-white tabular-nums">{timeLeft.h.toString().padStart(2, '0')}</span>
                             <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest mt-1">Hours</span>

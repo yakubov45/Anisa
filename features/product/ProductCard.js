@@ -3,18 +3,22 @@
 import Image from "next/image"
 import Link from "next/link"
 import useStore from "@/store/useStore"
+import useUIStore from "@/store/useUIStore"
 import { useState } from "react"
 import QuickView from "./QuickView"
 import PriceDisplay from "@/components/common/PriceDisplay"
+import { useTranslation } from "@/lib/LanguageContext"
 
 export default function ProductCard({ product, badge = null, rating = null }) {
     const { addToCart, wishlist, toggleWishlist } = useStore();
+    const { addToast, triggerCartAnimation } = useUIStore();
+    const { t } = useTranslation();
     const isFavorite = wishlist.some(item => item.id === product.id);
     const [isQuickViewOpen, setIsQuickViewOpen] = useState(false)
 
     return (
         <>
-            <div className="product-card rounded-2xl p-2.5 md:p-5 flex flex-col h-full group relative overflow-hidden animate-slide-up">
+            <div className="product-card rounded-2xl p-2 md:p-5 flex flex-col h-full group relative overflow-hidden animate-slide-up bg-surface/50 border border-border-alpha hover:border-primary/50 transition-colors">
 
                 {/* Precision Badge */}
                 <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
@@ -29,8 +33,8 @@ export default function ProductCard({ product, badge = null, rating = null }) {
                     ) : null}
                 </div>
 
-                {/* IMAGE */}
-                <div className="block relative overflow-hidden rounded-xl bg-surface-50 flex-1 min-h-[140px] md:min-h-[220px]">
+                {/* IMAGE - Balandligi oshirildi */}
+                <div className="block relative overflow-hidden rounded-xl bg-surface-50 flex-1 min-h-[160px] md:min-h-[220px]">
                     <Image
                         src={product.image || "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=500&auto=format&fit=crop&q=80"}
                         alt={product.name}
@@ -44,7 +48,7 @@ export default function ProductCard({ product, badge = null, rating = null }) {
                             onClick={() => setIsQuickViewOpen(true)}
                             className="bg-surface text-foreground font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] px-4 md:px-8 py-3 md:py-4 rounded-xl shadow-2xl hover:bg-primary hover:text-white transition-all active:scale-95 border border-border-alpha"
                         >
-                            Quick View
+                            {t('quick_view')}
                         </button>
                         <button
                             onClick={(e) => { e.preventDefault(); toggleWishlist(product); }}
@@ -57,31 +61,34 @@ export default function ProductCard({ product, badge = null, rating = null }) {
                     </div>
                 </div>
 
-                <div className="mt-3 md:mt-6 flex flex-col gap-1.5 md:gap-3">
+                <div className="mt-3 md:mt-6 flex flex-col gap-2 md:gap-4">
+                    {/* Qator 1: Brand va Reyting */}
                     <div className="flex items-center justify-between">
                         <span className="text-[7px] md:text-[9px] font-black text-surface-500 uppercase tracking-[0.3em] font-mono">{product.brand || 'Brand'}</span>
-                        <div className="flex items-center gap-2">
-                            {(rating || product.rating) && (
-                                <div className="flex text-yellow-500 text-[8px] gap-0.5">
-                                    {[...Array(5)].map((_, i) => (
-                                        <span key={i}>{i < (rating || product.rating) ? '★' : '☆'}</span>
-                                    ))}
-                                </div>
-                            )}
-                            <div className="flex items-center gap-1">
-                                <span className={`w-1 h-1 md:w-1.5 md:h-1.5 rounded-full ${product.stock > 0 ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-                                <span className={`text-[8px] md:text-[9px] font-black uppercase tracking-widest ${product.stock > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                    {product.stock > 0 ? `Available` : 'Out of Stock'}
-                                </span>
+                        {(rating || product.rating) && (
+                            <div className="flex text-yellow-500 text-[8px] gap-0.5">
+                                {[...Array(5)].map((_, i) => (
+                                    <span key={i}>{i < (rating || product.rating) ? '★' : '☆'}</span>
+                                ))}
                             </div>
-                        </div>
+                        )}
                     </div>
+
+                    {/* Qator 2: Stock Status */}
+                    <div className="flex items-center gap-1.5">
+                        <span className={`w-1 h-1 md:w-1.5 md:h-1.5 rounded-full ${product.stock > 0 ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                        <span className={`text-[8px] md:text-[9px] font-black uppercase tracking-widest ${product.stock > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                            {product.stock > 0 ? `${product.stock} ${t('stock')}` : t('out_of_stock')}
+                        </span>
+                    </div>
+
+                    {/* Qator 3: Product Name */}
                     <Link href={`/products/${product.id}`}>
-                        <h3 className="font-extrabold text-foreground text-xs md:text-lg tracking-tight group-hover:text-primary transition-colors line-clamp-1 uppercase">{product.name}</h3>
+                        <h3 className="font-extrabold text-foreground text-[10px] md:text-lg tracking-tight group-hover:text-primary transition-colors line-clamp-2 uppercase leading-tight">{product.name}</h3>
                     </Link>
                     
-                    {/* Price Section */}
-                    <div className="flex items-baseline gap-2">
+                    {/* Qator 4: Price Section */}
+                    <div className="flex flex-col gap-0.5">
                         {product.discount && (
                             <PriceDisplay 
                                 price={product.price / (1 - product.discount / 100)} 
@@ -90,19 +97,25 @@ export default function ProductCard({ product, badge = null, rating = null }) {
                         )}
                         <PriceDisplay 
                             price={product.price} 
-                            className="font-black text-sm md:text-xl text-foreground tracking-tight" 
+                            className="font-black text-xs md:text-xl text-foreground tracking-tight" 
                         />
                     </div>
 
+                    {/* Qator 5: Buttons */}
                     <div className="flex gap-2 pt-1 md:pt-2">
-                        <Link href={`/products/${product.id}`} className="flex-1 h-9 md:h-14 border border-border-alpha hover:border-primary/50 text-surface-500 hover:text-primary font-black text-[8px] md:text-[10px] uppercase tracking-widest rounded-lg md:rounded-xl bg-surface-50 flex items-center justify-center transition-all active:scale-95">
-                            Details
+                        <Link href={`/products/${product.id}`} className="flex-1 h-9 md:h-14 border border-border-alpha hover:border-primary/50 text-surface-500 hover:text-primary font-black text-[9px] md:text-[10px] uppercase tracking-widest rounded-lg md:rounded-xl bg-surface-50 flex items-center justify-center transition-all active:scale-95">
+                            {t('details')}
                         </Link>
                         <button
-                            onClick={(e) => { e.preventDefault(); addToCart(product); }}
+                            onClick={(e) => { 
+                                e.preventDefault(); 
+                                addToCart(product);
+                                triggerCartAnimation();
+                                addToast(`${product.name} SAVATCHAGA QO'SHILDI`);
+                            }}
                             className="flex-[2] h-9 md:h-14 bg-foreground text-background font-black text-[8px] md:text-[10px] uppercase tracking-widest rounded-lg md:rounded-xl hover:bg-primary hover:text-white transition-all active:scale-95 shadow-lg"
                         >
-                            Buy Now
+                            {t('buy_now')}
                         </button>
                     </div>
                 </div>

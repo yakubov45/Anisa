@@ -10,14 +10,22 @@ import BuilderGuide from "@/features/builder/BuilderGuide"
 import AutoBuilder from "@/features/builder/AutoBuilder"
 
 const COMPONENT_STRUCTURE = [
-    { id: 'cpu', title: 'Central Processing Unit', category: 'Processors' },
-    { id: 'motherboard', title: 'Motherboard', category: 'Motherboards' },
-    { id: 'ram', title: 'Memory (RAM)', category: 'Memory' },
-    { id: 'gpu', title: 'Graphics Card', category: 'Graphics' },
-    { id: 'storage', title: 'Storage (SSD/HDD)', category: 'Storage' },
-    { id: 'psu', title: 'Power Supply', category: 'PSUs' },
-    { id: 'case', title: 'Chassis (Case)', category: 'Cases' },
-    { id: 'cooling', title: 'Thermal Solution', category: 'Cooling' },
+    // Core Components
+    { id: 'cpu', title: 'Central Processing Unit', category: 'Processors', section: 'Core' },
+    { id: 'motherboard', title: 'Motherboard', category: 'Motherboards', section: 'Core' },
+    { id: 'ram', title: 'Memory (RAM)', category: 'Memory', section: 'Core' },
+    { id: 'gpu', title: 'Graphics Card', category: 'Graphics', section: 'Core' },
+    { id: 'storage', title: 'Storage (SSD/HDD)', category: 'Storage', section: 'Core' },
+    { id: 'psu', title: 'Power Supply', category: 'PSUs', section: 'Core' },
+    { id: 'case', title: 'Chassis (Case)', category: 'Cases', section: 'Core' },
+    { id: 'cooling', title: 'Thermal Solution', category: 'Cooling', section: 'Core' },
+    // Peripherals & Furniture
+    { id: 'monitor', title: 'Monitor / Screen', category: 'Monitors', section: 'Setup' },
+    { id: 'keyboard', title: 'Mechanical Keyboard', category: 'Klaviaturalar', section: 'Setup' },
+    { id: 'mouse', title: 'Gaming Mouse', category: 'Sichqonchalar', section: 'Setup' },
+    { id: 'headphones', title: 'Audio / Headset', category: 'Quloqchinlar', section: 'Setup' },
+    { id: 'chair', title: 'Gaming Chair', category: 'Chairs', section: 'Setup' },
+    { id: 'desk', title: 'Pro Gaming Desk', category: 'Desks', section: 'Setup' },
 ]
 
 export default function PCBuilderPage() {
@@ -34,7 +42,7 @@ export default function PCBuilderPage() {
     }
 
     return (
-        <div className="space-y-20 animate-fade-in pb-20 pt-32">
+        <div className="space-y-12 md:space-y-20 animate-fade-in pb-20 md:pt-8 px-4 sm:px-0">
             {/* Featured Section */}
             <ReadyBuilds />
 
@@ -54,17 +62,17 @@ export default function PCBuilderPage() {
             <AutoBuilder />
 
             {/* Main Builder Area */}
-            <div className="flex flex-col lg:flex-row gap-12 relative items-start">
+            <div className="flex flex-col lg:flex-row gap-8 md:gap-12 relative items-start">
                 {/* Left: Components Selection */}
-                <div className="flex-1 space-y-6">
+                <div className="flex-1 space-y-4 md:space-y-6 w-full">
                     <div className="flex items-center justify-between border-b border-border-alpha pb-4">
                         <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.4em]">Component Selection</h3>
                         <span className="text-[9px] font-mono text-surface-400">VERSION 1.0.4 STABLE</span>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 gap-4">
                         {COMPONENT_STRUCTURE.map(slot => (
-                            <ComponentSlot 
+                            <ComponentSlot
                                 key={slot.id}
                                 category={slot.id}
                                 title={slot.title}
@@ -86,7 +94,7 @@ export default function PCBuilderPage() {
             <BuilderGuide />
 
             {/* Picker Modal */}
-            <ComponentPickerModal 
+            <ComponentPickerModal
                 isOpen={pickerState.isOpen}
                 onClose={() => setPickerState({ ...pickerState, isOpen: false })}
                 category={pickerState.category}

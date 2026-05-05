@@ -70,7 +70,11 @@ export default function CheckoutPage() {
         const result = await createOrderAction(orderPayload, cart);
 
         if (result.success) {
-            clearCart();
+            // Force clear cart before redirect to prevent hydration issues
+            clearCart(); 
+            if (typeof window !== 'undefined') {
+                localStorage.removeItem('onepc-storage'); // Final safety purge
+            }
             router.push("/checkout/success");
         } else {
             setError(result.error || "Failed to process order. Please try again.");

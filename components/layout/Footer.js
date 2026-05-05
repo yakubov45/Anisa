@@ -1,8 +1,15 @@
 "use client"
 
 import { useState, useEffect } from "react";
+import { subscriptionService } from "@/lib/services/subscription.service";
+import useUIStore from "@/store/useUIStore";
+import { useTranslation } from "@/lib/LanguageContext";
 
 export default function Footer() {
+    const { t, lang } = useTranslation();
+    const [email, setEmail] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { addToast } = useUIStore();
     const [counts, setCounts] = useState({
         youtube: 4250,
         telegram: 12800,
@@ -49,6 +56,28 @@ export default function Footer() {
         }
     ];
 
+    const handleSubscribe = async (e) => {
+        if (e) e.preventDefault();
+        if (isSubmitting) return;
+
+        setIsSubmitting(true);
+        try {
+            await subscriptionService.subscribe(email);
+            addToast("IDENTITY SYNCHRONIZED SUCCESSFULLY!");
+            setEmail("");
+        } catch (error) {
+            addToast(error.message.toUpperCase(), "error");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const getLangLabel = () => {
+        if (lang === 'uz') return "O'zbekcha";
+        if (lang === 'ru') return "Русский";
+        return "English";
+    };
+
     return (
         <footer className="mt-auto bg-[#111113] border-t border-white/5 relative overflow-hidden">
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03]" />
@@ -59,15 +88,15 @@ export default function Footer() {
                     <div className="col-span-2 md:col-span-1 space-y-4">
                         <div className="flex flex-col gap-1">
                             <img src="/icons/footer-logo.svg" alt="OnePC" className="h-7 md:h-7 w-auto brightness-0 invert" />
-                            <span className="text-xs md:text-[11px] font-black text-zinc-500 uppercase tracking-[0.4em] leading-none mt-2 md:mt-1">High-Precision Hardware</span>
+                            <span className="text-xs md:text-[11px] font-black text-zinc-500 uppercase tracking-[0.4em] leading-none mt-2 md:mt-1">{t('footer_tagline')}</span>
                         </div>
                         <p className="text-zinc-400 text-sm md:text-xs font-medium leading-relaxed max-w-xs opacity-70">
-                            Architecting the world's most reliable hardware ecosystem for elite performance and critical workstation reliability.
+                            {t('footer_desc')}
                         </p>
                     </div>
 
                     <div className="col-span-1 space-y-4">
-                        <h4 className="text-xs md:text-[11px] font-black text-white uppercase tracking-[0.4em]">Resource Group</h4>
+                        <h4 className="text-xs md:text-[11px] font-black text-white uppercase tracking-[0.4em]">{t('footer_resources')}</h4>
                         <ul className="space-y-4 md:space-y-3">
                             {[
                                 { name: 'Product Map', url: '/support' },
@@ -83,14 +112,14 @@ export default function Footer() {
                     </div>
 
                     <div className="col-span-1 space-y-4">
-                        <h4 className="text-xs md:text-[11px] font-black text-white uppercase tracking-[0.4em]">Corporate Info</h4>
+                        <h4 className="text-xs md:text-[11px] font-black text-white uppercase tracking-[0.4em]">{t('footer_deployments')}</h4>
                         <ul className="space-y-4 md:space-y-3">
                             {[
                                 { name: 'Registry', url: '/legal' },
                                 { name: 'Privacy Protocol', url: '/legal' },
                                 { name: 'Operational Terms', url: '/legal' },
                                 { name: 'Security Audit', url: '/legal' },
-                                { name: 'About Us', url: '/about' }
+                                { name: t('nav_about'), url: '/about' }
                             ].map(item => (
                                 <li key={item.name}>
                                     <a href={item.url} className="text-zinc-500 text-xs md:text-[11px] font-black uppercase tracking-widest hover:text-primary transition-colors">{item.name}</a>
@@ -100,20 +129,27 @@ export default function Footer() {
                     </div>
 
                     <div className="col-span-2 md:col-span-1 space-y-6">
-                        <div className="space-y-3">
+                        <form onSubmit={handleSubscribe} className="space-y-3">
                             <h4 className="text-xs md:text-[11px] font-black text-white uppercase tracking-[0.4em]">Broadcast System</h4>
-                            <p className="text-zinc-400 text-[11px] md:text-[10px] leading-relaxed font-bold uppercase tracking-widest">Subscribe for hardware drops</p>
+                            <p className="text-zinc-400 text-[11px] md:text-[10px] leading-relaxed font-bold uppercase tracking-widest">{t('footer_subscribe_text')}</p>
                             <div className="relative group">
                                 <input
                                     type="email"
-                                    placeholder="IDENTITY@DOMAIN.COM"
-                                    className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-4 md:py-3 text-xs md:text-[11px] font-mono tracking-widest focus:ring-1 focus:ring-primary/40 transition-all text-white placeholder:text-zinc-600"
+                                    required
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder={t('newsletter_placeholder')}
+                                    className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-4 md:py-3 text-xs md:text-[11px] font-mono tracking-widest focus:ring-1 focus:ring-primary/40 transition-all text-white placeholder:text-zinc-600 outline-none"
                                 />
-                                <button className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-primary text-white text-[10px] md:text-[9px] font-black px-4 py-2 md:px-3 md:py-1.5 rounded-lg hover:bg-white hover:text-black transition-all uppercase tracking-widest">
-                                    SYNC
+                                <button 
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-primary text-white text-[10px] md:text-[9px] font-black px-4 py-2 md:px-3 md:py-1.5 rounded-lg hover:bg-white hover:text-black transition-all uppercase tracking-widest disabled:opacity-50"
+                                >
+                                    {isSubmitting ? '...' : 'SYNC'}
                                 </button>
                             </div>
-                        </div>
+                        </form>
 
                         <div className="space-y-4 pt-2">
                             <div className="flex flex-wrap items-center gap-6 md:gap-5 opacity-80">
@@ -136,7 +172,7 @@ export default function Footer() {
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-[11px] md:text-[10px] font-black text-white uppercase tracking-[0.3em] leading-none mb-2">{platform.name}</span>
-                                    <div className="flex items-center gap-2">
+                                    <div className="items-center gap-2 hidden sm:flex">
                                         <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
                                         <span className="text-[13px] md:text-[12px] font-mono text-zinc-500 font-bold tracking-tight">{platform.count.toLocaleString()} SUBS</span>
                                     </div>
@@ -148,10 +184,10 @@ export default function Footer() {
 
                 <div className="mt-10 md:mt-8 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
                     <p className="text-zinc-600 text-[11px] md:text-[10px] font-black uppercase tracking-[0.4em]">
-                        &copy; 2026 ONEPC ENTERPRISE. ALL RIGHTS RESERVED.
+                        &copy; 2026 ONEPC ENTERPRISE. {t('footer_rights')}
                     </p>
                     <div className="flex gap-8 md:gap-6">
-                        <span className="text-zinc-600 text-[11px] md:text-[10px] font-black uppercase tracking-[0.4em] opacity-40">English</span>
+                        <span className="text-zinc-600 text-[11px] md:text-[10px] font-black uppercase tracking-[0.4em] opacity-40">{getLangLabel()}</span>
                         <span className="text-zinc-600 text-[11px] md:text-[10px] font-black uppercase tracking-[0.4em] opacity-40">UTC +5:00</span>
                     </div>
                 </div>

@@ -9,20 +9,19 @@ import HeroSlider from "@/components/home/HeroSlider"
 import DiscountBanner from "@/components/home/DiscountBanner"
 import { bannerService } from "@/lib/services/banner.service"
 import PromotionSlider from "@/components/home/PromotionSlider"
+import SectionHeading from "@/components/common/SectionHeading"
 
-export const revalidate = 3600 // Cache for 1 hour to protect Firestore from high traffic
+export const revalidate = 3600
 
 export default async function HomePage() {
     const allProducts = await getProducts()
     const banners = await bannerService.getBanners()
     
-    // Select different sets for variety
     const hotProducts = allProducts.slice(0, 12)
     const topSelling = allProducts.slice(12, 20)
-    const discountProducts = allProducts.slice(5, 15) // Select items for flash deals
 
     return (
-        <div className="space-y-20 animate-fade-in pb-20 pt-10">
+        <div className="space-y-12 md:space-y-20 animate-fade-in pb-20 md:pt-10 px-4 sm:px-0">
 
             {/* 1. HERO SLIDER */}
             <HeroSlider initialSlides={banners.filter(b => b.type !== "promo").length > 0 ? banners.filter(b => b.type !== "promo") : undefined} />
@@ -30,12 +29,9 @@ export default async function HomePage() {
             {/* 2. CATEGORIES */}
             <CategoryGrid />
 
-            {/* 3. HOT DEPLOYMENT */}
+            {/* 3. HOT DEPLOYMENT -> NEW ARRIVALS */}
             <section className="space-y-10">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-1 bg-primary rounded-full" />
-                    <h2 className="text-3xl font-black text-foreground uppercase tracking-tighter">Hot Deployment</h2>
-                </div>
+                <SectionHeading titleKey="new_arrivals" />
                 <ProductGrid products={hotProducts} badge="Hot" />
             </section>
 
@@ -44,12 +40,9 @@ export default async function HomePage() {
                 <PromotionSlider slides={banners.filter(b => b.type === "promo")} />
             )}
 
-            {/* 4. TOP SELLING */}
+            {/* 4. TOP SELLING -> BEST SELLERS */}
             <section className="space-y-10">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-1 bg-primary rounded-full" />
-                    <h2 className="text-3xl font-black text-foreground uppercase tracking-tighter">Top Selling</h2>
-                </div>
+                <SectionHeading titleKey="best_sellers" />
                 <ProductGrid products={topSelling} badge="Bestseller" rating={5} />
             </section>
 

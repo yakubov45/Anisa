@@ -13,7 +13,16 @@ const useBuildStore = create(
                 psu: null,
                 case: null,
                 cooling: null,
+                // Peripherals & Furniture
+                monitor: null,
+                mouse: null,
+                keyboard: null,
+                headphones: null,
+                chair: null,
+                desk: null,
             },
+            buildMode: 'case_only', // 'case_only' or 'full_set'
+            setBuildMode: (mode) => set({ buildMode: mode }),
             
             setPart: (category, part) => set((state) => ({
                 selectedParts: {
@@ -39,6 +48,12 @@ const useBuildStore = create(
                     psu: null,
                     case: null,
                     cooling: null,
+                    monitor: null,
+                    mouse: null,
+                    keyboard: null,
+                    headphones: null,
+                    chair: null,
+                    desk: null,
                 }
             }),
 
@@ -108,87 +123,86 @@ const useBuildStore = create(
                 return issues
             },
 
-            autoConfigureBuild: (allProducts, purpose, tier) => {
-                const parts = {}
-                const idMap = {
-                    'Processors': 'cpu', 'Motherboards': 'motherboard', 'Memory': 'ram',
-                    'Graphics': 'gpu', 'PSUs': 'psu', 'Cases': 'case',
-                    'Storage': 'storage', 'Cooling': 'cooling'
+            autoConfigureBuild: (allProducts, purpose, tier, mode = 'case_only') => {
+                const parts = {
+                    cpu: null, motherboard: null, ram: null, gpu: null,
+                    storage: null, psu: null, case: null, cooling: null,
+                    monitor: null, mouse: null, keyboard: null, headphones: null, chair: null, desk: null
                 }
 
-                // Tier-based budget targets
+                // Tier-based budget targets (Optimized for UZS/USD reality)
                 const budgetMap = {
-                    entry: { min: 0, max: 800 },
-                    mid: { min: 800, max: 1800 },
-                    ultra: { min: 1800, max: 10000 }
+                    gaming: { entry: 500, mid: 1200, ultra: 3500 },
+                    creator: { entry: 600, mid: 1500, ultra: 4500 },
+                    office: { entry: 300, mid: 600, ultra: 1000 }
                 }
-                const targetBudget = budgetMap[tier]
+                
+                let targetPrice = budgetMap[purpose][tier]
+                if (mode === 'full_set') targetPrice = targetPrice * 1.5 
+                
+                // Helper to find parts within a specific price bracket
+                const findPart = (category, weight, constraints = {}) => {
+                    const priceLimit = targetPrice * weight
+                    let filtered = allProducts.filter(p => p.category?.toLowerCase() === category.toLowerCase())
+                    
+                    // 1. Apply strict compatibility constraints
+                    Object.entries(constraints).forEach(([key, value]) => {
+                        if (value) {
+                            filtered = filtered.filter(p => {
+                                const pVal = p[key]?.toString().toLowerCase().trim()
+                                const cVal = value.toString().toLowerCase().trim()
+                                return pVal === cVal
+                            })
+                        }
+                    })
 
-                const findBestPart = (category, preference = 'balanced') => {
-                    let filtered = allProducts.filter(p => p.category === category)
-                    if (filtered.length === 0) return null
+                    if (filtered.length === 0) {
+                        filtered = allProducts.filter(p => p.category?.toLowerCase() === category.toLowerCase())
+                    }
 
-                    // Sort by price and performance bias
+                    // 2. Sort Logic: Entry tier always picks the CHEAPEST compatible part.
+                    // Mid and Ultra tiers try to match the budget weight.
                     return filtered.sort((a, b) => {
-                        const priceA = a.price || 0
-                        const priceB = b.price || 0
+                        if (tier === 'entry') return a.price - b.price;
                         
-                        if (tier === 'ultra') return priceB - priceA
-                        if (tier === 'entry') return priceA - priceB
-                        
-                        // Mid tier: try to find something in the middle
-                        return Math.abs(priceA - 150) - Math.abs(priceB - 150)
+                        const diffA = Math.abs(a.price - priceLimit)
+                        const diffB = Math.abs(b.price - priceLimit)
+                        return diffA - diffB
                     })[0]
                 }
 
-                // Purpose specific logic overrides
-                const cpu = findBestPart('Processors')
-                const gpu = purpose === 'office' ? null : findBestPart('Graphics')
-                const ram = findBestPart('Memory')
-                const mb = findBestPart('Motherboards')
-                const storage = findBestPart('Storage')
-                const psu = findBestPart('PSUs')
-                const pcCase = findBestPart('Cases')
-                const cooling = findBestPart('Cooling')
-
-                // Applied logic per purpose
-                if (purpose === 'gaming') {
-                    // Gaming prioritizes GPU
-                    parts.gpu = allProducts.filter(p => p.category === 'Graphics').sort((a,b) => b.price - a.price)[tier === 'ultra' ? 0 : tier === 'mid' ? 1 : 2]
-                    parts.cpu = cpu
-                    parts.ram = ram
-                } else if (purpose === 'creator') {
-                    // Creator prioritizes CPU and RAM
-                    parts.cpu = allProducts.filter(p => p.category === 'Processors').sort((a,b) => b.price - a.price)[tier === 'ultra' ? 0 : tier === 'mid' ? 1 : 2]
-                    parts.ram = allProducts.filter(p => p.category === 'Memory').sort((a,b) => b.price - a.price)[tier === 'ultra' ? 0 : tier === 'mid' ? 1 : 2]
-                    parts.gpu = gpu
-                } else {
-                    // Office prioritizes stability and value
-                    parts.cpu = allProducts.filter(p => p.category === 'Processors').sort((a,b) => a.price - b.price)[tier === 'ultra' ? 2 : tier === 'mid' ? 1 : 0]
-                    parts.gpu = null // Use integrated graphics
+                // 1. Core Components
+                parts.cpu = findPart('Processors', purpose === 'creator' ? 0.2 : 0.15)
+                parts.motherboard = findPart('Motherboards', 0.1, { socket: parts.cpu?.socket })
+                parts.ram = findPart('Memory', 0.08, { ddr: parts.motherboard?.ddr })
+                if (purpose !== 'office') {
+                    parts.gpu = findPart('Graphics', purpose === 'gaming' ? 0.35 : 0.2)
                 }
+                parts.storage = findPart('Storage', 0.06)
+                
+                const mbForm = parts.motherboard?.formFactor || 'ATX'
+                parts.case = allProducts.filter(p => p.category?.toLowerCase() === 'cases').sort((a,b) => a.price - b.price).find(p => {
+                    const formFactorScores = { 'ATX': 3, 'mATX': 2, 'ITX': 1 }
+                    return formFactorScores[p.maxFormFactor] >= formFactorScores[mbForm]
+                }) || findPart('Cases', 0.05)
 
-                parts.motherboard = mb
-                parts.storage = storage
-                parts.psu = psu
-                parts.case = pcCase
-                parts.cooling = cooling
+                const estWattage = (parts.cpu?.tdp || 100) + (parts.gpu?.tdp || 250) + 150
+                parts.psu = allProducts.filter(p => p.category?.toLowerCase() === 'psus' && p.wattage >= estWattage).sort((a,b) => a.price - b.price)[0] || findPart('PSUs', 0.05)
+                parts.cooling = findPart('Cooling', 0.04)
+
+                // 2. Peripherals (only if full_set)
+                if (mode === 'full_set') {
+                    parts.monitor = findPart('Monitors', 0.15)
+                    parts.keyboard = findPart('Klaviaturalar', 0.05)
+                    parts.mouse = findPart('Sichqonchalar', 0.04)
+                    parts.headphones = findPart('Quloqchinlar', 0.05)
+                    parts.chair = findPart('Chairs', 0.08)
+                    parts.desk = findPart('Desks', 0.08)
+                }
 
                 set({ selectedParts: parts })
             },
 
-            resetBuild: () => set({
-                selectedParts: {
-                    cpu: null,
-                    motherboard: null,
-                    ram: null,
-                    gpu: null,
-                    storage: null,
-                    psu: null,
-                    case: null,
-                    cooling: null,
-                }
-            })
         }),
         {
             name: 'onepc-build-storage',

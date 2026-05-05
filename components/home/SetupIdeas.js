@@ -1,38 +1,43 @@
-import Link from 'next/link';
+"use client";
 
-const setups = [
-    { 
-        name: "Pro Gaming Setup", 
-        price: 1250, 
-        image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=800&q=80",
-        items: "RTX 4070 SUPER + i7-14700K + 240Hz Pro Monitor", 
-        badge: "ESPORTS READY"
-    },
-    { 
-        name: "Studio Workstation", 
-        price: 950, 
-        image: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=800&q=80",
-        items: "32GB RAM + 2TB NVMe + 4K Color Accurate Display", 
-        badge: "CREATIVE PRO"
-    },
-    { 
-        name: "Elite Streamer Pack", 
-        price: 1800, 
-        image: "https://images.unsplash.com/photo-1614018424563-29f1bb346b94?w=800&q=80",
-        items: "Dual PC Setup + Capture Card + RGB Environment", 
-        badge: "CREATOR ELITE"
-    },
-];
+import Link from 'next/link';
+import { useTranslation } from "@/lib/LanguageContext";
 
 export default function SetupIdeas() {
+    const { t } = useTranslation();
+
+    const setups = [
+        { 
+            name: t('setup_gaming_name'), 
+            price: 1250, 
+            image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=800&q=80",
+            items: t('setup_gaming_items'), 
+            badge: "ESPORTS READY"
+        },
+        { 
+            name: t('setup_studio_name'), 
+            price: 950, 
+            image: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=800&q=80",
+            items: t('setup_studio_items'), 
+            badge: "CREATIVE PRO"
+        },
+        { 
+            name: t('setup_streamer_name'), 
+            price: 1800, 
+            image: "https://images.unsplash.com/photo-1614018424563-29f1bb346b94?w=800&q=80",
+            items: t('setup_streamer_items'), 
+            badge: "CREATOR ELITE"
+        },
+    ];
+
     return (
         <section className="space-y-12">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-1 bg-primary rounded-full" />
-                    <h2 className="text-3xl font-black text-foreground uppercase tracking-tighter">Setup Ideas</h2>
+                    <h2 className="text-3xl font-black text-foreground uppercase tracking-tighter">{t('setup_ideas_title')}</h2>
                 </div>
-                <Link href="/pc-builder" className="text-[10px] font-black text-primary uppercase tracking-widest hover:text-white transition-colors">Start Custom Build</Link>
+                <Link href="/pc-builder" className="text-[10px] font-black text-primary uppercase tracking-widest hover:text-white transition-colors">{t('setup_custom_build')}</Link>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
@@ -59,7 +64,7 @@ export default function SetupIdeas() {
                             </div>
                             <div className="flex gap-4 mt-auto">
                                 <Link href="/pc-builder" className="flex-1 bg-primary text-white text-center py-5 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-foreground hover:text-background transition-all shadow-xl shadow-primary/20">
-                                    Aquire Setup
+                                    {t('acquire_setup')}
                                 </Link>
                                 <button className="w-16 h-16 flex items-center justify-center border border-border-alpha rounded-2xl hover:bg-surface-100 transition-all text-foreground">
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>

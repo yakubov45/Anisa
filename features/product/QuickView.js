@@ -3,9 +3,13 @@
 import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
 import useStore from "@/store/useStore";
+import useUIStore from "@/store/useUIStore";
+import { useTranslation } from "@/lib/LanguageContext";
 
 export default function QuickView({ product, isOpen, onClose }) {
+    const { t } = useTranslation();
     const addToCart = useStore(state => state.addToCart);
+    const { addToast, triggerCartAnimation } = useUIStore();
 
     if (!isOpen) return null;
 
@@ -38,7 +42,7 @@ export default function QuickView({ product, isOpen, onClose }) {
                     <div className="space-y-4 md:space-y-6">
                         <div className="flex items-center gap-4">
                             <span className="text-[9px] md:text-[10px] font-black text-primary bg-primary/10 border border-primary/20 px-3 py-1 md:px-4 md:py-1.5 rounded-lg uppercase tracking-[0.3em]">
-                                Product Info
+                                {t('quick_view')}
                             </span>
                             <span className="text-[9px] md:text-[10px] text-surface-500 font-bold uppercase tracking-[0.2em] font-mono">ID: {product.id.slice(-8).toUpperCase()}</span>
                         </div>
@@ -52,19 +56,26 @@ export default function QuickView({ product, isOpen, onClose }) {
                             <span className="text-3xl md:text-5xl font-black text-foreground tracking-tighter">${product.price}</span>
                         </div>
                         <div className="flex-1 hidden sm:block">
-                            <div className="text-[8px] md:text-[10px] font-black text-green-500 uppercase tracking-widest mb-2">Available</div>
+                            <div className="text-[8px] md:text-[10px] font-black text-green-500 uppercase tracking-widest mb-2">
+                                {product.stock > 0 ? t('stock') : t('out_of_stock')}
+                            </div>
                             <div className="w-full h-1 bg-surface-100 dark:bg-surface-700 rounded-full overflow-hidden">
-                                <div className="w-4/5 h-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+                                <div className={`h-full ${product.stock > 0 ? 'w-4/5 bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]' : 'w-0 bg-red-500'}`} />
                             </div>
                         </div>
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-4 md:gap-6 pt-2 md:pt-4">
                         <button
-                            onClick={() => { addToCart(product); onClose(); }}
+                            onClick={() => { 
+                                addToCart(product); 
+                                triggerCartAnimation();
+                                addToast(`${product.name} SAVATCHAGA QO'SHILDI`);
+                                onClose(); 
+                            }}
                             className="flex-1 bg-foreground dark:bg-white text-background dark:text-black font-black py-4 md:py-6 rounded-xl shadow-2xl hover:bg-primary dark:hover:bg-primary hover:text-white transition-all uppercase text-[10px] md:text-xs tracking-widest active:scale-95"
                         >
-                            Buy Now
+                            {t('buy_now')}
                         </button>
                         <button className="hidden sm:flex px-8 md:px-10 py-4 md:py-0 border border-surface-200 dark:border-white/10 rounded-xl items-center justify-center hover:bg-surface-50 dark:hover:bg-white/5 transition-all text-foreground dark:text-white">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>

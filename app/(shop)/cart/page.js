@@ -8,12 +8,19 @@ import Link from "next/link";
 export default function CartPage() {
     const { cart, removeFromCart, updateQuantity } = useStore();
     const { t } = useTranslation();
-    const subtotal = cart?.reduce((acc, item) => acc + item.price * (item.quantity || 1), 0) || 0;
+    
+    const calculateItemTotal = (item) => {
+        const price = Number(item.price) || 0;
+        const quantity = Number(item.quantity) || 1;
+        return price * quantity;
+    };
+
+    const subtotal = cart?.reduce((acc, item) => acc + calculateItemTotal(item), 0) || 0;
 
     if (!cart || cart.length === 0) {
         return (
             <div className="min-h-[70vh] flex flex-col items-center justify-center space-y-8 animate-fade-in pt-20">
-                <div className="w-24 h-24 bg-surface-50 dark:bg-zinc-900 rounded-full flex items-center justify-center text-4xl grayscale opacity-50">🛒</div>
+                <div className="w-24 h-24 bg-surface-50 dark:bg-surface-100 rounded-full flex items-center justify-center text-4xl grayscale opacity-50">🛒</div>
                 <div className="text-center space-y-2">
                     <h2 className="text-3xl font-black text-foreground tracking-tighter uppercase whitespace-nowrap">Cart is Empty</h2>
                     <p className="text-surface-500 font-bold uppercase text-[9px] tracking-[0.3em]">Choose some hardware to get started</p>
@@ -37,8 +44,8 @@ export default function CartPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 <div className="lg:col-span-2 space-y-6">
                     {cart.map((item) => (
-                        <div key={item.id} className="bg-white dark:bg-zinc-900 p-6 md:p-8 rounded-2xl shadow-sm border border-surface-200 dark:border-white/5 flex flex-col md:flex-row items-center gap-8 group hover:border-primary/20 transition-all relative overflow-hidden">
-                            <div className="w-24 h-24 bg-surface-50 dark:bg-black rounded-xl overflow-hidden shrink-0 border border-surface-200 dark:border-white/5 grayscale-[0.5] group-hover:grayscale-0 transition-all duration-700 p-2">
+                        <div key={item.id} className="bg-surface-50 dark:bg-surface-50 p-6 md:p-8 rounded-2xl shadow-sm border border-surface-200 dark:border-white/5 flex flex-col md:flex-row items-center gap-8 group hover:border-primary/20 transition-all relative overflow-hidden">
+                            <div className="w-24 h-24 bg-white dark:bg-black rounded-xl overflow-hidden shrink-0 border border-surface-200 dark:border-white/5 grayscale-[0.5] group-hover:grayscale-0 transition-all duration-700 p-2">
                                 <img src={item.image} className="w-full h-full object-contain" alt={item.name} />
                             </div>
 
@@ -48,7 +55,7 @@ export default function CartPage() {
                                     <h3 className="text-base font-black text-foreground uppercase tracking-tight line-clamp-1">{item.name}</h3>
                                 </div>
                                 <div className="pt-2 flex items-center gap-4">
-                                    <div className="bg-surface-50 dark:bg-black/40 border border-surface-200 dark:border-white/10 p-0.5 rounded-lg flex items-center gap-2">
+                                    <div className="bg-surface-100 dark:bg-black/40 border border-surface-200 dark:border-white/10 p-0.5 rounded-lg flex items-center gap-2">
                                         <button 
                                             onClick={() => updateQuantity(item.id, Math.max(1, (item.quantity || 1) - 1))} 
                                             className="w-8 h-8 flex items-center justify-center font-black text-surface-500 hover:text-foreground hover:bg-surface-200 dark:hover:bg-zinc-800 rounded-md transition-all text-xs"
@@ -72,13 +79,13 @@ export default function CartPage() {
                             </div>
 
                             <div className="text-right w-full md:w-auto relative z-10">
-                                <p className="text-xl font-black text-foreground tracking-tighter">${(item.price * (item.quantity || 1)).toLocaleString()}</p>
+                                <p className="text-xl font-black text-foreground tracking-tighter">${calculateItemTotal(item).toLocaleString()}</p>
                             </div>
                         </div>
                     ))}
                 </div>
 
-                <div className="bg-white dark:bg-zinc-900 border border-surface-200 dark:border-white/5 p-8 rounded-3xl shadow-2xl h-fit space-y-8 sticky top-36 overflow-hidden">
+                <div className="bg-surface-50 dark:bg-surface-50 border border-surface-200 dark:border-white/5 p-8 rounded-3xl shadow-2xl h-fit space-y-8 sticky top-36 overflow-hidden">
                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03] pointer-events-none" />
 
                     <div className="space-y-6 relative z-10">

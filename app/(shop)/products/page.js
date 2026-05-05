@@ -1,13 +1,18 @@
 import ProductListing from "@/features/product/ProductListing";
-import { getProducts } from "@/features/product/api";
+import { getProducts, getCategories } from "@/features/product/api";
 
 export const revalidate = 3600; // Cache catalog for 1 hour
 
-export default async function ProductsPage() {
-    const products = await getProducts();
+export default async function ProductsPage({ searchParams }) {
+    const { category } = await searchParams;
+
+    const [products, allCategories] = await Promise.all([
+        getProducts(null, category),
+        getCategories()
+    ]);
 
     return (
-        <div className="space-y-12 animate-fade-in pb-20 pt-28 px-4 md:px-8">
+        <div className="space-y-12 animate-fade-in pb-20 md:pt-15 px-4 md:px-8">
             <div className="space-y-3">
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-1 bg-primary rounded-full" />
@@ -19,7 +24,7 @@ export default async function ProductsPage() {
                 </p>
             </div>
 
-            <ProductListing initialProducts={products} />
+            <ProductListing initialProducts={products} allCategories={allCategories} />
         </div>
     );
 }

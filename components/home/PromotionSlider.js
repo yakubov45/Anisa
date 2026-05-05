@@ -68,7 +68,7 @@ export default function PromotionSlider({ slides = [] }) {
 
     return (
         <section 
-            className="relative w-full overflow-hidden rounded-[3rem] bg-[#450A0A] min-h-[400px] md:min-h-[550px] shadow-2xl animate-fade-in border border-white/10 group"
+            className="relative w-full overflow-hidden rounded-3xl md:rounded-[3rem] bg-[#450A0A] min-h-[400px] md:min-h-[550px] shadow-2xl animate-fade-in border border-white/10 group"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}

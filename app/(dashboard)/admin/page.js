@@ -3,13 +3,16 @@
 import { useUser } from "@/lib/UserContext";
 import { useEffect, useState } from "react";
 import { productService } from "@/lib/services/product.service";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
-import { COLLECTIONS } from "@/lib/constants";
+import { COLLECTIONS, ORDER_STATUS } from "@/lib/constants";
+import { formatPrice } from "@/lib/utils";
+import useStore from "@/store/useStore";
 import Link from "next/link";
 
 export default function AdminOverview() {
     const { user } = useUser();
+    const { currency, exchangeRate } = useStore();
     const [stats, setStats] = useState([
         { label: "Total Products", value: "...", growth: "Hardware Units", icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg> },
         { label: "Active Orders", value: "0", growth: "0 pending", icon: <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg> },
@@ -22,19 +25,28 @@ export default function AdminOverview() {
             try {
                 const productSnapshot = await getDocs(collection(db, COLLECTIONS.PRODUCTS));
                 const userSnapshot = await getDocs(collection(db, COLLECTIONS.USERS));
+                const orderSnapshot = await getDocs(collection(db, COLLECTIONS.ORDERS));
                 
+                const orders = orderSnapshot.docs.map(d => d.data());
+                const pendingOrdersCount = orders.filter(o => 
+                    o.status === ORDER_STATUS.PENDING || o.status === 'pending' || o.status === 'Processing'
+                ).length;
+
+                const totalRevenueUSD = orders.reduce((acc, o) => acc + (Number(o.totalAmount || o.total) || 0), 0);
+                const displayRevenue = currency === 'UZS' ? totalRevenueUSD * exchangeRate : totalRevenueUSD;
+
                 setStats(prev => [
                     { ...prev[0], value: productSnapshot.size.toString() },
-                    { ...prev[1], value: "0" }, // Orders logic to be implemented
+                    { ...prev[1], value: pendingOrdersCount.toString(), growth: `${pendingOrdersCount} active` },
                     { ...prev[2], value: userSnapshot.size.toString() },
-                    { ...prev[3], value: "$0" }
+                    { ...prev[3], value: formatPrice(displayRevenue, currency) }
                 ]);
             } catch (error) {
                 console.error("Error fetching stats:", error);
             }
         };
         fetchStats();
-    }, []);
+    }, [currency, exchangeRate]);
 
     return (
         <div className="space-y-10 animate-fade-in pb-20">

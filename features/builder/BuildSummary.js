@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react"
 import useBuildStore from "@/store/useBuildStore"
 import useStore from "@/store/useStore"
+import useUIStore from "@/store/useUIStore"
 
 export default function BuildSummary() {
     const { selectedParts, getTotalPrice, getProgress, getCompatibilityIssues, resetBuild } = useBuildStore()
     const addToCart = useStore(state => state.addToCart)
+    const { addToast, triggerCartAnimation } = useUIStore()
     const totalPrice = getTotalPrice()
     const progress = getProgress()
     const issues = getCompatibilityIssues()
+    const hasErrors = issues.some(i => i.type === 'error')
     const [buildId, setBuildId] = useState("")
     const [isMounted, setIsMounted] = useState(false)
 
@@ -19,12 +22,18 @@ export default function BuildSummary() {
     if (!isMounted) return null;
 
     const handleAddToCart = () => {
+        if (hasErrors) {
+            addToast("COMPATIBILITY ERROR DETECTED. FIX BEFORE PURCHASE.", "error")
+            return
+        }
+
         // Add all selected parts to the global cart
         Object.values(selectedParts).forEach(part => {
             if (part) addToCart(part)
         })
-        // Feedback could be added here
-        alert("Build added to cart successfully!")
+        
+        triggerCartAnimation()
+        addToast("BUILD ARCHITECTURE SYNCHRONIZED TO CART")
     }
 
     return (
@@ -88,11 +97,15 @@ export default function BuildSummary() {
             {/* Actions */}
             <div className="space-y-3 pt-4">
                 <button 
-                    disabled={progress.count === 0}
+                    disabled={progress.count === 0 || hasErrors}
                     onClick={handleAddToCart}
-                    className="w-full bg-primary text-white font-black text-xs uppercase tracking-[0.2em] py-5 rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-30 disabled:hover:scale-100"
+                    className={`w-full font-black text-xs uppercase tracking-[0.2em] py-5 rounded-2xl transition-all ${
+                        hasErrors 
+                        ? 'bg-red-500/20 text-red-500 border border-red-500/30 cursor-not-allowed opacity-50' 
+                        : 'bg-primary text-white shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-30'
+                    }`}
                 >
-                    INITIALIZE_PURCHASE
+                    {hasErrors ? 'COMPATIBILITY_FAILURE' : 'INITIALIZE_PURCHASE'}
                 </button>
                 <div className="grid grid-cols-2 gap-3">
                     <button className="bg-surface-100 border border-border-alpha text-foreground font-black text-[9px] uppercase tracking-widest py-4 rounded-xl hover:bg-foreground hover:text-background transition-all">
