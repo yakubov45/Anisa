@@ -20,7 +20,12 @@ export default function PriceDisplay({ price, className = "" }) {
 
     const formatPrice = (p) => {
         if (currency === 'USD') {
-            return `$${p.toLocaleString()}`
+            return (
+                <>
+                    <span className="opacity-60 text-[0.8em] mr-0.5">$</span>
+                    {p.toLocaleString()}
+                </>
+            )
         }
 
         // UZS logic
@@ -34,7 +39,12 @@ export default function PriceDisplay({ price, className = "" }) {
             roundedUZS = Math.floor(rawUZS / 100000) * 100000
         }
 
-        return `${roundedUZS.toLocaleString()} UZS`
+        return (
+            <>
+                {roundedUZS.toLocaleString()}
+                <span className="opacity-60 text-[0.5em] ml-1 uppercase">UZS</span>
+            </>
+        )
     }
 
     return (

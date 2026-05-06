@@ -1,6 +1,7 @@
 "use client"
 
-import Image from "next/image"
+import ImageWithFallback from "@/components/common/ImageWithFallback"
+import PriceDisplay from "@/components/common/PriceDisplay"
 
 const COMPONENT_DESCRIPTIONS = {
     cpu: "Kompyuterning miyasi - barcha hisob-kitoblarni bajaradi.",
@@ -21,7 +22,11 @@ export default function ComponentSlot({ category, title, selectedPart, onSelect,
                     {/* Icon/Image Placeholder */}
                     <div className={`flex-shrink-0 w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center transition-all ${selectedPart ? 'bg-white shadow-sm' : 'bg-surface-100 border border-dashed border-border-alpha'}`}>
                         {selectedPart ? (
-                            <img src={selectedPart.image} alt={selectedPart.name} className="w-10 h-10 md:w-12 md:h-12 object-contain" />
+                            <ImageWithFallback 
+                                src={selectedPart.image} 
+                                alt={selectedPart.name} 
+                                className="w-10 h-10 md:w-12 md:h-12 object-contain" 
+                            />
                         ) : (
                             <span className="text-surface-400 font-mono text-[9px] md:text-[10px] uppercase font-black tracking-widest">{category.slice(0, 3)}</span>
                         )}
@@ -50,9 +55,12 @@ export default function ComponentSlot({ category, title, selectedPart, onSelect,
                         <>
                             <div className="flex flex-col items-start sm:items-end">
                                 {selectedPart.discount && (
-                                    <span className="text-[9px] font-mono text-surface-400 line-through opacity-60">$ {(selectedPart.price / (1 - selectedPart.discount / 100)).toFixed(0)}</span>
+                                    <PriceDisplay 
+                                        price={selectedPart.price / (1 - selectedPart.discount / 100)} 
+                                        className="text-[9px] font-mono text-surface-400 line-through opacity-60" 
+                                    />
                                 )}
-                                <span className="text-base md:text-lg font-black text-foreground tracking-tighter">${selectedPart.price}</span>
+                                <PriceDisplay price={selectedPart.price} className="text-base md:text-lg font-black text-foreground tracking-tighter" />
                             </div>
                             <div className="flex items-center gap-2">
                                 <button 

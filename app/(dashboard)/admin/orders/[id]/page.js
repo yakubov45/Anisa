@@ -2,18 +2,24 @@
 
 import { useState, useEffect } from "react";
 import { orderService } from "@/lib/services/order.service";
+import { userService } from "@/lib/services/user.service";
 import { useParams, useRouter } from "next/navigation";
 import { formatPrice, formatDate } from "@/lib/utils";
 import Link from "next/link";
 import useStore from "@/store/useStore";
 
+import { useTranslation } from "@/lib/LanguageContext";
+
 export default function OrderDetailsPage() {
+    const { t } = useTranslation();
     const { id } = useParams();
     const router = useRouter();
     const { currency, exchangeRate } = useStore();
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
+    const [couriers, setCouriers] = useState([]);
+    const [selectedCourier, setSelectedCourier] = useState("");
 
     useEffect(() => {
         const fetchOrder = async () => {
@@ -21,6 +27,7 @@ export default function OrderDetailsPage() {
                 const data = await orderService.getById(id);
                 if (data) {
                     setOrder(data);
+                    setSelectedCourier(data.deliveryId || "");
                 } else {
                     router.push("/admin/orders");
                 }
@@ -30,7 +37,12 @@ export default function OrderDetailsPage() {
                 setLoading(false);
             }
         };
+        const fetchCouriers = async () => {
+            const data = await userService.getAllUsers("delivery");
+            setCouriers(data);
+        };
         fetchOrder();
+        fetchCouriers();
     }, [id, router]);
 
     const handleStatusChange = async (newStatus) => {
@@ -40,6 +52,23 @@ export default function OrderDetailsPage() {
             setOrder({ ...order, status: newStatus });
         } catch (error) {
             console.error("Error updating status:", error);
+        } finally {
+            setUpdating(false);
+        }
+    };
+
+    const handleAssignCourier = async () => {
+        if (!selectedCourier) return;
+        setUpdating(true);
+        try {
+            await orderService.updateOrder(id, { 
+                deliveryId: selectedCourier,
+                status: "Shipped" // Auto transition to shipped when assigned
+            });
+            setOrder({ ...order, deliveryId: selectedCourier, status: "Shipped" });
+            alert("Courier assigned and shipment initiated.");
+        } catch (error) {
+            console.error("Error assigning courier:", error);
         } finally {
             setUpdating(false);
         }
@@ -64,23 +93,45 @@ export default function OrderDetailsPage() {
                         <Link href="/admin/orders" className="w-10 h-10 bg-surface dark:bg-zinc-900 rounded-xl flex items-center justify-center border border-surface-100 dark:border-white/5 hover:text-primary transition-all shadow-sm">
                             ←
                         </Link>
-                        <h1 className="text-3xl font-black text-foreground tracking-tighter uppercase">Order_Manifest</h1>
+                        <h1 className="text-3xl font-black text-foreground tracking-tighter uppercase">{t('det_manifest')}</h1>
                     </div>
                     <p className="text-surface-500 font-bold ml-14">LOG_ID: <span className="font-mono text-xs">#{order.id.toUpperCase()}</span></p>
                 </div>
 
-                <div className="flex items-center gap-4 ml-14 md:ml-0">
+                <div className="flex flex-wrap items-center gap-4 ml-14 md:ml-0">
+                    {/* Courier Assignment */}
+                    <div className="flex items-center gap-2 bg-surface-50 dark:bg-white/5 p-2 rounded-2xl border border-surface-100 dark:border-white/5">
+                        <select
+                            value={selectedCourier}
+                            onChange={(e) => setSelectedCourier(e.target.value)}
+                            className="bg-transparent border-none text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer text-foreground min-w-[150px]"
+                        >
+                            <option value="">{t('admin_search_operatives').replace('_...', '')}</option>
+                            {couriers.map(c => (
+                                <option key={c.id} value={c.id}>{c.fullName || c.name || c.email}</option>
+                            ))}
+                        </select>
+                        <button 
+                            onClick={handleAssignCourier}
+                            disabled={updating || !selectedCourier}
+                            className="bg-primary text-white text-[9px] font-black px-4 py-2 rounded-xl uppercase tracking-widest hover:bg-white hover:text-black transition-all disabled:opacity-50"
+                        >
+                            {t('del_accept')}
+                        </button>
+                    </div>
+
                     <select
                         value={order.status}
                         onChange={(e) => handleStatusChange(e.target.value)}
                         disabled={updating}
                         className="bg-surface dark:bg-zinc-900 border border-surface-100 dark:border-white/5 rounded-xl px-5 py-3 text-[10px] font-black uppercase tracking-widest focus:ring-2 focus:ring-primary outline-none cursor-pointer disabled:opacity-50 shadow-sm text-foreground"
                     >
-                        <option value="Pending">Pending</option>
-                        <option value="Processing">Processing</option>
-                        <option value="Shipped">Shipped</option>
-                        <option value="Delivered">Delivered</option>
-                        <option value="Cancelled">Cancelled</option>
+                        <option value="Pending">{t('ord_status_pending')}</option>
+                        <option value="Confirmed">{t('ord_status_confirmed')}</option>
+                        <option value="Assigned">{t('ord_status_assigned')}</option>
+                        <option value="Shipped">{t('ord_status_shipped')}</option>
+                        <option value="Delivered">{t('ord_status_delivered')}</option>
+                        <option value="Cancelled">{t('ord_status_cancelled')}</option>
                     </select>
                 </div>
             </div>
@@ -90,7 +141,7 @@ export default function OrderDetailsPage() {
                     {/* Order Items */}
                     <div className="bg-surface dark:bg-zinc-900 rounded-[2.5rem] shadow-premium border border-surface-50 dark:border-white/5 overflow-hidden">
                         <div className="px-10 py-6 bg-surface-50 dark:bg-zinc-800/50 border-b border-surface-100 dark:border-white/5">
-                            <h3 className="text-[10px] font-black text-surface-400 uppercase tracking-widest">Hardware Configuration</h3>
+                            <h3 className="text-[10px] font-black text-surface-400 uppercase tracking-widest">{t('det_cargo_inventory')}</h3>
                         </div>
                         <div className="p-10 space-y-6">
                             {order.items?.map((item, idx) => (
@@ -115,7 +166,7 @@ export default function OrderDetailsPage() {
                 <div className="space-y-8">
                     {/* Customer Info */}
                     <div className="bg-surface dark:bg-zinc-900 p-10 rounded-[2.5rem] shadow-premium border border-surface-50 dark:border-white/5 space-y-6">
-                        <h3 className="text-[10px] font-black text-surface-400 uppercase tracking-widest">Client Metadata</h3>
+                        <h3 className="text-[10px] font-black text-surface-400 uppercase tracking-widest">{t('det_customer_intel')}</h3>
                         <div className="space-y-4">
                             <div>
                                 <p className="text-[9px] font-black text-surface-300 dark:text-white/30 uppercase tracking-widest mb-1">Full Name</p>
@@ -143,7 +194,7 @@ export default function OrderDetailsPage() {
 
                     {/* Financial Summary */}
                     <div className="bg-zinc-950 text-white p-10 rounded-[2.5rem] shadow-2xl shadow-black/20 space-y-6 border border-white/5 h-auto min-h-fit">
-                        <h3 className="text-[10px] font-black text-white/30 uppercase tracking-widest">Billing Summary</h3>
+                        <h3 className="text-[10px] font-black text-white/30 uppercase tracking-widest">{t('det_total_valuation')}</h3>
                         <div className="space-y-4 border-b border-white/10 pb-6">
                             <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs font-bold">
                                 <span className="text-white/50 uppercase tracking-widest">Subtotal</span>

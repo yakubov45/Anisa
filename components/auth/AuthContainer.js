@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { authService } from "@/lib/services/auth.service";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslation } from "@/lib/LanguageContext";
 
 export default function AuthContainer({ initialMode = "login" }) {
+    const { t } = useTranslation();
     const [mode, setMode] = useState(initialMode); // 'login' or 'register'
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -33,13 +35,11 @@ export default function AuthContainer({ initialMode = "login" }) {
 
         try {
             if (mode === "register") {
-                // Phone validation
                 const phoneRegex = /^\+998\d{9}$/;
                 if (!phoneRegex.test(formData.phoneNumber.replace(/\s/g, ""))) {
-                    throw new Error("Please enter a valid Uzbek phone number (+998XXXXXXXXX).");
+                    throw new Error(t('auth_invalid_phone'));
                 }
                 
-                // Password confirmation
                 if (formData.password !== formData.confirmPassword) {
                     throw new Error("Passwords do not match.");
                 }
@@ -55,12 +55,10 @@ export default function AuthContainer({ initialMode = "login" }) {
                 setError("This email is already in use.");
             } else if (err.code === "auth/weak-password") {
                 setError("Password must be at least 6 characters.");
-            } else if (err.code === "auth/operation-not-allowed") {
-                setError("Email/Password registration is not enabled. Please enable it in Firebase Console.");
             } else if (err.code === "auth/invalid-credential") {
-                setError("Invalid email or password.");
+                setError(t('auth_invalid_credential') || "Invalid email or password.");
             } else {
-                setError(err.message || "Authentication failed. Please try again.");
+                setError(err.message || "Authentication failed.");
             }
         } finally {
             setLoading(false);
@@ -76,11 +74,11 @@ export default function AuthContainer({ initialMode = "login" }) {
         }
     };
 
-    const inputClasses = "w-full bg-surface-100/50 dark:bg-white/5 border border-surface-200 dark:border-white/10 rounded-2xl px-6 py-4 text-sm focus:ring-2 focus:ring-primary/40 outline-none transition-all placeholder:text-surface-400 dark:placeholder:text-white/20 text-foreground dark:text-white font-medium";
+    const inputClasses = "w-full bg-surface-50 dark:bg-black border border-surface-200 dark:border-white/10 rounded-2xl px-6 py-4 text-sm focus:ring-2 focus:ring-primary/40 outline-none transition-all placeholder:text-surface-400 dark:placeholder:text-white/20 text-foreground dark:text-white font-bold";
     const labelClasses = "text-[10px] font-black text-surface-500 dark:text-surface-400 uppercase tracking-widest pl-2";
 
     return (
-        <div className="w-full max-w-[480px] bg-surface/60 backdrop-blur-3xl p-6 md:p-14 rounded-3xl md:rounded-[3rem] shadow-2xl border border-surface-200 dark:border-white/10 relative overflow-hidden min-h-[500px] md:min-h-[600px] flex flex-col justify-center">
+        <div className="w-full max-w-[480px] bg-white dark:bg-zinc-900 p-6 md:p-14 rounded-3xl md:rounded-[3rem] shadow-2xl border border-surface-200 dark:border-white/10 relative overflow-hidden min-h-[500px] md:min-h-[600px] flex flex-col justify-center">
 
             {/* Decorative Elements */}
             <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/20 rounded-full blur-3xl" />
@@ -97,10 +95,10 @@ export default function AuthContainer({ initialMode = "login" }) {
                 >
                     <div className="text-center space-y-2 md:space-y-3">
                         <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tighter uppercase leading-tight">
-                            {mode === "login" ? "Sign In" : "Create Account"}
+                            {mode === "login" ? t('auth_sign_in') : t('auth_create_account')}
                         </h1>
                         <p className="text-surface-500 font-bold uppercase text-[8px] md:text-[10px] tracking-[0.3em]">
-                            {mode === "login" ? "Access your hardware ecosystem" : "Join the elite hardware community"}
+                            {mode === "login" ? t('auth_access_ecosystem') : t('auth_join_community')}
                         </p>
                     </div>
 
@@ -118,7 +116,7 @@ export default function AuthContainer({ initialMode = "login" }) {
                         {mode === "register" && (
                             <>
                                 <div className="space-y-1">
-                                    <label className={labelClasses}>Full Name</label>
+                                    <label className={labelClasses}>{t('auth_fullname')}</label>
                                     <input
                                         type="text"
                                         name="name"
@@ -126,11 +124,11 @@ export default function AuthContainer({ initialMode = "login" }) {
                                         value={formData.name}
                                         onChange={handleChange}
                                         className={inputClasses}
-                                        placeholder="John Doe"
+                                        placeholder="ENTER NAME"
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className={labelClasses}>Phone Number</label>
+                                    <label className={labelClasses}>{t('auth_phone')}</label>
                                     <input
                                         type="tel"
                                         name="phoneNumber"
@@ -138,14 +136,14 @@ export default function AuthContainer({ initialMode = "login" }) {
                                         value={formData.phoneNumber}
                                         onChange={handleChange}
                                         className={inputClasses}
-                                        placeholder="+998 90 123 45 67"
+                                        placeholder="+998 -- --- -- --"
                                     />
                                 </div>
                             </>
                         )}
 
                         <div className="space-y-1">
-                            <label className={labelClasses}>Email Address</label>
+                            <label className={labelClasses}>{t('auth_email') || "Email Address"}</label>
                             <input
                                 type="email"
                                 name="email"
@@ -153,15 +151,15 @@ export default function AuthContainer({ initialMode = "login" }) {
                                 value={formData.email}
                                 onChange={handleChange}
                                 className={inputClasses}
-                                placeholder="your@email.com"
+                                placeholder="ENTER EMAIL"
                             />
                         </div>
 
                         <div className="space-y-1">
                             <div className="flex justify-between items-center px-2">
-                                <label className={labelClasses}>Password</label>
+                                <label className={labelClasses}>{t('auth_password') || "Password"}</label>
                                 {mode === "login" && (
-                                    <Link href="/forgot-password" title="Forgot Password" className="text-[10px] font-black text-primary hover:underline uppercase tracking-widest">Forgot?</Link>
+                                    <Link href="/forgot-password" title="Forgot Password" className="text-[10px] font-black text-primary hover:underline uppercase tracking-widest">{t('auth_forgot_title') || "Forgot?"}?</Link>
                                 )}
                             </div>
                             <div className="relative">
@@ -190,7 +188,7 @@ export default function AuthContainer({ initialMode = "login" }) {
 
                         {mode === "register" && (
                             <div className="space-y-1">
-                                <label className={labelClasses}>Confirm Password</label>
+                                <label className={labelClasses}>{t('auth_confirm_password') || "Confirm Password"}</label>
                                 <div className="relative">
                                     <input
                                         type={showPassword ? "text" : "password"}
@@ -219,47 +217,47 @@ export default function AuthContainer({ initialMode = "login" }) {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-foreground text-background font-black py-5 rounded-2xl shadow-2xl hover:bg-primary hover:text-white transition-all active:scale-95 disabled:opacity-50 uppercase text-[10px] tracking-[0.2em]"
+                            className="w-full bg-foreground dark:bg-white text-background dark:text-black font-black py-5 rounded-2xl shadow-2xl hover:bg-primary hover:text-white transition-all active:scale-95 disabled:opacity-50 uppercase text-[10px] tracking-[0.2em]"
                         >
-                            {loading ? "Processing..." : (mode === "login" ? "Enter Portal" : "Register Now")}
+                            {loading ? t('auth_processing') : (mode === "login" ? t('auth_enter_portal') : t('auth_register_now'))}
                         </button>
                     </form>
 
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-surface-200 dark:border-white/10" /></div>
-                        <div className="relative flex justify-center text-[10px] uppercase"><span className="bg-surface/10 backdrop-blur-md px-4 text-surface-500 font-black tracking-widest">Alternative</span></div>
+                        <div className="relative flex justify-center text-[10px] uppercase"><span className="bg-white dark:bg-zinc-900 px-4 text-surface-500 font-black tracking-widest">{t('auth_alternative')}</span></div>
                     </div>
 
                     <button
                         onClick={handleGoogleLogin}
                         type="button"
-                        className="w-full bg-surface-100/50 dark:bg-surface-100/5 border border-surface-200 dark:border-white/5 text-foreground font-black py-4 rounded-2xl flex items-center justify-center gap-4 hover:bg-surface-200/50 transition-all active:scale-95 shadow-sm uppercase text-[10px] tracking-widest"
+                        className="w-full bg-surface-50 dark:bg-black border border-surface-200 dark:border-white/5 text-foreground font-black py-4 rounded-2xl flex items-center justify-center gap-4 hover:bg-surface-100 transition-all active:scale-95 shadow-sm uppercase text-[10px] tracking-widest"
                     >
                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
-                        {mode === "login" ? "Continue with Google" : "Join with Google"}
+                        {mode === "login" ? t('auth_continue_google') : t('auth_join_google')}
                     </button>
 
                     <p className="text-center text-[10px] text-surface-500 font-black uppercase tracking-[0.2em] pt-4">
                         {mode === "login" ? (
                             <>
-                                New to OnePC?{" "}
+                                {t('auth_new_to_onepc')}{" "}
                                 <button
                                     type="button"
                                     onClick={() => setMode("register")}
                                     className="text-primary hover:underline"
                                 >
-                                    Create Account
+                                    {t('auth_create_account')}
                                 </button>
                             </>
                         ) : (
                             <>
-                                Already a member?{" "}
+                                {t('auth_already_member')}{" "}
                                 <button
                                     type="button"
                                     onClick={() => setMode("login")}
                                     className="text-primary hover:underline"
                                 >
-                                    Sign In
+                                    {t('auth_sign_in')}
                                 </button>
                             </>
                         )}

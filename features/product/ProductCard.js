@@ -1,6 +1,6 @@
 "use client"
 
-import Image from "next/image"
+import ImageWithFallback from "@/components/common/ImageWithFallback"
 import Link from "next/link"
 import useStore from "@/store/useStore"
 import useUIStore from "@/store/useUIStore"
@@ -35,12 +35,11 @@ export default function ProductCard({ product, badge = null, rating = null }) {
 
                 {/* IMAGE - Balandligi oshirildi */}
                 <div className="block relative overflow-hidden rounded-xl bg-surface-50 flex-1 min-h-[160px] md:min-h-[220px]">
-                    <Image
-                        src={product.image || "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=500&auto=format&fit=crop&q=80"}
+                    <ImageWithFallback
+                        src={product.image}
+                        fallbackSrc="https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=500&auto=format&fit=crop&q=80"
                         alt={product.name}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-1000 grayscale-[0.5] group-hover:grayscale-0"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 grayscale-[0.5] group-hover:grayscale-0"
                     />
 
                     <div className="absolute inset-0 bg-surface/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px] gap-4">

@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { categoryService } from "@/lib/services/category.service";
+import { useTranslation } from "@/lib/LanguageContext";
 
 export default function AdminCategoriesPage() {
+    const { t } = useTranslation();
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -35,7 +37,7 @@ export default function AdminCategoriesPage() {
     };
 
     const handleDelete = async (id) => {
-        if (confirm("Are you sure? This may affect products in this category.")) {
+        if (confirm(t('cat_confirm_delete'))) {
             await categoryService.delete(id);
             fetchCategories();
         }
@@ -51,20 +53,20 @@ export default function AdminCategoriesPage() {
         <div className="space-y-10 pb-20 animate-fade-in">
             <div className="flex justify-between items-center">
                 <div className="space-y-1">
-                    <h1 className="text-4xl font-black text-surface-900 tracking-tighter uppercase">Taxonomy_Control</h1>
-                    <p className="text-surface-500 font-bold italic">Manage hardware classification and global sorting logic.</p>
+                    <h1 className="text-4xl font-black text-surface-900 tracking-tighter uppercase">{t('cat_taxonomy_control')}</h1>
+                    <p className="text-surface-500 font-bold italic">{t('cat_taxonomy_desc')}</p>
                 </div>
                 <button 
                     onClick={() => { setEditing(null); setFormData({ name: "", slug: "", icon: "🏷️" }); setShowModal(true); }}
                     className="bg-primary text-white font-black px-8 py-4 rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 transition-all uppercase tracking-widest text-xs"
                 >
-                    + New Category
+                    {t('cat_new_category')}
                 </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {loading ? (
-                    <div className="col-span-full py-20 text-center text-surface-300 italic animate-pulse uppercase tracking-widest text-xs">Accessing classification database...</div>
+                    <div className="col-span-full py-20 text-center text-surface-300 italic animate-pulse uppercase tracking-widest text-xs">{t('cat_loading_db')}</div>
                 ) : (
                     categories.map((cat) => (
                         <div key={cat.id} className="bg-surface p-8 rounded-[2rem] shadow-premium border border-surface-50 group hover:border-primary/20 transition-all relative">
@@ -91,11 +93,11 @@ export default function AdminCategoriesPage() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-md animate-in fade-in duration-200">
                     <div className="bg-surface w-full max-w-md p-10 rounded-[2.5rem] shadow-2xl border border-surface-100 animate-in zoom-in-95 duration-200">
                         <h2 className="text-2xl font-black text-surface-900 uppercase tracking-tight mb-8">
-                            {editing ? "Modify_Taxonomy" : "Create_Taxonomy"}
+                            {editing ? t('cat_modify_taxonomy') : t('cat_create_taxonomy')}
                         </h2>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest pl-1">Category Name</label>
+                                <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest pl-1">{t('cat_name_label')}</label>
                                 <input 
                                     type="text" 
                                     value={formData.name}
@@ -106,7 +108,7 @@ export default function AdminCategoriesPage() {
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest pl-1">Unique Slug (ID)</label>
+                                <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest pl-1">{t('cat_slug_label')}</label>
                                 <input 
                                     type="text" 
                                     value={formData.slug}
@@ -117,7 +119,7 @@ export default function AdminCategoriesPage() {
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest pl-1">Visual Icon (Emoji)</label>
+                                <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest pl-1">{t('cat_icon_label')}</label>
                                 <input 
                                     type="text" 
                                     value={formData.icon}
@@ -131,14 +133,14 @@ export default function AdminCategoriesPage() {
                                     type="submit"
                                     className="flex-1 bg-primary text-white font-black py-5 rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-widest text-xs"
                                 >
-                                    {editing ? "Update" : "Initialize"}
+                                    {editing ? t('cat_update') : t('cat_initialize')}
                                 </button>
                                 <button 
                                     type="button"
                                     onClick={() => setShowModal(false)}
                                     className="bg-surface-50 text-surface-900 font-black px-8 py-5 rounded-2xl hover:bg-surface-100 transition-all uppercase tracking-widest text-xs"
                                 >
-                                    Cancel
+                                    {t('cat_cancel')}
                                 </button>
                             </div>
                         </form>

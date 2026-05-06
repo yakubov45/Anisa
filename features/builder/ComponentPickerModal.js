@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { getProducts } from "@/features/product/api"
+import PriceDisplay from "@/components/common/PriceDisplay"
+import ImageWithFallback from "@/components/common/ImageWithFallback"
 
 export default function ComponentPickerModal({ isOpen, onClose, category, onSelect }) {
     const [products, setProducts] = useState([])
@@ -77,12 +79,16 @@ export default function ComponentPickerModal({ isOpen, onClose, category, onSele
                                 >
                                     <div className="flex items-center gap-4">
                                         <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center border border-border-alpha overflow-hidden">
-                                            <img src={product.image} alt={product.name} className="w-12 h-12 object-contain group-hover:scale-110 transition-transform" />
+                                            <ImageWithFallback 
+                                                src={product.image} 
+                                                alt={product.name} 
+                                                className="w-12 h-12 object-contain group-hover:scale-110 transition-transform" 
+                                            />
                                         </div>
                                         <div className="flex flex-col gap-0.5">
                                             <span className="text-[8px] font-black text-surface-400 uppercase tracking-widest">{product.brand}</span>
                                             <h4 className="text-xs font-black text-foreground tracking-tight uppercase line-clamp-1">{product.name}</h4>
-                                            <span className="text-[10px] font-mono text-green-500 font-bold">$ {product.price}</span>
+                                            <PriceDisplay price={product.price} className="text-[10px] font-mono text-green-500 font-bold" />
                                         </div>
                                     </div>
                                     <button className="bg-foreground text-background text-[9px] font-black px-4 py-2.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-primary hover:text-white transition-all uppercase tracking-widest shadow-lg">

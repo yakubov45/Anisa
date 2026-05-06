@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import useBuildStore from "@/store/useBuildStore"
 import useStore from "@/store/useStore"
 import useUIStore from "@/store/useUIStore"
+import PriceDisplay from "@/components/common/PriceDisplay"
 
 export default function BuildSummary() {
     const { selectedParts, getTotalPrice, getProgress, getCompatibilityIssues, resetBuild } = useBuildStore()
@@ -31,7 +32,7 @@ export default function BuildSummary() {
         Object.values(selectedParts).forEach(part => {
             if (part) addToCart(part)
         })
-        
+
         triggerCartAnimation()
         addToast("BUILD ARCHITECTURE SYNCHRONIZED TO CART")
     }
@@ -54,8 +55,8 @@ export default function BuildSummary() {
                     <span className="text-[10px] font-mono text-primary font-bold">{progress.count} / {progress.total}</span>
                 </div>
                 <div className="h-2 bg-surface-100 rounded-full overflow-hidden border border-border-alpha p-0.5">
-                    <div 
-                        className="h-full bg-primary rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(227,30,36,0.5)]" 
+                    <div
+                        className="h-full bg-primary rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(227,30,36,0.5)]"
                         style={{ width: `${progress.percent}%` }}
                     />
                 </div>
@@ -65,16 +66,16 @@ export default function BuildSummary() {
             <div className="bg-zinc-900 rounded-2xl p-6 space-y-4 border border-white/5">
                 <div className="flex items-center justify-between">
                     <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Total_Investment</span>
-                    <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">USD</span>
+                    <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">CURRENCY</span>
                 </div>
                 <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-black text-white tracking-tighter">$ {totalPrice.toLocaleString()}</span>
+                    <PriceDisplay price={totalPrice} className="text-2xl font-black text-white tracking-tighter" />
                     <span className="text-xs font-mono text-zinc-500 font-bold">/ SYSTEM</span>
                 </div>
                 <div className="pt-4 border-t border-white/5">
                     <div className="flex items-center justify-between">
                         <span className="text-[10px] font-bold text-zinc-400">Installment Plan</span>
-                        <span className="text-[10px] font-black text-primary">$ {(totalPrice / 12).toFixed(2)}/mo</span>
+                        <PriceDisplay price={totalPrice / 12} className="text-[10px] font-black text-primary" />
                     </div>
                 </div>
             </div>
@@ -83,7 +84,7 @@ export default function BuildSummary() {
             {issues.length > 0 && (
                 <div className="space-y-3">
                     {issues.map((issue, idx) => (
-                        <div 
+                        <div
                             key={idx}
                             className={`p-4 rounded-xl border flex gap-3 ${issue.type === 'error' ? 'bg-red-500/5 border-red-500/20 text-red-500' : 'bg-yellow-500/5 border-yellow-500/20 text-yellow-500'}`}
                         >
@@ -96,14 +97,13 @@ export default function BuildSummary() {
 
             {/* Actions */}
             <div className="space-y-3 pt-4">
-                <button 
+                <button
                     disabled={progress.count === 0 || hasErrors}
                     onClick={handleAddToCart}
-                    className={`w-full font-black text-xs uppercase tracking-[0.2em] py-5 rounded-2xl transition-all ${
-                        hasErrors 
-                        ? 'bg-red-500/20 text-red-500 border border-red-500/30 cursor-not-allowed opacity-50' 
-                        : 'bg-primary text-white shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-30'
-                    }`}
+                    className={`w-full font-black text-xs uppercase tracking-[0.2em] py-5 rounded-2xl transition-all ${hasErrors
+                            ? 'bg-red-500/20 text-red-500 border border-red-500/30 cursor-not-allowed opacity-50'
+                            : 'bg-primary text-white shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-30'
+                        }`}
                 >
                     {hasErrors ? 'COMPATIBILITY_FAILURE' : 'INITIALIZE_PURCHASE'}
                 </button>
@@ -111,7 +111,7 @@ export default function BuildSummary() {
                     <button className="bg-surface-100 border border-border-alpha text-foreground font-black text-[9px] uppercase tracking-widest py-4 rounded-xl hover:bg-foreground hover:text-background transition-all">
                         Save_Build
                     </button>
-                    <button 
+                    <button
                         onClick={resetBuild}
                         className="bg-surface-100 border border-border-alpha text-foreground font-black text-[9px] uppercase tracking-widest py-4 rounded-xl hover:bg-red-500 hover:text-white transition-all"
                     >

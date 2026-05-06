@@ -1,4 +1,5 @@
 "use client"
+import Link from "next/link"
 
 export default function BuilderGuide() {
     const steps = [
@@ -59,9 +60,11 @@ export default function BuilderGuide() {
                         <p className="text-[10px] text-surface-400 font-medium">All selected components have undergone 100% hardware validation testing.</p>
                     </div>
                 </div>
-                <button className="bg-primary text-white font-black text-[10px] px-8 py-4 rounded-xl uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:scale-105 transition-all">
-                    Request Technical Support
-                </button>
+                <Link href="/faq">
+                    <button className="bg-primary text-white font-black text-[10px] px-8 py-4 rounded-xl uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:scale-105 transition-all">
+                        Request Technical Support
+                    </button>
+                </Link>
             </div>
         </div>
     )

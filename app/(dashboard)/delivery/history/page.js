@@ -5,8 +5,10 @@ import { useUser } from "@/lib/UserContext"
 import { orderService } from "@/lib/services/order.service"
 import Link from "next/link"
 import { ORDER_STATUS } from "@/lib/constants"
+import { useTranslation } from "@/lib/LanguageContext"
 
 export default function DeliveryHistory() {
+    const { t } = useTranslation();
     const { user } = useUser()
     const [orders, setOrders] = useState([])
     const [loading, setLoading] = useState(true)
@@ -36,19 +38,19 @@ export default function DeliveryHistory() {
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-1 bg-primary rounded-full" />
-                        <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">Historical Archives</span>
+                        <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">{t('hist_archives')}</span>
                     </div>
-                    <h1 className="text-4xl font-black text-white uppercase tracking-tighter">Mission History</h1>
+                    <h1 className="text-4xl font-black text-white uppercase tracking-tighter">{t('hist_mission')}</h1>
                 </div>
 
                 <div className="bg-[#161B22] border border-white/5 px-8 py-4 rounded-2xl flex items-center gap-6">
                     <div className="space-y-1 text-right">
-                        <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">Total Cargo Value</p>
+                        <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">{t('hist_total_cargo')}</p>
                         <p className="text-xl font-black text-white">$ {totalEarnings.toLocaleString()}</p>
                     </div>
                     <div className="w-[1px] h-10 bg-white/10" />
                     <div className="space-y-1">
-                        <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">Completed Jobs</p>
+                        <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">{t('hist_completed')}</p>
                         <p className="text-xl font-black text-primary">{orders.length}</p>
                     </div>
                 </div>
@@ -61,7 +63,7 @@ export default function DeliveryHistory() {
                 </div>
             ) : orders.length === 0 ? (
                 <div className="text-center py-20 bg-[#161B22] rounded-[2.5rem] border border-white/5">
-                    <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">Archive is currently empty</p>
+                    <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">{t('hist_empty')}</p>
                 </div>
             ) : (
                 <div className="bg-[#161B22] border border-white/5 rounded-[2.5rem] overflow-hidden">
@@ -69,11 +71,11 @@ export default function DeliveryHistory() {
                         <table className="w-full text-left">
                             <thead>
                                 <tr className="border-b border-white/5 bg-white/5">
-                                    <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Manifest ID</th>
-                                    <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Customer</th>
-                                    <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Completion Date</th>
-                                    <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">Valuation</th>
-                                    <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest text-right">Protocol</th>
+                                    <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">{t('hist_manifest_id')}</th>
+                                    <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">{t('hist_customer')}</th>
+                                    <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">{t('hist_date')}</th>
+                                    <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest">{t('hist_valuation')}</th>
+                                    <th className="px-8 py-6 text-[10px] font-black text-white/40 uppercase tracking-widest text-right">{t('hist_protocol')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
@@ -93,7 +95,7 @@ export default function DeliveryHistory() {
                                         </td>
                                         <td className="px-8 py-6 text-right">
                                             <Link href={`/delivery/orders/${order.id}`} className="text-[9px] font-black text-white/40 uppercase tracking-widest hover:text-white transition-colors">
-                                                View Manifest
+                                                {t('hist_view_manifest')}
                                             </Link>
                                         </td>
                                     </tr>

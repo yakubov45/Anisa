@@ -8,8 +8,10 @@ import { useRouter } from "next/navigation";
 import { createOrderAction } from "@/lib/actions/order.actions";
 import { useUser } from "@/lib/UserContext";
 import { REGIONS } from "@/lib/constants";
+import { useTranslation } from "@/lib/LanguageContext";
 
 export default function CheckoutPage() {
+    const { t } = useTranslation();
     const { cart, clearCart } = useStore();
     const { user, loading: userLoading } = useUser();
     const router = useRouter();
@@ -48,12 +50,17 @@ export default function CheckoutPage() {
     const handleCheckout = async (e) => {
         e.preventDefault();
         if (!user) {
-            setError("You must be logged in to place an order.");
+            setError(t('auth_identity_required'));
             return;
         }
 
         if (!formData.phone || formData.phone.length < 9) {
-            setError("A valid phone number is required for logistics coordination.");
+            setError(t('auth_invalid_phone'));
+            return;
+        }
+
+        if (formData.address.length < 10) {
+            setError(t('checkout_address_instruction'));
             return;
         }
 
@@ -70,14 +77,19 @@ export default function CheckoutPage() {
         const result = await createOrderAction(orderPayload, cart);
 
         if (result.success) {
-            // Force clear cart before redirect to prevent hydration issues
             clearCart(); 
             if (typeof window !== 'undefined') {
-                localStorage.removeItem('onepc-storage'); // Final safety purge
+                localStorage.removeItem('onepc-storage'); 
             }
             router.push("/checkout/success");
         } else {
-            setError(result.error || "Failed to process order. Please try again.");
+            let errorMsg = result.error || t('ord_no_found');
+            if (errorMsg.includes('|')) {
+                const [key, param] = errorMsg.split('|');
+                const translationKey = key.toLowerCase();
+                errorMsg = t(translationKey).replace('{name}', param);
+            }
+            setError(errorMsg);
             setIsSubmitting(false);
         }
     };
@@ -95,11 +107,11 @@ export default function CheckoutPage() {
                     <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                 </div>
                 <div className="text-center space-y-2">
-                    <h1 className="text-3xl font-black text-foreground uppercase tracking-tighter">Identity Required</h1>
-                    <p className="text-surface-500 font-bold uppercase text-[10px] tracking-widest">Sign in to proceed with hardware acquisition</p>
+                    <h1 className="text-3xl font-black text-foreground uppercase tracking-tighter">{t('auth_identity_required')}</h1>
+                    <p className="text-surface-500 font-bold uppercase text-[10px] tracking-widest">{t('auth_sign_in_proceed')}</p>
                 </div>
                 <Link href="/login" className="bg-primary text-white font-black px-10 py-5 rounded-xl uppercase text-xs tracking-widest hover:bg-foreground transition-all shadow-xl shadow-primary/20">
-                    Sign In
+                    {t('auth_sign_in')}
                 </Link>
             </div>
         );
@@ -112,11 +124,11 @@ export default function CheckoutPage() {
                     <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                 </div>
                 <div className="text-center space-y-2">
-                    <h1 className="text-3xl font-black text-foreground uppercase tracking-tighter">Your cart is empty</h1>
-                    <p className="text-surface-500 font-bold uppercase text-[10px] tracking-widest">Add some high-performance hardware to proceed</p>
+                    <h1 className="text-3xl font-black text-foreground uppercase tracking-tighter">{t('cart_empty')}</h1>
+                    <p className="text-surface-500 font-bold uppercase text-[10px] tracking-widest">{t('cart_empty_desc')}</p>
                 </div>
                 <Link href="/products" className="bg-primary text-white font-black px-10 py-5 rounded-xl uppercase text-xs tracking-widest hover:bg-foreground transition-all shadow-xl shadow-primary/20">
-                    Browse Inventory
+                    {t('nav_products')}
                 </Link>
             </div>
         );
@@ -124,16 +136,15 @@ export default function CheckoutPage() {
 
     return (
         <div className="max-w-7xl mx-auto px-4 md:px-0 pb-20 pt-6 md:pt-10 space-y-12 animate-fade-in">
-            {/* PROGRESS TRACKER */}
             <div className="flex items-center justify-center gap-4 md:gap-10 text-[9px] md:text-[11px] font-black uppercase tracking-[0.3em] text-surface-400">
                 <div className={`flex items-center gap-2 ${step >= 1 ? "text-primary" : ""}`}>
                     <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${step >= 1 ? "border-primary bg-primary/10" : "border-surface-200"}`}>1</span>
-                    <span className="hidden sm:inline">Information</span>
+                    <span className="hidden sm:inline">{t('admin_general_info')}</span>
                 </div>
                 <div className="w-8 md:w-16 h-px bg-surface-200 dark:bg-white/10" />
                 <div className={`flex items-center gap-2 ${step >= 2 ? "text-primary" : ""}`}>
                     <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${step >= 2 ? "border-primary bg-primary/10" : "border-surface-200"}`}>2</span>
-                    <span className="hidden sm:inline">Payment</span>
+                    <span className="hidden sm:inline">{t('det_total_valuation')}</span>
                 </div>
             </div>
 
@@ -145,20 +156,18 @@ export default function CheckoutPage() {
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-16 items-start">
-                {/* LEFT: FORM */}
                 <div className="lg:col-span-7 space-y-10">
                     <div className="bg-white dark:bg-zinc-900 rounded-[2rem] md:rounded-[3rem] p-8 md:p-12 border border-surface-200 dark:border-white/5 shadow-xl">
                         <form onSubmit={handleCheckout} className="space-y-10 md:space-y-12">
-                            {/* Shipping Destination */}
                             <div className="space-y-8">
                                 <div className="border-l-4 border-primary pl-6">
-                                    <h2 className="text-xl md:text-2xl font-black text-foreground uppercase tracking-tighter">Shipping Destination</h2>
-                                    <p className="text-surface-500 font-bold uppercase text-[9px] tracking-widest mt-1">Specify where your hardware should be deployed</p>
+                                    <h2 className="text-xl md:text-2xl font-black text-foreground uppercase tracking-tighter">{t('ord_shipping_address')}</h2>
+                                    <p className="text-surface-500 font-bold uppercase text-[9px] tracking-widest mt-1">{t('admin_registered_clients')}</p>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-surface-500 uppercase tracking-widest ml-1">Full Name</label>
+                                        <label className="text-[10px] font-black text-surface-500 uppercase tracking-widest ml-1">{t('auth_fullname')}</label>
                                         <input 
                                             required
                                             type="text" 
@@ -169,7 +178,7 @@ export default function CheckoutPage() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-surface-500 uppercase tracking-widest ml-1">Phone Number</label>
+                                        <label className="text-[10px] font-black text-surface-500 uppercase tracking-widest ml-1">{t('auth_phone')}</label>
                                         <input 
                                             required
                                             type="tel" 
@@ -180,11 +189,10 @@ export default function CheckoutPage() {
                                         />
                                     </div>
 
-                                    {/* REGION SELECTOR */}
                                     <div className="space-y-4 md:col-span-2 bg-surface-50 dark:bg-black/40 p-6 rounded-2xl border border-surface-200 dark:border-white/5">
                                         <div className="flex items-center justify-between">
                                             <div className="space-y-1">
-                                                <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest">Delivery Region</label>
+                                                <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest">{t('ord_region')}</label>
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-primary">
                                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -223,32 +231,38 @@ export default function CheckoutPage() {
                                         )}
                                     </div>
 
-                                    <div className="space-y-2 md:col-span-2">
-                                        <label className="text-[10px] font-black text-surface-500 uppercase tracking-widest ml-1">Delivery Address</label>
-                                        <textarea 
-                                            required
-                                            rows="3"
-                                            value={formData.address}
-                                            onChange={(e) => setFormData({...formData, address: e.target.value})}
-                                            className="w-full bg-surface-50 dark:bg-black border border-surface-200 dark:border-white/10 rounded-xl px-6 py-4 text-sm text-foreground focus:ring-1 focus:ring-primary outline-none transition-all resize-none" 
-                                            placeholder="STREET, APARTMENT, DISTRICT, CITY..." 
-                                        />
+                                    <div className="space-y-4 md:col-span-2">
+                                        <div className="bg-primary/5 border border-primary/20 p-4 rounded-xl">
+                                            <p className="text-[10px] font-bold text-primary leading-relaxed">
+                                                ⚠️ {t('checkout_address_instruction')}
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-surface-500 uppercase tracking-widest ml-1">{t('checkout_street_name')}</label>
+                                            <textarea 
+                                                required
+                                                rows="3"
+                                                value={formData.address}
+                                                onChange={(e) => setFormData({...formData, address: e.target.value})}
+                                                className="w-full bg-surface-50 dark:bg-black border border-surface-200 dark:border-white/10 rounded-xl px-6 py-4 text-sm text-foreground focus:ring-1 focus:ring-primary outline-none transition-all resize-none" 
+                                                placeholder={t('checkout_address_placeholder')}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Payment Methods */}
                             <div className="space-y-8">
                                 <div className="border-l-4 border-primary pl-6">
-                                    <h2 className="text-xl md:text-2xl font-black text-foreground uppercase tracking-tighter">Secure Payment</h2>
-                                    <p className="text-surface-500 font-bold uppercase text-[9px] tracking-widest mt-1">Select your preferred transaction protocol</p>
+                                    <h2 className="text-xl md:text-2xl font-black text-foreground uppercase tracking-tighter">{t('det_payment_method')}</h2>
+                                    <p className="text-surface-500 font-bold uppercase text-[9px] tracking-widest mt-1">{t('det_cargo_manifest')}</p>
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                     {[
                                         { id: 'payme', name: 'Payme', icon: '/icons/main-payme.webp' },
                                         { id: 'click', name: 'Click', icon: '/icons/main-click.webp' },
-                                        { id: 'cash', name: 'Cash', icon: null }
+                                        { id: 'cash', name: t('det_cash_on_delivery'), icon: null }
                                     ].map((method) => (
                                         <div 
                                             key={method.id}
@@ -273,18 +287,17 @@ export default function CheckoutPage() {
                                 disabled={isSubmitting}
                                 className="w-full bg-foreground dark:bg-white text-background dark:text-black font-black py-6 rounded-2xl shadow-2xl hover:bg-primary hover:text-white transition-all uppercase text-xs tracking-[0.2em] active:scale-[0.98] disabled:opacity-50"
                             >
-                                {isSubmitting ? 'Validating Protocol...' : 'Complete Order'}
+                                {isSubmitting ? t('admin_updating') + '...' : t('det_confirm_order')}
                             </button>
                         </form>
                     </div>
                 </div>
 
-                {/* RIGHT: SUMMARY */}
                 <div className="lg:col-span-5 space-y-8 sticky top-32">
                     <div className="bg-surface-50 dark:bg-zinc-900 rounded-[2rem] border border-surface-200 dark:border-white/5 overflow-hidden shadow-xl">
                         <div className="p-8 border-b border-surface-200 dark:border-white/5 bg-white dark:bg-zinc-800/50">
-                            <h3 className="text-xl font-black text-foreground uppercase tracking-tighter">Order Summary</h3>
-                            <p className="text-surface-500 font-bold uppercase text-[9px] tracking-widest mt-1">Review your hardware configuration</p>
+                            <h3 className="text-xl font-black text-foreground uppercase tracking-tighter">{t('cart_summary')}</h3>
+                            <p className="text-surface-500 font-bold uppercase text-[9px] tracking-widest mt-1">{t('det_manifest')}</p>
                         </div>
                         
                         <div className="p-8 space-y-6 max-h-[400px] overflow-y-auto custom-scrollbar">
@@ -295,7 +308,7 @@ export default function CheckoutPage() {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-[11px] font-black text-foreground uppercase tracking-tight truncate">{item.name}</p>
-                                        <p className="text-[10px] text-surface-500 font-bold uppercase tracking-widest">Qty: {item.quantity || 1}</p>
+                                        <p className="text-[10px] text-surface-500 font-bold uppercase tracking-widest">{t('det_qty')}: {item.quantity || 1}</p>
                                     </div>
                                     <div className="text-right">
                                         <PriceDisplay price={item.price * (item.quantity || 1)} className="text-sm font-black text-foreground tracking-tight" />
@@ -306,18 +319,18 @@ export default function CheckoutPage() {
 
                         <div className="p-8 bg-white dark:bg-zinc-800/30 border-t border-surface-200 dark:border-white/5 space-y-4">
                             <div className="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest text-surface-500">
-                                <span>Subtotal</span>
+                                <span>{t('det_subtotal')}</span>
                                 <PriceDisplay price={subtotal} className="text-foreground" />
                             </div>
                             <div className="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest text-surface-500">
-                                <span>Shipping</span>
-                                <span className="text-green-500">Free</span>
+                                <span>{t('det_delivery')}</span>
+                                <span className="text-green-500">{t('det_free')}</span>
                             </div>
                             <div className="h-px bg-surface-200 dark:bg-white/10 my-2" />
                             <div className="flex justify-between items-end">
                                 <div className="space-y-1">
-                                    <span className="text-[10px] font-black text-surface-400 uppercase tracking-[0.2em]">Total Amount</span>
-                                    <p className="text-xs text-surface-500 font-bold uppercase">Tax included</p>
+                                    <span className="text-[10px] font-black text-surface-400 uppercase tracking-[0.2em]">{t('det_total_valuation')}</span>
+                                    <p className="text-xs text-surface-500 font-bold uppercase">{t('det_tax_included')}</p>
                                 </div>
                                 <PriceDisplay price={total} className="text-3xl font-black text-foreground tracking-tighter" />
                             </div>

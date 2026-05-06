@@ -241,8 +241,12 @@ export default function Navbar() {
                                                 onClick={() => setIsProfileOpen(!isProfileOpen)}
                                                 className="flex items-center gap-2 group outline-none"
                                             >
-                                                <div className="w-8 h-8 md:w-9 md:h-9 bg-primary rounded-lg md:rounded-xl flex items-center justify-center font-black text-white shadow-lg shadow-primary/40 transition-transform group-hover:scale-105 active:scale-95 text-xs">
-                                                    {user.displayName?.[0] || user.email?.[0].toUpperCase()}
+                                                <div className="w-8 h-8 md:w-9 md:h-9 bg-primary rounded-lg md:rounded-xl overflow-hidden flex items-center justify-center font-black text-white shadow-lg shadow-primary/40 transition-transform group-hover:scale-105 active:scale-95 text-xs">
+                                                    {(user.photoURL || user.avatar) ? (
+                                                        <img src={user.photoURL || user.avatar} alt={user.displayName} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        user.displayName?.[0] || user.email?.[0].toUpperCase()
+                                                    )}
                                                 </div>
                                             </button>
 
