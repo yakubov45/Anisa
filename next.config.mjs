@@ -22,6 +22,10 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'i.rtings.com',
             },
+            {
+                protocol: 'https',
+                hostname: 'avatars.mds.yandex.net',
+            },
         ],
     },
 };

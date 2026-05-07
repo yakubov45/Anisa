@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
+import { auth } from "@/lib/firebase/client"
 
 export default function AdminBrandsPage() {
     const [brands, setBrands] = useState([]);
@@ -30,8 +31,12 @@ export default function AdminBrandsPage() {
         formData.append("file", file);
 
         try {
+            const token = await auth.currentUser?.getIdToken();
             const res = await fetch("/api/upload", {
                 method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
                 body: formData
             });
             const data = await res.json();
@@ -49,9 +54,13 @@ export default function AdminBrandsPage() {
         e.preventDefault();
         if (!newBrand.name || !newBrand.logo) return;
 
+        const token = await auth.currentUser?.getIdToken();
         const res = await fetch("/api/brands", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
             body: JSON.stringify(newBrand)
         });
 

@@ -3,8 +3,10 @@
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { getPreBuiltSystems } from "@/features/product/api"
+import { useTranslation } from "@/lib/LanguageContext"
 
 export default function ReadyBuilds() {
+    const { t } = useTranslation()
     const [currentIndex, setCurrentIndex] = useState(0);
     const [builds, setBuilds] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -88,12 +90,10 @@ export default function ReadyBuilds() {
             <div
                 className="relative flex w-full transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
                 style={{
-                    // Inline width ni olib tashladik, endi slider faqat translateX orqali boshqariladi
                     transform: `translateX(calc(-${currentIndex * 100}% + ${dragOffset}px))`
                 }}
             >
                 {builds.map((activePC, idx) => (
-                    // Xatolikni to'g'irlash uchun "min-w-full w-full" klassini qo'shdik, shunda rasmlar o'z o'rniga tushadi
                     <div key={activePC.id} className="min-w-full w-full flex-shrink-0 flex flex-col lg:flex-row items-center gap-8 md:gap-12 p-6 md:p-20 min-h-[500px] md:min-h-[550px]">
 
                         {/* Left: Content */}
@@ -101,7 +101,7 @@ export default function ReadyBuilds() {
                             <div className="space-y-4">
                                 <div className="flex items-center gap-4">
                                     <div className="w-10 h-1 bg-primary rounded-full" />
-                                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">Featured Build {idx + 1}</span>
+                                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">{t('pc_builder_featured')} {idx + 1}</span>
                                 </div>
                                 <h2 className="text-2xl lg:text-7xl font-black text-white tracking-tighter uppercase leading-none">{activePC.name}</h2>
                                 <p className="text-white/60 font-bold text-xs lg:text-base max-w-lg leading-relaxed uppercase tracking-wider">
@@ -117,21 +117,21 @@ export default function ReadyBuilds() {
                                 <div className="space-y-1">
                                     <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Build Status</span>
                                     <p className="text-[10px] md:text-xs font-bold text-green-500 uppercase tracking-wider flex items-center gap-2">
-                                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" /> Certified Stable
+                                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" /> {t('pc_builder_stable')}
                                     </p>
                                 </div>
                             </div>
 
                             <div className="flex items-center gap-8">
                                 <div className="flex flex-col">
-                                    <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">One-time Investment</span>
+                                    <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">{t('pc_builder_investment')}</span>
                                     <span className="text-2xl md:text-4xl font-black text-white tracking-tighter">$ {activePC.price}</span>
                                 </div>
                                 <Link
                                     href={`/pc-builder/${activePC.id}`}
                                     className="lg:flex-none bg-primary text-white font-black text-[10px] md:text-xs text-center uppercase tracking-[0.2em] px-10 md:px-12 py-3.5 md:py-5 rounded-2xl hover:bg-white hover:text-black transition-all shadow-xl shadow-primary/20"
                                 >
-                                    View Details
+                                    {t('pc_builder_view_details')}
                                 </Link>
                             </div>
                         </div>

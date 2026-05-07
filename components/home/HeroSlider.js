@@ -11,23 +11,23 @@ export default function HeroSlider({ initialSlides }) {
     const DEFAULT_SLIDES = [
         {
             id: 1,
-            title: t('hero_title').split(' ')[0],
-            subtitle: t('hero_title').split(' ').slice(1).join(' '),
-            badge: "Ultimate Hardware 2026",
-            description: t('hero_subtitle'),
+            title: t('hero_1_title'),
+            subtitle: t('hero_1_subtitle'),
+            badge: t('hero_1_badge'),
+            description: t('hero_1_desc'),
             image: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=1200&auto=format&fit=crop&q=90",
             link: "/products",
-            linkText: t('hero_cta')
+            linkText: t('hero_cta_shop')
         },
         {
             id: 2,
-            title: "Gaming",
-            subtitle: "Unleashed.",
-            badge: "RTX 5090 Ready",
-            description: "Experience virtual worlds in breathtaking detail with our custom-tuned high-end gaming rigs.",
-            image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&auto=format&fit=crop&q=90",
+            title: t('hero_2_title'),
+            subtitle: t('hero_2_subtitle'),
+            badge: t('hero_2_badge'),
+            description: t('hero_2_desc'),
+            image: "https://images.unsplash.com/photo-1591485121906-6033fb939881?w=1200&auto=format&fit=crop&q=90",
             link: "/pc-builder",
-            linkText: t('hero_secondary_cta')
+            linkText: t('hero_cta_builder')
         }
     ];
 
@@ -132,10 +132,10 @@ export default function HeroSlider({ initialSlides }) {
                                     {slide.badge}
                                 </div>
 
-                                {/* Mobil shrift o'lchami text-3xl ga o'zgartirildi (juda katta bo'lmasligi uchun) */}
-                                <h1 className="text-3xl sm:text-5xl md:text-8xl font-black text-white leading-[1.1] md:leading-[0.85] tracking-tighter uppercase italic">
+                                {/* Mobil shrift o'lchami text-2xl ga o'zgartirildi (juda katta bo'lmasligi uchun) */}
+                                <h1 className="text-2xl sm:text-4xl md:text-6xl font-black text-white leading-[1.1] md:leading-[1.1] tracking-tighter uppercase italic break-words">
                                     {slide.title} <br />
-                                    <span className="text-primary not-italic break-words">{slide.subtitle}</span>
+                                    <span className="text-primary not-italic">{slide.subtitle}</span>
                                 </h1>
 
                                 {/* Ta'rif matni o'lchami mobil uchun moslandi - juda keng bo'lib ketmasligi uchun max-w qo'shildi */}
@@ -145,10 +145,10 @@ export default function HeroSlider({ initialSlides }) {
 
                                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 pt-4">
                                     <Link href={slide.link} className="bg-primary text-white font-black px-10 sm:px-12 py-3.5 md:py-5 rounded-2xl hover:bg-white hover:text-black transition-all shadow-2xl shadow-primary/20 active:scale-95 uppercase text-[10px] md:text-xs tracking-widest w-auto text-center flex items-center justify-center">
-                                        {slide.linkText || t('hero_cta')}
+                                        {slide.linkText || t('hero_cta_shop')}
                                     </Link>
                                     <Link href="/pc-builder" className="text-white/50 font-black hover:text-white transition-colors flex items-center gap-4 group/btn text-[10px] md:text-xs uppercase tracking-[0.2em] md:tracking-[0.3em] w-auto justify-center sm:justify-start py-2">
-                                        {t('hero_secondary_cta')}
+                                        {t('hero_cta_builder')}
                                         <svg className="w-4 h-4 md:w-5 md:h-5 group-hover/btn:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                                     </Link>
                                 </div>

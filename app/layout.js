@@ -7,6 +7,7 @@ import { LanguageProvider } from "@/lib/LanguageContext";
 import { CartSyncProvider } from "@/lib/CartSyncProvider";
 import IntroOverlay from "@/components/layout/IntroOverlay";
 import ToastContainer from "@/components/common/ToastContainer";
+import ConfirmModal from "@/components/common/ConfirmModal";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
@@ -31,6 +32,7 @@ export default function RootLayout({ children }) {
                         <CartSyncProvider>
                             <IntroOverlay />
                             <ToastContainer />
+                            <ConfirmModal />
                             <div className="min-h-screen flex flex-col">
                                 <Navbar />
                                 <main className="flex-1 max-w-[1600px] mx-auto w-full px-6 md:px-12 pt-20 md:pt-32 pb-12">

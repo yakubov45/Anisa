@@ -29,6 +29,20 @@ const useUIStore = create((set) => ({
     triggerCartAnimation: () => {
         set({ cartAnimation: true });
         setTimeout(() => set({ cartAnimation: false }), 1000);
+    },
+
+    // Global Confirm Modal
+    confirmModal: {
+        isOpen: false,
+        message: "",
+        onConfirm: null,
+        title: "Confirm Action"
+    },
+    showConfirm: (message, onConfirm, title = "Confirm Action") => {
+        set({ confirmModal: { isOpen: true, message, onConfirm, title } });
+    },
+    hideConfirm: () => {
+        set({ confirmModal: { isOpen: false, message: "", onConfirm: null, title: "" } });
     }
 }))
 

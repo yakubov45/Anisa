@@ -3,11 +3,24 @@
 import { useState } from "react";
 import { useTranslation } from "@/lib/LanguageContext";
 import useStore from "@/store/useStore";
+import useUIStore from "@/store/useUIStore";
 import Link from "next/link";
 
 export default function CartPage() {
-    const { cart, removeFromCart, updateQuantity } = useStore();
+    const { cart, removeFromCart, updateQuantity, clearCart } = useStore();
     const { t } = useTranslation();
+    const { addToast, showConfirm } = useUIStore();
+
+    const handleClearCart = () => {
+        showConfirm(
+            t('cart_clear_confirm'),
+            () => {
+                clearCart();
+                addToast(t('cart_cleared_msg'));
+            },
+            t('nav_cart').toUpperCase()
+        );
+    };
     
     const calculateItemTotal = (item) => {
         const price = Number(item.price) || 0;
@@ -22,11 +35,11 @@ export default function CartPage() {
             <div className="min-h-[70vh] flex flex-col items-center justify-center space-y-8 animate-fade-in pt-20">
                 <div className="w-24 h-24 bg-surface-50 dark:bg-surface-100 rounded-full flex items-center justify-center text-4xl grayscale opacity-50">🛒</div>
                 <div className="text-center space-y-2">
-                    <h2 className="text-3xl font-black text-foreground tracking-tighter uppercase whitespace-nowrap">Cart is Empty</h2>
-                    <p className="text-surface-500 font-bold uppercase text-[9px] tracking-[0.3em]">Choose some hardware to get started</p>
+                    <h2 className="text-3xl font-black text-foreground tracking-tighter uppercase whitespace-nowrap">{t('cart_empty')}</h2>
+                    <p className="text-surface-500 font-bold uppercase text-[9px] tracking-[0.3em]">{t('cart_empty_desc')}</p>
                 </div>
                 <Link href="/products" className="bg-primary text-white px-10 py-5 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-foreground transition-all shadow-xl shadow-primary/20">
-                    Browse Products
+                    {t('cart_browse')}
                 </Link>
             </div>
         );
@@ -34,11 +47,18 @@ export default function CartPage() {
 
     return (
         <div className="max-w-7xl mx-auto px-4 md:px-8 space-y-12 animate-fade-in pt-10 pb-20">
-            <div className="flex items-end justify-between border-l-4 border-primary pl-8">
+            <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 border-l-4 border-primary pl-8">
                 <div className="space-y-2">
-                    <h1 className="text-3xl font-black text-foreground tracking-tighter uppercase">Shopping Cart</h1>
-                    <p className="text-surface-500 font-bold uppercase text-[9px] tracking-[0.2em]">Hardware selection manifest</p>
+                    <h1 className="text-3xl font-black text-foreground tracking-tighter uppercase">{t('cart_title')}</h1>
+                    <p className="text-surface-500 font-bold uppercase text-[9px] tracking-[0.2em]">{t('cart_subtitle')}</p>
                 </div>
+                <button 
+                    onClick={handleClearCart}
+                    className="group flex items-center gap-2 text-[10px] font-black text-surface-400 hover:text-red-500 uppercase tracking-widest transition-all"
+                >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    <span>{t('cart_clear_btn')}</span>
+                </button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -89,21 +109,21 @@ export default function CartPage() {
                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03] pointer-events-none" />
 
                     <div className="space-y-6 relative z-10">
-                        <h3 className="text-xl font-black tracking-tighter text-foreground uppercase">Order Summary</h3>
+                        <h3 className="text-xl font-black tracking-tighter text-foreground uppercase">{t('cart_summary')}</h3>
                         <div className="space-y-4 text-[9px] font-black text-surface-500 uppercase tracking-[0.2em]">
-                            <div className="flex justify-between"><span>Subtotal</span><span className="text-foreground">${subtotal.toLocaleString()}</span></div>
-                            <div className="flex justify-between"><span>Shipping</span><span className="text-green-500">Free</span></div>
-                            <div className="flex justify-between"><span>Tax</span><span className="text-foreground">Included</span></div>
+                            <div className="flex justify-between"><span>{t('cart_subtotal')}</span><span className="text-foreground">${subtotal.toLocaleString()}</span></div>
+                            <div className="flex justify-between"><span>{t('cart_shipping')}</span><span className="text-green-500">{t('cart_shipping_free')}</span></div>
+                            <div className="flex justify-between"><span>{t('cart_tax')}</span><span className="text-foreground">{t('cart_tax_included')}</span></div>
                         </div>
                     </div>
 
                     <div className="pt-8 border-t border-surface-200 dark:border-white/5 space-y-6 relative z-10">
                         <div className="flex justify-between items-end">
-                            <span className="text-surface-500 font-black uppercase text-[8px] tracking-[0.3em]">Total Amount</span>
+                            <span className="text-surface-500 font-black uppercase text-[8px] tracking-[0.3em]">{t('cart_total')}</span>
                             <span className="text-3xl font-black text-foreground tracking-tighter">${subtotal.toLocaleString()}</span>
                         </div>
                         <Link href="/checkout" className="block w-full bg-foreground dark:bg-white text-background dark:text-black font-black py-5 rounded-xl text-center shadow-lg hover:bg-primary hover:text-white transition-all uppercase text-[10px] tracking-widest active:scale-95">
-                            Checkout Now
+                            {t('cart_checkout_btn')}
                         </Link>
                     </div>
                 </div>

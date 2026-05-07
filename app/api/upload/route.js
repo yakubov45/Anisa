@@ -1,8 +1,14 @@
 import { NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
+import { requireAdmin } from "@/lib/firebase/serverAuth";
 
 export async function POST(request) {
+    const auth = await requireAdmin(request);
+    if (auth.error) {
+        return NextResponse.json({ error: auth.error }, { status: auth.status });
+    }
+
     try {
         const formData = await request.formData();
         const file = formData.get('file');

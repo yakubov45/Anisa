@@ -1,12 +1,15 @@
 "use client"
 
 import { useRef, useState, useEffect } from 'react';
+import { useTranslation } from '@/lib/LanguageContext';
 import ProductCard from '@/features/product/ProductCard';
 import { flashDealsService } from '@/lib/services/flash-deals.service';
 import { getProductsByIds, getProducts } from '@/features/product/api';
 
 export default function DiscountBanner() {
+    const { t } = useTranslation();
     const scrollRef = useRef(null);
+    const ticking = useRef(false);
     const [settings, setSettings] = useState(null);
     const [products, setProducts] = useState([]);
     const [timeLeft, setTimeLeft] = useState({ h: 0, m: 0, s: 0 });
@@ -15,10 +18,14 @@ export default function DiscountBanner() {
     const [scrollProgress, setScrollProgress] = useState(0);
 
     const handleScroll = () => {
-        if (scrollRef.current) {
-            const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-            const progress = (scrollLeft / (scrollWidth - clientWidth)) * 100;
-            setScrollProgress(progress);
+        if (scrollRef.current && !ticking.current) {
+            window.requestAnimationFrame(() => {
+                const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+                const progress = (scrollLeft / (scrollWidth - clientWidth)) * 100;
+                setScrollProgress(progress);
+                ticking.current = false;
+            });
+            ticking.current = true;
         }
     };
 
@@ -87,6 +94,8 @@ export default function DiscountBanner() {
     if (loading) return null;
     if (isExpired || products.length === 0) return null;
 
+    const flashDealsTitle = t('home_flash_deals').split(' ');
+
     return (
         <section className="relative overflow-hidden rounded-3xl md:rounded-[3rem] bg-[#0A0A0B] border border-white/5 shadow-2xl shadow-primary/10 mx-4 md:mx-8 animate-fade-in">
             {/* Background Gradients */}
@@ -98,12 +107,12 @@ export default function DiscountBanner() {
                     <div className="space-y-4">
                         <div className="flex items-center gap-3">
                             <span className="bg-primary text-white text-[9px] font-black px-4 py-2 rounded-full uppercase tracking-[0.2em] animate-pulse">
-                                Active Promotion
+                                {t('home_promo_active')}
                             </span>
                             <div className="w-12 h-px bg-white/10" />
                         </div>
                         <h2 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none">
-                            FLASH <span className="text-primary italic">DEALS</span>
+                            {flashDealsTitle[0]} <span className="text-primary italic">{flashDealsTitle.slice(1).join(' ')}</span>
                         </h2>
                     </div>
 
@@ -111,17 +120,17 @@ export default function DiscountBanner() {
                     <div className="flex items-center gap-4 md:gap-6 bg-white/5 p-4 md:p-6 rounded-2xl md:rounded-[2rem] border border-white/10 backdrop-blur-md">
                         <div className="flex flex-col items-center">
                             <span className="text-3xl font-black text-white tabular-nums">{timeLeft.h.toString().padStart(2, '0')}</span>
-                            <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest mt-1">Hours</span>
+                            <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest mt-1">{t('home_hours')}</span>
                         </div>
                         <div className="text-2xl font-black text-primary opacity-50 mb-4">:</div>
                         <div className="flex flex-col items-center">
                             <span className="text-3xl font-black text-white tabular-nums">{timeLeft.m.toString().padStart(2, '0')}</span>
-                            <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest mt-1">Mins</span>
+                            <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest mt-1">{t('home_mins')}</span>
                         </div>
                         <div className="text-2xl font-black text-primary opacity-50 mb-4">:</div>
                         <div className="flex flex-col items-center">
                             <span className="text-3xl font-black text-primary tabular-nums">{timeLeft.s.toString().padStart(2, '0')}</span>
-                            <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest mt-1">Secs</span>
+                            <span className="text-[8px] font-black text-zinc-500 uppercase tracking-widest mt-1">{t('home_secs')}</span>
                         </div>
                     </div>
 

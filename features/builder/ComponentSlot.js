@@ -1,20 +1,22 @@
 "use client"
 
+import { useTranslation } from "@/lib/LanguageContext"
 import ImageWithFallback from "@/components/common/ImageWithFallback"
 import PriceDisplay from "@/components/common/PriceDisplay"
 
-const COMPONENT_DESCRIPTIONS = {
-    cpu: "Kompyuterning miyasi - barcha hisob-kitoblarni bajaradi.",
-    motherboard: "Asosiy plata - barcha detallarni bir-biriga bog'laydi.",
-    ram: "Tezkor xotira - bir vaqtning o'zida ko'p dasturda ishlash uchun.",
-    gpu: "Video karta - o'yinlar va grafika sifatiga javob beradi.",
-    storage: "Xotira (SSD/HDD) - barcha fayl va o'yinlarni saqlash uchun.",
-    psu: "Blok pitaniya - kompyuterni elektr quvvati bilan ta'minlaydi.",
-    case: "Korpus - barcha detallar uchun quti.",
-    cooling: "Sovutish tizimi - detallar qizib ketmasligi uchun."
-}
-
 export default function ComponentSlot({ category, title, selectedPart, onSelect, onRemove }) {
+    const { t } = useTranslation()
+    
+    const COMPONENT_DESCRIPTIONS = {
+        cpu: t('comp_cpu_desc'),
+        motherboard: t('comp_mob_desc'),
+        ram: t('comp_ram_desc'),
+        gpu: t('comp_gpu_desc'),
+        storage: t('comp_sto_desc'),
+        psu: t('comp_psu_desc'),
+        case: t('comp_cas_desc'),
+        cooling: t('comp_coo_desc')
+    }
     return (
         <div className="bg-surface-50 border border-border-alpha rounded-2xl p-4 md:p-6 transition-all hover:border-primary/30 group">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 md:gap-6">
@@ -44,7 +46,7 @@ export default function ComponentSlot({ category, title, selectedPart, onSelect,
                                 onClick={onSelect}
                                 className="text-[10px] md:text-xs font-black text-primary hover:underline uppercase tracking-widest flex items-center gap-2 mt-1 bg-primary/5 px-3 py-1.5 rounded-lg w-fit"
                             >
-                                <span className="text-sm">+</span> SELECT_COMPONENT
+                                <span className="text-sm">+</span> {t('comp_select')}
                             </button>
                         )}
                     </div>

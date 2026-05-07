@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslation } from "@/lib/LanguageContext"
 import useBuildStore from "@/store/useBuildStore"
 import ComponentSlot from "@/features/builder/ComponentSlot"
 import ComponentPickerModal from "@/features/builder/ComponentPickerModal"
@@ -29,8 +30,28 @@ const COMPONENT_STRUCTURE = [
 ]
 
 export default function PCBuilderPage() {
+    const { t } = useTranslation()
     const { selectedParts, setPart, removePart } = useBuildStore()
     const [pickerState, setPickerState] = useState({ isOpen: false, category: '', id: '' })
+
+    const COMPONENT_STRUCTURE = [
+        // Core Components
+        { id: 'cpu', title: t('comp_cpu'), category: 'Processors', section: 'Core' },
+        { id: 'motherboard', title: t('comp_mob'), category: 'Motherboards', section: 'Core' },
+        { id: 'ram', title: t('comp_ram'), category: 'Memory', section: 'Core' },
+        { id: 'gpu', title: t('comp_gpu'), category: 'Graphics', section: 'Core' },
+        { id: 'storage', title: t('comp_sto'), category: 'Storage', section: 'Core' },
+        { id: 'psu', title: t('comp_psu'), category: 'PSUs', section: 'Core' },
+        { id: 'case', title: t('comp_cas'), category: 'Cases', section: 'Core' },
+        { id: 'cooling', title: t('comp_coo'), category: 'Cooling', section: 'Core' },
+        // Peripherals & Furniture
+        { id: 'monitor', title: t('nav_products'), category: 'Monitors', section: 'Setup' },
+        { id: 'keyboard', title: 'Mechanical Keyboard', category: 'Klaviaturalar', section: 'Setup' },
+        { id: 'mouse', title: 'Gaming Mouse', category: 'Sichqonchalar', section: 'Setup' },
+        { id: 'headphones', title: 'Audio / Headset', category: 'Quloqchinlar', section: 'Setup' },
+        { id: 'chair', title: 'Gaming Chair', category: 'Chairs', section: 'Setup' },
+        { id: 'desk', title: 'Pro Gaming Desk', category: 'Desks', section: 'Setup' },
+    ]
 
     const openPicker = (id, category) => {
         setPickerState({ isOpen: true, category, id })
@@ -50,11 +71,11 @@ export default function PCBuilderPage() {
             <div className="space-y-3">
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-1 bg-primary rounded-full" />
-                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">System Architect</span>
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">{t('pc_builder_title')}</span>
                 </div>
                 <h1 className="text-3xl md:text-5xl font-black text-foreground tracking-tighter uppercase">PC BUILDER PRO</h1>
                 <p className="text-foreground/60 font-medium max-w-2xl text-sm leading-relaxed">
-                    Design and validate your high-performance computing system. Our intelligent compatibility engine ensures all components are technically aligned before deployment.
+                    {t('pc_builder_subtitle')}
                 </p>
             </div>
 
@@ -66,7 +87,7 @@ export default function PCBuilderPage() {
                 {/* Left: Components Selection */}
                 <div className="flex-1 space-y-4 md:space-y-6 w-full">
                     <div className="flex items-center justify-between border-b border-border-alpha pb-4">
-                        <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.4em]">Component Selection</h3>
+                        <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.4em]">{t('pc_builder_component_selection')}</h3>
                         <span className="text-[9px] font-mono text-surface-400">VERSION 1.0.4 STABLE</span>
                     </div>
 

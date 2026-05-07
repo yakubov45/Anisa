@@ -1,10 +1,14 @@
+"use client"
+
 import { useState, useEffect } from "react"
+import { useTranslation } from "@/lib/LanguageContext"
 import useBuildStore from "@/store/useBuildStore"
 import useStore from "@/store/useStore"
 import useUIStore from "@/store/useUIStore"
 import PriceDisplay from "@/components/common/PriceDisplay"
 
 export default function BuildSummary() {
+    const { t } = useTranslation()
     const { selectedParts, getTotalPrice, getProgress, getCompatibilityIssues, resetBuild } = useBuildStore()
     const addToCart = useStore(state => state.addToCart)
     const { addToast, triggerCartAnimation } = useUIStore()
@@ -24,7 +28,7 @@ export default function BuildSummary() {
 
     const handleAddToCart = () => {
         if (hasErrors) {
-            addToast("COMPATIBILITY ERROR DETECTED. FIX BEFORE PURCHASE.", "error")
+            addToast(t('pc_builder_comp_failure'), "error")
             return
         }
 
@@ -34,7 +38,7 @@ export default function BuildSummary() {
         })
 
         triggerCartAnimation()
-        addToast("BUILD ARCHITECTURE SYNCHRONIZED TO CART")
+        addToast(t('pc_builder_build_sync_msg'))
     }
 
     return (
@@ -42,16 +46,16 @@ export default function BuildSummary() {
             {/* Header */}
             <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">Configuration_Summary</span>
-                    <span className="text-[10px] font-mono text-surface-400">ID: {buildId || "SYNCING..."}</span>
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">{t('pc_builder_summary')}</span>
+                    <span className="text-[10px] font-mono text-surface-400">ID: {buildId || t('pc_builder_syncing')}</span>
                 </div>
-                <h3 className="text-2xl font-black text-foreground tracking-tighter uppercase">Elite_Build</h3>
+                <h3 className="text-2xl font-black text-foreground tracking-tighter uppercase">{t('pc_builder_elite_build')}</h3>
             </div>
 
             {/* Progress */}
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-black text-foreground uppercase tracking-widest">Assembly_Progress</span>
+                    <span className="text-[10px] font-black text-foreground uppercase tracking-widest">{t('pc_builder_progress')}</span>
                     <span className="text-[10px] font-mono text-primary font-bold">{progress.count} / {progress.total}</span>
                 </div>
                 <div className="h-2 bg-surface-100 rounded-full overflow-hidden border border-border-alpha p-0.5">
@@ -65,16 +69,16 @@ export default function BuildSummary() {
             {/* Price */}
             <div className="bg-zinc-900 rounded-2xl p-6 space-y-4 border border-white/5">
                 <div className="flex items-center justify-between">
-                    <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Total_Investment</span>
-                    <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">CURRENCY</span>
+                    <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">{t('pc_builder_total')}</span>
+                    <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">{t('pc_builder_currency')}</span>
                 </div>
                 <div className="flex items-baseline gap-2">
                     <PriceDisplay price={totalPrice} className="text-2xl font-black text-white tracking-tighter" />
-                    <span className="text-xs font-mono text-zinc-500 font-bold">/ SYSTEM</span>
+                    <span className="text-xs font-mono text-zinc-500 font-bold">{t('pc_builder_per_system')}</span>
                 </div>
                 <div className="pt-4 border-t border-white/5">
                     <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-zinc-400">Installment Plan</span>
+                        <span className="text-[10px] font-bold text-zinc-400">{t('pc_builder_installment')}</span>
                         <PriceDisplay price={totalPrice / 12} className="text-[10px] font-black text-primary" />
                     </div>
                 </div>
@@ -105,17 +109,17 @@ export default function BuildSummary() {
                             : 'bg-primary text-white shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-30'
                         }`}
                 >
-                    {hasErrors ? 'COMPATIBILITY_FAILURE' : 'INITIALIZE_PURCHASE'}
+                    {hasErrors ? t('pc_builder_comp_failure') : t('pc_builder_buy')}
                 </button>
                 <div className="grid grid-cols-2 gap-3">
                     <button className="bg-surface-100 border border-border-alpha text-foreground font-black text-[9px] uppercase tracking-widest py-4 rounded-xl hover:bg-foreground hover:text-background transition-all">
-                        Save_Build
+                        {t('pc_builder_save_build')}
                     </button>
                     <button
                         onClick={resetBuild}
                         className="bg-surface-100 border border-border-alpha text-foreground font-black text-[9px] uppercase tracking-widest py-4 rounded-xl hover:bg-red-500 hover:text-white transition-all"
                     >
-                        Reset
+                        {t('pc_builder_reset_btn')}
                     </button>
                 </div>
             </div>

@@ -1,11 +1,11 @@
 import ProductGrid from "@/features/product/ProductGrid";
-import { productService } from "@/lib/services/product.service";
+import { getCategoryProductsAction } from "@/lib/actions/product.actions";
 
-export const revalidate = 3600; // Cache category for 1 hour
+export const revalidate = 60; // Refresh every minute
 
 export default async function CategoryPage({ params }) {
     const { slug } = params;
-    const products = await productService.getAll({ category: slug });
+    const products = await getCategoryProductsAction(slug);
 
     return (
         <div className="space-y-12 animate-fade-in">
