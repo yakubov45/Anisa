@@ -1,22 +1,11 @@
 /** @type {import('next').NextConfig} */
 
-const ContentSecurityPolicy = `
-  default-src 'self' https://*.firebaseio.com https://*.googleapis.com;
-  script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://apis.google.com;
-  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-  img-src * blob: data:;
-  font-src 'self' data: https://fonts.gstatic.com;
-  connect-src *;
-  frame-src 'self' https://*.firebaseapp.com;
-`;
-
 const securityHeaders = [
   { key: 'X-DNS-Prefetch-Control', value: 'on' },
   { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), browsing-topics=()' },
-  { key: 'Content-Security-Policy', value: ContentSecurityPolicy.replace(/\s{2,}/g, ' ').trim() }
+  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), browsing-topics=()' }
 ];
 
 const nextConfig = {
