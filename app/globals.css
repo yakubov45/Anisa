@@ -115,3 +115,18 @@ body::after {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes progress-loading {
+  0% { width: 0%; left: 0; }
+  50% { width: 70%; left: 15%; }
+  100% { width: 100%; left: 0; }
+}
+
+.animate-progress-loading {
+  animation: progress-loading 2s ease-in-out infinite;
+}
