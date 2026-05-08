@@ -68,7 +68,10 @@ async function fetchFromRest(collectionName, limitCount = null) {
     
     const url = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/${collectionName}?pageSize=300`;
     try {
-        const response = await fetch(url, { next: { revalidate: 60 } });
+        const response = await fetch(url, { 
+            next: { revalidate: 60 },
+            signal: AbortSignal.timeout(5000)
+        });
         if (!response.ok) {
             const errorText = await response.text();
             throw new Error(`HTTP ${response.status}: ${errorText}`);

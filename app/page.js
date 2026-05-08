@@ -14,11 +14,24 @@ import SectionHeading from "@/components/common/SectionHeading"
 export const revalidate = 3600
 
 export default async function HomePage() {
-    const allProducts = await getProducts()
-    const banners = await bannerService.getBanners()
+    let allProducts = [];
+    let banners = [];
+
+    try {
+        // Fetch in parallel with a shared timeout safety
+        const results = await Promise.allSettled([
+            getProducts(),
+            bannerService.getBanners()
+        ]);
+
+        allProducts = results[0].status === 'fulfilled' ? results[0].value : [];
+        banners = results[1].status === 'fulfilled' ? results[1].value : [];
+    } catch (error) {
+        console.error("Critical error in HomePage data fetching:", error);
+    }
     
-    const hotProducts = allProducts.slice(0, 12)
-    const topSelling = allProducts.slice(12, 20)
+    const hotProducts = (allProducts || []).slice(0, 12);
+    const topSelling = (allProducts || []).slice(12, 20);
 
     return (
         <div className="space-y-12 md:space-y-20 animate-fade-in pb-20 md:pt-10 px-4 sm:px-0">
