@@ -8,8 +8,7 @@ import ComponentPickerModal from "@/features/builder/ComponentPickerModal"
 import BuildSummary from "@/features/builder/BuildSummary"
 import ReadyBuilds from "@/features/builder/ReadyBuilds"
 import BuilderGuide from "@/features/builder/BuilderGuide"
-import { db } from "@/lib/firebase/client"
-import { doc, getDoc } from "firebase/firestore"
+import { getPCBuilderHeroAction } from "@/lib/actions/pc-builder.actions"
 import AutoBuilder from "@/features/builder/AutoBuilder"
 
 const COMPONENT_STRUCTURE = [
@@ -49,14 +48,12 @@ export default function PCBuilderPage() {
         video2: "/videos/0508%20(2).mp4" 
     });
 
-    // Fetch Custom Videos from Firestore
+    // Fetch Custom Videos from Server Action
     useEffect(() => {
         const fetchVideos = async () => {
             try {
-                const docRef = doc(db, "settings", "pc_builder_hero");
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
+                const data = await getPCBuilderHeroAction()
+                if (data) {
                     setHeroVideos({
                         video1: data.video1 || "/videos/0508.mp4",
                         video2: data.video2 || "/videos/0508%20(2).mp4"

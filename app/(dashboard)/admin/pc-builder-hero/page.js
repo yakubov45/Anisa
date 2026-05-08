@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { db, storage } from "@/lib/firebase/client";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { storage } from "@/lib/firebase/client";
 import { ref, uploadBytesResumable, getDownloadURL, listAll, deleteObject } from "firebase/storage";
+import { getPCBuilderHeroAction, updatePCBuilderHeroAction } from "@/lib/actions/pc-builder.actions"
 import { useTranslation } from "@/lib/LanguageContext";
 
 const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB
@@ -51,17 +51,13 @@ export default function PCBuilderHeroSettings() {
         }
     };
 
-    // Fetch existing settings
+    // Fetch existing settings from Server Action
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const docRef = doc(db, "settings", "pc_builder_hero");
-                const docSnap = await getDoc(docRef);
-                
-                if (docSnap.exists()) {
-                    setVideos(docSnap.data());
-                } else {
-                    setVideos({ video1: defaultVideo1, video2: defaultVideo2 });
+                const data = await getPCBuilderHeroAction();
+                if (data) {
+                    setVideos(data);
                 }
             } catch (err) {
                 console.error("Error fetching hero videos:", err);
@@ -141,11 +137,10 @@ export default function PCBuilderHeroSettings() {
                 updatedVideo2 = await getDownloadURL(uploadTask2.ref);
             }
 
-            // Save to Firestore
-            await setDoc(doc(db, "settings", "pc_builder_hero"), {
+            // Save via Server Action
+            await updatePCBuilderHeroAction({
                 video1: updatedVideo1,
-                video2: updatedVideo2,
-                updatedAt: new Date().toISOString()
+                video2: updatedVideo2
             });
 
             setVideos({ video1: updatedVideo1, video2: updatedVideo2 });
