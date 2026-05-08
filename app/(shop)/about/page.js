@@ -26,28 +26,30 @@ export default function AboutPage() {
         <div className="space-y-16 md:space-y-32 py-10 px-4 sm:px-0">
             {/* Hero Section */}
             <section className="relative h-[60vh] md:h-[70vh] rounded-3xl md:rounded-[4rem] overflow-hidden group mx-4 md:mx-0">
-                <Image
-                    src="/images/banner_02.png"
-                    alt="OnePC Banner"
-                    fill
-                    priority
-                    sizes="100vw"
-                    className="object-cover transition-all duration-1000 scale-110 group-hover:scale-100"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-                    <motion.h1 
+                <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="absolute inset-0 object-cover w-full h-full transition-all duration-1000 scale-110 group-hover:scale-100"
+                >
+                    <source src="/videos/A_hyper_realistic_macro_animat.mp4" type="video/mp4" />
+                </video>
+                <div className="absolute inset-0 bg-black/60 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 text-white">
+                    <motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-6xl md:text-8xl font-black tracking-tighter uppercase leading-none"
+                        className="text-6xl md:text-8xl font-black tracking-tighter uppercase leading-none drop-shadow-2xl"
                     >
-                        {t('about_title')} <br /> <span className="text-primary">OnePC</span>
+                        {t('about_title')} <br /> <span className="text-primary drop-shadow-lg">OnePC</span>
                     </motion.h1>
-                    <motion.p 
+                    <motion.p
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.3 }}
-                        className="mt-8 text-foreground/70 font-bold uppercase text-[10px] tracking-[0.5em] max-w-xl leading-loose"
+                        className="mt-8 text-white/80 font-bold uppercase text-[10px] tracking-[0.5em] max-w-xl leading-loose drop-shadow"
                     >
                         {t('about_subtitle')}
                     </motion.p>
@@ -67,30 +69,102 @@ export default function AboutPage() {
                         {t('about_history_text')}
                     </p>
                 </div>
-                <div className="relative aspect-square rounded-[3rem] overflow-hidden shadow-premium">
-                    <Image 
-                        src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=80"
-                        alt="Workspace"
-                        fill
-                        className="object-cover"
-                    />
-                    <div className="absolute inset-0 bg-primary/10 mix-blend-overlay" />
+                <div className="relative aspect-[4/3] rounded-[3rem] overflow-hidden shadow-premium">
+                    <video
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="object-cover w-full h-full scale-105"
+                    >
+                        <source src="/videos/Youtube retroo.mp4" type="video/mp4" />
+                    </video>
+                    {/* Darkening overlay */}
+                    <div className="absolute inset-0 bg-black/40 pointer-events-none" />
+                    {/* Primary tint overlay */}
+                    <div className="absolute inset-0 bg-primary/10 mix-blend-overlay pointer-events-none" />
                 </div>
             </section>
 
             {/* Quality and Why Choose Us Grid */}
-            <section className="grid grid-cols-1 md:grid-cols-2 gap-8 px-6">
-                <div className="bg-surface/40 p-12 md:p-16 rounded-[3rem] border border-white/5 space-y-8 hover:border-primary/20 transition-all group">
-                    <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">💎</div>
-                    <h3 className="text-3xl font-black uppercase tracking-tight">{t('about_quality_title')}</h3>
-                    <p className="text-foreground/60 text-lg font-medium leading-relaxed">{t('about_quality_text')}</p>
+            <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 px-6">
+
+                {/* Card 1: Quality and Innovation */}
+                <div className="relative group rounded-[3rem] overflow-hidden">
+                    {/* Hover Gradient Background */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+                    {/* Base Glass Layer */}
+                    <div className="absolute inset-0 bg-zinc-900/90 dark:bg-black/60 backdrop-blur-3xl rounded-[3rem]" />
+
+                    {/* Content Container with Border */}
+                    <div className="relative h-full flex flex-col justify-start bg-gradient-to-b from-white/[0.08] to-transparent border border-white/10 group-hover:border-primary/50 p-10 md:p-16 rounded-[3rem] transition-all duration-500 overflow-hidden shadow-2xl">
+
+                        {/* Glow effect behind icon */}
+                        <div className="absolute -top-10 -left-10 w-64 h-64 bg-primary/20 blur-[80px] rounded-full group-hover:bg-primary/40 transition-colors duration-700" />
+
+                        {/* Icon */}
+                        <div className="relative mb-10 w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-[1.5rem] border border-primary/20 flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-transform duration-500 shadow-lg shadow-primary/10">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 text-primary">
+                                <path d="M6 3h12l4 6-10 13L2 9Z" />
+                                <path d="M11 3 8 9l4 13 4-13-3-6" />
+                                <path d="M2 9h20" />
+                            </svg>
+                        </div>
+
+                        {/* Text Content */}
+                        <div className="space-y-6">
+                            <h3 className="text-3xl md:text-4xl font-black uppercase tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70 group-hover:to-primary/80 transition-colors duration-500">
+                                {t('about_quality_title')}
+                            </h3>
+                            <p className="text-zinc-400 text-base md:text-lg font-medium leading-relaxed group-hover:text-zinc-200 transition-colors duration-500">
+                                {t('about_quality_text')}
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <div className="bg-zinc-900 text-white p-12 md:p-16 rounded-[3rem] border border-white/5 space-y-8 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-12 opacity-10 text-9xl font-black pointer-events-none group-hover:scale-125 transition-transform">PC</div>
-                    <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-3xl">🚀</div>
-                    <h3 className="text-3xl font-black uppercase tracking-tight relative z-10">{t('about_why_title')}</h3>
-                    <p className="text-white/60 text-sm font-medium leading-relaxed relative z-10">{t('about_why_text')}</p>
+
+                {/* Card 2: Why Choose Us */}
+                <div className="relative group rounded-[3rem] overflow-hidden">
+                    {/* Hover Gradient Background */}
+                    <div className="absolute inset-0 bg-gradient-to-bl from-indigo-500/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+                    {/* Base Glass Layer */}
+                    <div className="absolute inset-0 bg-zinc-900/90 dark:bg-black/60 backdrop-blur-3xl rounded-[3rem]" />
+
+                    {/* Content Container with Border */}
+                    <div className="relative h-full flex flex-col justify-start bg-gradient-to-b from-white/[0.08] to-transparent border border-white/10 group-hover:border-indigo-500/50 p-10 md:p-16 rounded-[3rem] transition-all duration-500 overflow-hidden shadow-2xl">
+
+                        {/* Massive Animated Watermark */}
+                        <div className="absolute -bottom-10 -right-10 text-[15rem] font-black leading-none text-white/[0.02] group-hover:text-indigo-500/[0.05] group-hover:scale-110 group-hover:-rotate-12 transition-all duration-1000 pointer-events-none select-none">
+                            PC
+                        </div>
+
+                        {/* Glow effect behind icon */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-indigo-500/10 blur-[100px] rounded-full group-hover:bg-indigo-500/20 transition-colors duration-700 pointer-events-none" />
+
+                        {/* Icon */}
+                        <div className="relative mb-10 w-20 h-20 bg-gradient-to-br from-indigo-500/20 to-indigo-500/5 rounded-[1.5rem] border border-indigo-500/20 flex items-center justify-center group-hover:-translate-y-3 group-hover:scale-110 transition-transform duration-500 shadow-lg shadow-indigo-500/10">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 text-indigo-400 group-hover:rotate-12 transition-transform duration-500">
+                                <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+                                <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+                                <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+                                <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+                            </svg>
+                        </div>
+
+                        {/* Text Content */}
+                        <div className="space-y-6 relative z-10">
+                            <h3 className="text-3xl md:text-4xl font-black uppercase tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70 group-hover:to-indigo-400 transition-colors duration-500">
+                                {t('about_why_title')}
+                            </h3>
+                            <p className="text-zinc-400 text-sm md:text-base font-medium leading-relaxed group-hover:text-zinc-200 transition-colors duration-500">
+                                {t('about_why_text')}
+                            </p>
+                        </div>
+                    </div>
                 </div>
+
             </section>
 
             {/* Store Locations */}
@@ -113,12 +187,12 @@ export default function AboutPage() {
                         stores.map((store, idx) => (
                             <div key={idx} className="group relative bg-surface rounded-3xl md:rounded-[3.5rem] overflow-hidden border border-white/5 hover:border-primary/30 transition-all flex flex-col md:flex-row">
                                 <div className="relative w-full md:w-1/2 h-80 md:h-auto">
-                                    <Image 
-                                        src={store.image} 
-                                        alt={store.name} 
-                                        fill 
+                                    <Image
+                                        src={store.image}
+                                        alt={store.name}
+                                        fill
                                         sizes="(max-width: 768px) 100vw, 50vw"
-                                        className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700" 
+                                        className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                                     />
                                 </div>
                                 <div className="p-12 md:w-1/2 space-y-6">
@@ -140,9 +214,9 @@ export default function AboutPage() {
                                             <p className="text-xs font-bold text-foreground/70 leading-relaxed">{store.hours}</p>
                                         </div>
                                     </div>
-                                    <a 
-                                        href={store.yandexMapUrl} 
-                                        target="_blank" 
+                                    <a
+                                        href={store.yandexMapUrl}
+                                        target="_blank"
                                         rel="noopener noreferrer"
                                         className="block w-full text-center mt-6 bg-surface-100 text-surface-900 font-black py-4 rounded-2xl text-[10px] uppercase tracking-widest hover:bg-primary hover:text-white transition-all"
                                     >
@@ -158,7 +232,7 @@ export default function AboutPage() {
             {/* Contact Form */}
             <section className="bg-zinc-900 text-white rounded-3xl md:rounded-[4rem] p-8 md:p-24 space-y-8 md:space-y-12 relative overflow-hidden shadow-2xl mx-6">
                 <div className="absolute right-0 top-0 w-96 h-96 bg-primary/20 rounded-full blur-[100px] -mr-48 -mt-48" />
-                
+
                 <div className="max-w-2xl space-y-6 relative">
                     <h2 className="text-5xl font-black uppercase tracking-tighter leading-none">{t('about_contact_core')}</h2>
                     <p className="text-zinc-400 font-medium leading-loose">{t('about_contact_desc')}</p>

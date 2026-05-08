@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { currencyService } from "@/lib/services/currency.service"
+import { getCurrencySettingsAction, updateCurrencyRateAction } from "@/lib/actions/currency.actions"
 
 export default function CurrencyAdmin() {
     const [rate, setRate] = useState(12800)
@@ -11,7 +11,7 @@ export default function CurrencyAdmin() {
 
     useEffect(() => {
         async function load() {
-            const data = await currencyService.getSettings()
+            const data = await getCurrencySettingsAction()
             if (data) {
                 setRate(data.rate)
                 setLastUpdated(data.lastUpdated)
@@ -23,7 +23,7 @@ export default function CurrencyAdmin() {
 
     const handleSave = async () => {
         setSaving(true)
-        const success = await currencyService.updateRate(rate)
+        const success = await updateCurrencyRateAction(rate)
         if (success) {
             alert("Exchange rate updated successfully!")
             setLastUpdated(new Date().toISOString())

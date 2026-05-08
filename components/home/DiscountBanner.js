@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { useTranslation } from '@/lib/LanguageContext';
 import ProductCard from '@/features/product/ProductCard';
-import { flashDealsService } from '@/lib/services/flash-deals.service';
+import { getFlashDealsSettingsAction } from '@/lib/actions/flash-deals.actions';
 import { getProductsByIds, getProducts } from '@/features/product/api';
 
 export default function DiscountBanner() {
@@ -31,7 +31,7 @@ export default function DiscountBanner() {
 
     useEffect(() => {
         async function loadData() {
-            const s = await flashDealsService.getSettings();
+            const s = await getFlashDealsSettingsAction();
             if (s) {
                 setSettings(s);
                 

@@ -2,7 +2,7 @@
 
 import useStore from "@/store/useStore"
 import { useEffect } from "react"
-import { currencyService } from "@/lib/services/currency.service"
+import { getCurrencySettingsAction } from "@/lib/actions/currency.actions"
 
 export default function PriceDisplay({ price, className = "" }) {
     const { currency, exchangeRate, setExchangeRate } = useStore()
@@ -10,7 +10,7 @@ export default function PriceDisplay({ price, className = "" }) {
     useEffect(() => {
         // Refresh rate from server occasionally
         const fetchRate = async () => {
-            const settings = await currencyService.getSettings()
+            const settings = await getCurrencySettingsAction()
             if (settings && settings.rate) {
                 setExchangeRate(settings.rate)
             }

@@ -11,7 +11,7 @@ import { reviewService } from "@/lib/services/review.service";
 export default function ProductDetailClient({ product, relatedProducts }) {
     const { addToCart, wishlist, toggleWishlist } = useStore();
     const isFavorite = wishlist.some(item => item.id === product.id);
-    const { t } = useTranslation();
+    const { t, lang } = useTranslation();
     const [isNotified, setIsNotified] = useState(false);
     const [activeImage, setActiveImage] = useState(product.image);
     const images = product.images || [product.image];
@@ -66,7 +66,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
 
                         <Image
                             src={activeImage || product.image}
-                            alt={product.name}
+                            alt={lang === 'ru' ? (product.nameRu || product.name) : lang === 'en' ? (product.nameEn || product.name) : product.name}
                             fill
                             priority
                             sizes="(max-width: 768px) 100vw, 50vw"
@@ -74,7 +74,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                         />
                         {product.countInStock <= 0 && (
                             <div className="absolute inset-0 bg-surface-900/40 backdrop-blur-[2px] flex items-center justify-center pointer-events-none z-20">
-                                <span className="bg-white/20 backdrop-blur-md text-white border border-white/30 font-black px-6 py-3 rounded-xl uppercase tracking-[0.3em] text-[10px]">Out of Stock</span>
+                                <span className="bg-white/20 backdrop-blur-md text-white border border-white/30 font-black px-6 py-3 rounded-xl uppercase tracking-[0.3em] text-[10px]">{t('out_of_stock') || "OUT OF STOCK"}</span>
                             </div>
                         )}
                     </div>
@@ -97,11 +97,11 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                     <div className="space-y-4 md:space-y-6">
                         <div className="flex items-center gap-4">
                             <span className="text-[9px] md:text-[10px] font-black text-primary bg-primary/10 border border-primary/20 px-3 py-1.5 md:px-4 md:py-2 rounded-lg uppercase tracking-[0.4em]">{product.brand || 'Brand'}</span>
-                            <span className="text-[9px] md:text-[10px] text-surface-500 font-bold uppercase tracking-[0.3em] font-mono">Status: {(product.countInStock > 0 ? "In Stock" : "On Request")}</span>
+                            <span className="text-[9px] md:text-[10px] text-surface-500 font-bold uppercase tracking-[0.3em] font-mono">Status: {(product.countInStock > 0 ? (t('stock') || "In Stock") : (t('out_of_stock') || "On Request"))}</span>
                         </div>
-                        <h1 className="text-3xl md:text-7xl font-black text-foreground tracking-tighter leading-[1] uppercase">{product.name}</h1>
+                        <h1 className="text-3xl md:text-7xl font-black text-foreground tracking-tighter leading-[1] uppercase">{lang === 'ru' ? (product.nameRu || product.name) : lang === 'en' ? (product.nameEn || product.name) : product.name}</h1>
                         <div className="bg-surface-50/50 dark:bg-surface-800/30 backdrop-blur-md p-5 md:p-8 rounded-2xl border border-surface-200 dark:border-white/5 shadow-sm">
-                            <p className="text-surface-600 dark:text-surface-400 text-sm md:text-lg font-medium leading-relaxed font-sans">{product.specs || "Professional hardware specifications and technical parameters."}</p>
+                            <p className="text-surface-600 dark:text-surface-400 text-sm md:text-lg font-medium leading-relaxed font-sans">{lang === 'ru' ? (product.descriptionRu || product.specs || product.description) : lang === 'en' ? (product.descriptionEn || product.specs || product.description) : (product.description || product.specs || "Professional hardware specifications and technical parameters.")}</p>
                         </div>
                     </div>
 
@@ -122,7 +122,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                             onClick={() => addToCart(product)}
                             className={`flex-[2] font-black py-5 md:py-7 rounded-xl shadow-lg md:shadow-2xl transition-all active:scale-95 uppercase text-[10px] md:text-xs tracking-widest ${product.countInStock > 0 ? 'bg-foreground text-background dark:bg-white dark:text-black hover:bg-primary hover:text-white' : 'bg-primary text-white hover:bg-foreground hover:text-background'}`}
                         >
-                            {product.countInStock > 0 ? 'Buy Now' : 'Pre-order'}
+                            {product.countInStock > 0 ? (t('buy_now') || 'Buy Now') : (t('pre_order') || 'Pre-order')}
                         </button>
                         <button
                             onClick={() => toggleWishlist(product)}
@@ -141,8 +141,8 @@ export default function ProductDetailClient({ product, relatedProducts }) {
             <section className="space-y-10 md:space-y-16 pt-12 md:pt-20 border-t border-surface-200 dark:border-white/5 px-4 md:px-0">
                 <div className="flex items-end justify-between border-l-4 border-primary pl-6 md:pl-8">
                     <div className="space-y-2 md:space-y-3">
-                        <h2 className="text-2xl md:text-4xl font-black text-foreground tracking-tighter uppercase">Техническая информация</h2>
-                        <p className="text-surface-500 font-bold uppercase text-[9px] md:text-[10px] tracking-[0.2em]">Detailed hardware specifications</p>
+                        <h2 className="text-2xl md:text-4xl font-black text-foreground tracking-tighter uppercase">{t('technical_specs') || "Техническая информация"}</h2>
+                        <p className="text-surface-500 font-bold uppercase text-[9px] md:text-[10px] tracking-[0.2em]">{t('detailed_specs') || "Detailed hardware specifications"}</p>
                     </div>
                 </div>
 
@@ -176,14 +176,14 @@ export default function ProductDetailClient({ product, relatedProducts }) {
             <section className="space-y-10 md:space-y-16 pt-12 md:pt-20 border-t border-surface-200 dark:border-white/5 px-4 md:px-0">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 border-l-4 border-primary pl-6 md:pl-8">
                     <div className="space-y-2 md:space-y-3">
-                        <h2 className="text-2xl md:text-4xl font-black text-foreground tracking-tighter uppercase">User Reviews</h2>
-                        <p className="text-surface-500 font-bold uppercase text-[9px] md:text-[10px] tracking-[0.2em]">Verified customer experiences</p>
+                        <h2 className="text-2xl md:text-4xl font-black text-foreground tracking-tighter uppercase">{t('user_reviews') || "User Reviews"}</h2>
+                        <p className="text-surface-500 font-bold uppercase text-[9px] md:text-[10px] tracking-[0.2em]">{t('verified_customer') || "Verified customer experiences"}</p>
                     </div>
                     <button
                         onClick={() => document.getElementById('review-form')?.scrollIntoView({ behavior: 'smooth' })}
                         className="bg-primary/10 border border-primary/20 text-primary font-black px-6 py-3 md:px-8 md:py-4 rounded-xl text-[9px] md:text-[10px] uppercase tracking-widest hover:bg-primary hover:text-white transition-all w-full md:w-auto backdrop-blur-sm"
                     >
-                        Add Review
+                        {t('add_review') || "Add Review"}
                     </button>
                 </div>
 
@@ -215,28 +215,28 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                         ) : (
                             <div className="bg-surface-50 dark:bg-zinc-900 border border-surface-200 dark:border-white/5 p-12 md:p-16 rounded-[2rem] text-center space-y-4 opacity-50">
                                 <div className="text-3xl md:text-4xl">📂</div>
-                                <p className="text-surface-500 font-black text-[10px] md:text-xs uppercase tracking-[0.4em]">No Reviews Found</p>
+                                <p className="text-surface-500 font-black text-[10px] md:text-xs uppercase tracking-[0.4em]">{t('no_reviews') || "No Reviews Found"}</p>
                             </div>
                         )}
                     </div>
 
                     {/* Review Form */}
                     <div id="review-form" className="bg-white dark:bg-zinc-900 border border-surface-200 dark:border-white/5 p-8 md:p-10 rounded-3xl md:rounded-[2.5rem] h-fit sticky top-32 shadow-lg">
-                        <h3 className="text-lg md:text-xl font-black text-foreground uppercase tracking-widest mb-6 md:mb-8">Add a Review</h3>
+                        <h3 className="text-lg md:text-xl font-black text-foreground uppercase tracking-widest mb-6 md:mb-8">{t('add_review') || "Add a Review"}</h3>
                         <form onSubmit={handleReviewSubmit} className="space-y-5 md:space-y-6">
                             <div className="space-y-2">
-                                <label className="text-[9px] md:text-[10px] font-black text-surface-500 uppercase tracking-widest">Your Name</label>
+                                <label className="text-[9px] md:text-[10px] font-black text-surface-500 uppercase tracking-widest">{t('form_name') || "Your Name"}</label>
                                 <input
                                     type="text"
                                     required
                                     value={newReview.userName}
                                     onChange={(e) => setNewReview({ ...newReview, userName: e.target.value })}
                                     className="w-full bg-surface-50 dark:bg-black border border-surface-200 dark:border-white/10 rounded-xl px-4 py-3 md:px-5 md:py-4 text-[11px] md:text-xs text-foreground focus:ring-1 focus:ring-primary outline-none transition-all"
-                                    placeholder="Enter your name"
+                                    placeholder={t('form_name_placeholder') || "Enter your name"}
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[9px] md:text-[10px] font-black text-surface-500 uppercase tracking-widest">Rating</label>
+                                <label className="text-[9px] md:text-[10px] font-black text-surface-500 uppercase tracking-widest">{t('form_rating') || "Rating"}</label>
                                 <div className="flex gap-2 md:gap-3">
                                     {[1, 2, 3, 4, 5].map(star => (
                                         <button
@@ -251,14 +251,14 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[9px] md:text-[10px] font-black text-surface-500 uppercase tracking-widest">Your Comment</label>
+                                <label className="text-[9px] md:text-[10px] font-black text-surface-500 uppercase tracking-widest">{t('form_comment') || "Your Comment"}</label>
                                 <textarea
                                     required
                                     rows="4"
                                     value={newReview.comment}
                                     onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
                                     className="w-full bg-surface-50 dark:bg-black border border-surface-200 dark:border-white/10 rounded-xl px-4 py-3 md:px-5 md:py-4 text-[11px] md:text-xs text-foreground focus:ring-1 focus:ring-primary outline-none transition-all resize-none"
-                                    placeholder="Describe your experience"
+                                    placeholder={t('form_comment_placeholder') || "Describe your experience"}
                                 />
                             </div>
                             <button
@@ -266,7 +266,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                                 disabled={isSubmitting}
                                 className="w-full bg-foreground text-background dark:bg-white dark:text-black font-black py-4 md:py-5 rounded-xl hover:bg-primary hover:text-white transition-all uppercase text-[10px] tracking-widest active:scale-95 disabled:opacity-50 shadow-xl"
                             >
-                                {isSubmitting ? 'Processing...' : 'Post Review'}
+                                {isSubmitting ? (t('form_processing') || 'Processing...') : (t('post_review') || 'Post Review')}
                             </button>
                         </form>
                     </div>
@@ -277,8 +277,8 @@ export default function ProductDetailClient({ product, relatedProducts }) {
             <section className="space-y-10 md:space-y-16 pt-12 md:pt-20 border-t border-surface-200 dark:border-white/5 px-4 md:px-0">
                 <div className="flex items-end justify-between border-l-4 border-primary pl-6 md:pl-8">
                     <div className="space-y-2 md:space-y-3">
-                        <h2 className="text-2xl md:text-4xl font-black text-foreground tracking-tighter uppercase">Related Products</h2>
-                        <p className="text-surface-500 font-bold uppercase text-[9px] md:text-[10px] tracking-[0.2em]">Comparable hardware options</p>
+                        <h2 className="text-2xl md:text-4xl font-black text-foreground tracking-tighter uppercase">{t('related_products') || "Related Products"}</h2>
+                        <p className="text-surface-500 font-bold uppercase text-[9px] md:text-[10px] tracking-[0.2em]">{t('comparable_hardware') || "Comparable hardware options"}</p>
                     </div>
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10">

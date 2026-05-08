@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
-import { getPreBuiltSystems } from "@/features/product/api"
+import { getPreBuiltSystemsAction } from "@/lib/actions/product.actions"
 import { useTranslation } from "@/lib/LanguageContext"
 
 export default function ReadyBuilds() {
@@ -18,8 +18,8 @@ export default function ReadyBuilds() {
 
     useEffect(() => {
         const fetchBuilds = async () => {
-            const data = await getPreBuiltSystems();
-            setBuilds(data);
+            const data = await getPreBuiltSystemsAction();
+            setBuilds(data || []);
             setLoading(false);
         };
         fetchBuilds();

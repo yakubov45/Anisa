@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { flashDealsService } from "@/lib/services/flash-deals.service"
+import { getFlashDealsSettingsAction, updateFlashDealsSettingsAction } from "@/lib/actions/flash-deals.actions"
 import { getProducts } from "@/features/product/api"
 import { categoryService } from "@/lib/services/category.service"
 import { useRouter } from "next/navigation"
@@ -26,7 +26,7 @@ export default function FlashDealsAdmin() {
     useEffect(() => {
         async function loadData() {
             const [s, p, c] = await Promise.all([
-                flashDealsService.getSettings(),
+                getFlashDealsSettingsAction(),
                 getProducts(),
                 categoryService.getAll()
             ])
@@ -40,7 +40,7 @@ export default function FlashDealsAdmin() {
 
     const handleSave = async () => {
         setSaving(true)
-        const success = await flashDealsService.updateSettings(settings)
+        const success = await updateFlashDealsSettingsAction(settings)
         if (success) {
             addToast(t('flash_updated_success'))
         } else {
