@@ -89,24 +89,6 @@
   }
 }
 
-/* Industrial Scanline Overlay */
-body::after {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.01), transparent);
-  animation: scanline 8s linear infinite;
-  pointer-events: none;
-  z-index: 9999;
-}
-
-.dark body::after {
-  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.01), transparent);
-}
-
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -114,11 +96,6 @@ body::after {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
-
-@keyframes scanline {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
 }
 
 @keyframes progress-loading {

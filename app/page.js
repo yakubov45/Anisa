@@ -1,4 +1,3 @@
-import { getProducts } from "@/features/product/api"
 import ProductGrid from "@/features/product/ProductGrid"
 import CategoryGrid from "@/components/home/CategoryGrid"
 import TrustSection from "@/components/home/TrustSection"
@@ -7,9 +6,9 @@ import BrandStrip from "@/components/home/BrandStrip"
 import Newsletter from "@/components/home/Newsletter"
 import HeroSlider from "@/components/home/HeroSlider"
 import DiscountBanner from "@/components/home/DiscountBanner"
-import { bannerService } from "@/lib/services/banner.service"
 import PromotionSlider from "@/components/home/PromotionSlider"
 import SectionHeading from "@/components/common/SectionHeading"
+import { getProductsAction, getBannersAction } from "@/lib/actions/product.actions"
 
 export const revalidate = 3600
 
@@ -18,10 +17,10 @@ export default async function HomePage() {
     let banners = [];
 
     try {
-        // Fetch in parallel with a shared timeout safety
+        // Fetch in parallel using secure Server Actions
         const results = await Promise.allSettled([
-            getProducts(),
-            bannerService.getBanners()
+            getProductsAction(20),
+            getBannersAction()
         ]);
 
         allProducts = results[0].status === 'fulfilled' ? results[0].value : [];
@@ -42,7 +41,7 @@ export default async function HomePage() {
             {/* 2. CATEGORIES */}
             <CategoryGrid />
 
-            {/* 3. HOT DEPLOYMENT -> NEW ARRIVALS */}
+            {/* 3. NEW ARRIVALS */}
             <section className="space-y-10">
                 <SectionHeading titleKey="new_arrivals" />
                 <ProductGrid products={hotProducts} badge="Hot" />
@@ -53,7 +52,7 @@ export default async function HomePage() {
                 <PromotionSlider slides={banners.filter(b => b.type === "promo")} />
             )}
 
-            {/* 4. TOP SELLING -> BEST SELLERS */}
+            {/* 4. BEST SELLERS */}
             <section className="space-y-10">
                 <SectionHeading titleKey="best_sellers" />
                 <ProductGrid products={topSelling} badge="Bestseller" rating={5} />

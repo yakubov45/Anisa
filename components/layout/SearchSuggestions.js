@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { productService } from "@/lib/services/product.service";
+import { getProductsAction } from "@/lib/actions/product.actions";
 import Link from "next/link";
 import { useTranslation } from "@/lib/LanguageContext";
 
@@ -22,8 +22,8 @@ export default function SearchSuggestions({ query, onClose }) {
 
     useEffect(() => {
         async function fetchFeatured() {
-            const products = await productService.getAll();
-            setFeatured(products.slice(0, 3));
+            const products = await getProductsAction(3);
+            setFeatured(products);
         }
         fetchFeatured();
     }, []);
@@ -32,10 +32,10 @@ export default function SearchSuggestions({ query, onClose }) {
         if (query.length > 0) {
             setLoading(true);
             const timer = setTimeout(async () => {
-                const products = await productService.getAll();
-                const filtered = products.filter(p =>
-                    p.name.toLowerCase().includes(query.toLowerCase()) ||
-                    p.category.toLowerCase().includes(query.toLowerCase()) ||
+                const products = await getProductsAction(100);
+                const filtered = (products || []).filter(p =>
+                    p.name?.toLowerCase().includes(query.toLowerCase()) ||
+                    p.category?.toLowerCase().includes(query.toLowerCase()) ||
                     p.brand?.toLowerCase().includes(query.toLowerCase())
                 ).slice(0, 5);
                 setSuggestions(filtered);

@@ -33,11 +33,11 @@ export default function IntroOverlay() {
             }
         }, 600);
 
-        // Automatically hide after 3.5 seconds
+        // Automatically hide after 2.5 seconds
         const timer = setTimeout(() => {
             setIsVisible(false);
             sessionStorage.setItem("onepc_intro_shown", "true");
-        }, 3500);
+        }, 2500);
 
         return () => {
             clearTimeout(timer);

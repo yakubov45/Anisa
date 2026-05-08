@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from 'react';
 import { useTranslation } from '@/lib/LanguageContext';
 import ProductCard from '@/features/product/ProductCard';
 import { getFlashDealsSettingsAction } from '@/lib/actions/flash-deals.actions';
-import { getProductsByIds, getProducts } from '@/features/product/api';
+import { getProductsByIdsAction, getProductsAction } from '@/lib/actions/product.actions';
 
 export default function DiscountBanner() {
     const { t } = useTranslation();
@@ -45,10 +45,10 @@ export default function DiscountBanner() {
                 }
 
                 if (s.productIds?.length > 0) {
-                    const p = await getProductsByIds(s.productIds);
+                    const p = await getProductsByIdsAction(s.productIds);
                     setProducts(p);
                 } else {
-                    const all = await getProducts(10);
+                    const all = await getProductsAction(10);
                     setProducts(all);
                 }
             }

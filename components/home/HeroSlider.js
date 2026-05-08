@@ -15,7 +15,7 @@ export default function HeroSlider({ initialSlides }) {
             subtitle: t('hero_1_subtitle'),
             badge: t('hero_1_badge'),
             description: t('hero_1_desc'),
-            image: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=1200&auto=format&fit=crop&q=90",
+            image: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=1200&q=80",
             link: "/products",
             linkText: t('hero_cta_shop')
         },
@@ -25,7 +25,7 @@ export default function HeroSlider({ initialSlides }) {
             subtitle: t('hero_2_subtitle'),
             badge: t('hero_2_badge'),
             description: t('hero_2_desc'),
-            image: "https://images.unsplash.com/photo-1591485121906-6033fb939881?w=1200&auto=format&fit=crop&q=90",
+            image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=1200&q=80",
             link: "/pc-builder",
             linkText: t('hero_cta_builder')
         }

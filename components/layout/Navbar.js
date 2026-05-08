@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { useTranslation } from "@/lib/LanguageContext"
 import { useUser } from "@/lib/UserContext"
 import { authService } from "@/lib/services/auth.service"
-import { categoryService } from "@/lib/services/category.service"
+import { getCategoriesAction } from "@/lib/actions/product.actions"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import SearchSuggestions from "./SearchSuggestions"
@@ -48,7 +48,7 @@ export default function Navbar() {
     useEffect(() => {
         async function fetchCategories() {
             try {
-                const data = await categoryService.getAll()
+                const data = await getCategoriesAction()
                 if (data && data.length > 0) {
                     setCategories(data)
                 }
