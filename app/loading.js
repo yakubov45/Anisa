@@ -1,8 +1,8 @@
 export default function Loading() {
     return (
-        <div className="fixed inset-0 z-[9999] bg-background flex flex-col items-center justify-center space-y-12 animate-fade-in overflow-hidden">
+        <div className="fixed inset-0 z-[9999] bg-background/60 backdrop-blur-md flex flex-col items-center justify-center space-y-12 animate-fade-in overflow-hidden pointer-events-none">
             {/* Ambient Background Glow */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-background to-background" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
 
             {/* Floating Components Container */}
             <div className="relative flex items-end gap-6 sm:gap-10 z-10 h-32">
@@ -34,8 +34,8 @@ export default function Loading() {
                     className="flex flex-col items-center gap-3 animate-bounce" 
                     style={{ animationDuration: '3s', animationDelay: '500ms' }}
                 >
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 bg-surface dark:bg-zinc-900 border border-white/10 rounded-3xl flex items-center justify-center shadow-[0_0_40px_rgba(255,255,255,0.1)] text-white relative overflow-hidden">
-                        <div className="absolute inset-0 bg-white/5 animate-pulse" />
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 bg-surface dark:bg-zinc-900 border border-white/10 rounded-3xl flex items-center justify-center shadow-[0_0_40px_rgba(var(--primary),0.2)] text-primary relative overflow-hidden">
+                        <div className="absolute inset-0 bg-primary/5 animate-pulse" />
                         <svg className="w-8 h-8 sm:w-10 sm:h-10 relative z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
                             <rect x="2" y="6" width="20" height="12" rx="2" />
                             <circle cx="8" cy="12" r="3" />
@@ -46,7 +46,7 @@ export default function Loading() {
                             <line x1="18" y1="18" x2="18" y2="21" />
                         </svg>
                     </div>
-                    <span className="text-[10px] font-black tracking-[0.2em] uppercase text-white">GPU</span>
+                    <span className="text-[10px] font-black tracking-[0.2em] uppercase text-surface-500 dark:text-white">GPU</span>
                 </div>
 
                 {/* RAM */}
@@ -76,7 +76,7 @@ export default function Loading() {
             <div className="flex flex-col items-center space-y-5 z-10 relative mt-8">
                 <div className="flex items-center gap-3">
                     <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                    <h2 className="text-xs sm:text-sm font-black text-white uppercase tracking-[0.4em]">
+                    <h2 className="text-xs sm:text-sm font-black text-surface-900 dark:text-white uppercase tracking-[0.4em]">
                         Loading Components
                     </h2>
                     <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" style={{ animationDelay: '200ms' }} />
