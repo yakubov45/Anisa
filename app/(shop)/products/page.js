@@ -1,7 +1,7 @@
 import ProductListing from "@/features/product/ProductListing";
 import { getProducts, getCategories } from "@/features/product/api";
 
-export const revalidate = 3600; // Cache catalog for 1 hour
+
 
 export default async function ProductsPage({ searchParams }) {
     const { category } = await searchParams;

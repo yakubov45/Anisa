@@ -10,7 +10,7 @@ import PromotionSlider from "@/components/home/PromotionSlider"
 import SectionHeading from "@/components/common/SectionHeading"
 import { getProductsAction, getBannersAction } from "@/lib/actions/product.actions"
 
-export const revalidate = 3600
+
 
 export default async function HomePage() {
     let allProducts = [];

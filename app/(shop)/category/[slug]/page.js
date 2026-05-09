@@ -1,7 +1,7 @@
 import ProductGrid from "@/features/product/ProductGrid";
 import { getCategoryProductsAction } from "@/lib/actions/product.actions";
 
-export const revalidate = 60; // Refresh every minute
+
 
 export default async function CategoryPage({ params }) {
     const { slug } = params;

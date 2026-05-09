@@ -10,7 +10,6 @@ const securityHeaders = [
 
 const nextConfig = {
     poweredByHeader: false,
-    cacheComponents: true,
     async headers() {
         return [
             {
