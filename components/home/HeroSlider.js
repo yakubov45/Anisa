@@ -5,33 +5,44 @@ import Image from "next/image";
 import Link from "next/link";
 import { useTranslation } from "@/lib/LanguageContext";
 
+// Static slide data — tarjimalar render vaqtida qo'shiladi
+const SLIDE_DATA = [
+    {
+        id: 1,
+        titleKey: 'hero_1_title',
+        subtitleKey: 'hero_1_subtitle',
+        badgeKey: 'hero_1_badge',
+        descKey: 'hero_1_desc',
+        image: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=1200&q=80",
+        link: "/products",
+        linkKey: 'hero_cta_shop'
+    },
+    {
+        id: 2,
+        titleKey: 'hero_2_title',
+        subtitleKey: 'hero_2_subtitle',
+        badgeKey: 'hero_2_badge',
+        descKey: 'hero_2_desc',
+        image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=1200&q=80",
+        link: "/pc-builder",
+        linkKey: 'hero_cta_builder'
+    }
+];
+
 export default function HeroSlider({ initialSlides }) {
     const { t } = useTranslation();
 
-    const DEFAULT_SLIDES = [
-        {
-            id: 1,
-            title: t('hero_1_title'),
-            subtitle: t('hero_1_subtitle'),
-            badge: t('hero_1_badge'),
-            description: t('hero_1_desc'),
-            image: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=1200&q=80",
-            link: "/products",
-            linkText: t('hero_cta_shop')
-        },
-        {
-            id: 2,
-            title: t('hero_2_title'),
-            subtitle: t('hero_2_subtitle'),
-            badge: t('hero_2_badge'),
-            description: t('hero_2_desc'),
-            image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=1200&q=80",
-            link: "/pc-builder",
-            linkText: t('hero_cta_builder')
-        }
-    ];
+    const slides = initialSlides?.length > 0
+        ? initialSlides
+        : SLIDE_DATA.map(s => ({
+            ...s,
+            title: t(s.titleKey),
+            subtitle: t(s.subtitleKey),
+            badge: t(s.badgeKey),
+            description: t(s.descKey),
+            linkText: t(s.linkKey),
+        }));
 
-    const slides = initialSlides || DEFAULT_SLIDES;
     const [current, setCurrent] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);
     const [dragOffset, setDragOffset] = useState(0);
