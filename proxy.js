@@ -1,36 +1,27 @@
 import { NextResponse } from 'next/server';
 
 export function proxy(request) {
-    const nonce = crypto.randomUUID();
-    const isDev = process.env.NODE_ENV === 'development';
-    
-    const cspHeader = `
-        default-src 'self' https://*.firebaseio.com https://*.googleapis.com;
-        script-src 'self' 'nonce-${nonce}' 'strict-dynamic' ${isDev ? "'unsafe-eval'" : ""} https://www.gstatic.com https://apis.google.com;
-        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-        img-src * blob: data:;
-        font-src 'self' data: https://fonts.gstatic.com;
-        connect-src *;
-        frame-src 'self' https://*.firebaseapp.com;
-        object-src 'none';
-        base-uri 'self';
-        form-action 'self';
-        frame-ancestors 'none';
-        upgrade-insecure-requests;
-    `.replace(/\s{2,}/g, ' ').trim();
- 
-    const requestHeaders = new Headers(request.headers);
-    requestHeaders.set('x-nonce', nonce);
-    requestHeaders.set('Content-Security-Policy', cspHeader);
- 
-    const response = NextResponse.next({
-        request: {
-            headers: requestHeaders,
-        },
-    });
+    const response = NextResponse.next();
 
-    response.headers.set('Content-Security-Policy', cspHeader);
- 
+    // Xavfsiz va Next.js bilan mos keladigan CSP
+    const csp = [
+        "default-src 'self' https://*.firebaseio.com https://*.googleapis.com",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://apis.google.com https://*.firebaseapp.com",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "img-src * blob: data:",
+        "font-src 'self' data: https://fonts.gstatic.com",
+        "connect-src *",
+        "frame-src 'self' https://*.firebaseapp.com https://accounts.google.com",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+    ].join('; ');
+
+    response.headers.set('Content-Security-Policy', csp);
+    response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+
     return response;
 }
 
