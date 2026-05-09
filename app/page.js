@@ -8,35 +8,51 @@ import HeroSlider from "@/components/home/HeroSlider"
 import DiscountBanner from "@/components/home/DiscountBanner"
 import PromotionSlider from "@/components/home/PromotionSlider"
 import SectionHeading from "@/components/common/SectionHeading"
-import { getProductsAction, getBannersAction } from "@/lib/actions/product.actions"
-
-
+import { getProductsAction, getBannersAction, getProductsByIdsAction } from "@/lib/actions/product.actions"
+import { getFlashDealsSettingsAction } from "@/lib/actions/flash-deals.actions"
 
 export default async function HomePage() {
     let allProducts = [];
     let banners = [];
+    let flashDeals = null;
 
     try {
-        // Fetch in parallel using secure Server Actions
-        const results = await Promise.allSettled([
+        // Parallel fetch — server tomonida, blokirovkasiz
+        const [productsResult, bannersResult, flashSettingsResult] = await Promise.allSettled([
             getProductsAction(20),
-            getBannersAction()
+            getBannersAction(),
+            getFlashDealsSettingsAction()
         ]);
 
-        allProducts = results[0].status === 'fulfilled' ? results[0].value : [];
-        banners = results[1].status === 'fulfilled' ? results[1].value : [];
+        allProducts = productsResult.status === 'fulfilled' ? productsResult.value : [];
+        banners = bannersResult.status === 'fulfilled' ? bannersResult.value : [];
+        
+        const flashSettings = flashSettingsResult.status === 'fulfilled' ? flashSettingsResult.value : null;
+        
+        if (flashSettings) {
+            let flashProducts = [];
+            if (flashSettings.productIds?.length > 0) {
+                const r = await getProductsByIdsAction(flashSettings.productIds);
+                flashProducts = r || [];
+            } else {
+                flashProducts = allProducts.slice(0, 10);
+            }
+            flashDeals = { settings: flashSettings, products: flashProducts };
+        }
     } catch (error) {
         console.error("Critical error in HomePage data fetching:", error);
     }
     
     const hotProducts = (allProducts || []).slice(0, 12);
     const topSelling = (allProducts || []).slice(12, 20);
+    const heroSlides = banners.filter(b => b.type !== "promo");
+    const promoSlides = banners.filter(b => b.type === "promo");
 
     return (
         <div className="space-y-12 md:space-y-20 animate-fade-in pb-20 md:pt-10 px-4 sm:px-0">
 
             {/* 1. HERO SLIDER */}
-            <HeroSlider initialSlides={banners.filter(b => b.type !== "promo").length > 0 ? banners.filter(b => b.type !== "promo") : undefined} />
+            <HeroSlider initialSlides={heroSlides.length > 0 ? heroSlides : undefined} />
 
             {/* 2. CATEGORIES */}
             <CategoryGrid />
@@ -48,8 +64,8 @@ export default async function HomePage() {
             </section>
 
             {/* 3.5 PROMOTION SLIDER */}
-            {banners.filter(b => b.type === "promo").length > 0 && (
-                <PromotionSlider slides={banners.filter(b => b.type === "promo")} />
+            {promoSlides.length > 0 && (
+                <PromotionSlider slides={promoSlides} />
             )}
 
             {/* 4. BEST SELLERS */}
@@ -61,8 +77,8 @@ export default async function HomePage() {
             {/* 5. WHY CHOOSE US */}
             <TrustSection />
 
-            {/* 5.1 FLASH DEALS BANNER */}
-            <DiscountBanner />
+            {/* 5.1 FLASH DEALS BANNER — data server tomonidan keladi */}
+            <DiscountBanner flashDeals={flashDeals} />
 
             {/* 6. SETUP IDEAS */}
             <SetupIdeas />
