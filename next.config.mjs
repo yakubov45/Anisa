@@ -10,12 +10,7 @@ const securityHeaders = [
 
 const nextConfig = {
     poweredByHeader: false,
-    eslint: {
-        ignoreDuringBuilds: true,
-    },
-    typescript: {
-        ignoreBuildErrors: true,
-    },
+    cacheComponents: true,
     async headers() {
         return [
             {
