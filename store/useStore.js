@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 const useStore = create(
     persist(
@@ -35,7 +35,6 @@ const useStore = create(
             })),
 
             clearCart: () => set({ cart: [] }),
-
             setCart: (cart) => set({ cart }),
 
             toggleWishlist: (product) => set((state) => {
@@ -48,6 +47,17 @@ const useStore = create(
         }),
         {
             name: 'onepc-storage',
+            storage: createJSONStorage(() => {
+                // Server tomonida xato chiqmasligi uchun
+                if (typeof window === 'undefined') {
+                    return {
+                        getItem: () => null,
+                        setItem: () => {},
+                        removeItem: () => {},
+                    };
+                }
+                return localStorage;
+            }),
         }
     )
 )

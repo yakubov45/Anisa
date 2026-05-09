@@ -21,6 +21,7 @@ export default function Navbar() {
     const dropdownRef = useRef(null);
     const { cart, currency, setCurrency } = useStore()
     const { cartAnimation } = useUIStore()
+    const [mounted, setMounted] = useState(false)
     const [isScrolled, setIsScrolled] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
     const [showSuggestions, setShowSuggestions] = useState(false)
@@ -46,6 +47,7 @@ export default function Navbar() {
     ])
 
     useEffect(() => {
+        setMounted(true)
         async function fetchCategories() {
             try {
                 const data = await getCategoriesAction()
@@ -59,13 +61,12 @@ export default function Navbar() {
         fetchCategories()
     }, [])
 
+    const cartCount = mounted ? cart.reduce((sum, item) => sum + (item.quantity || 1), 0) : 0
+    const activeCurrency = mounted ? currency : 'USD'
+
     const [isVisible, setIsVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
-    const [mounted, setMounted] = useState(false);
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -186,10 +187,10 @@ export default function Navbar() {
 
                                     {/* Currency Switcher */}
                                     <button
-                                        onClick={() => setCurrency(currency === 'USD' ? 'UZS' : 'USD')}
+                                        onClick={() => setCurrency(activeCurrency === 'USD' ? 'UZS' : 'USD')}
                                         className="hidden md:flex h-9 px-3 rounded-xl bg-white/5 border border-white/10 items-center gap-2 hover:bg-white/10 transition-all text-white group"
                                     >
-                                        <span className="text-[10px] font-black tracking-widest">{currency}</span>
+                                        <span className="text-[10px] font-black tracking-widest">{activeCurrency}</span>
                                     </button>
 
                                     {/* Theme Toggle */}
@@ -222,9 +223,9 @@ export default function Navbar() {
                                     >
                                         <Link href="/cart" className="relative group hover:scale-110 transition-transform flex items-center justify-center">
                                             <img src="/icons/cart.svg" className="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity" alt="Cart" />
-                                            {cart.length > 0 && (
+                                            {cartCount > 0 && (
                                                 <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-primary text-white text-[8px] font-black flex items-center justify-center rounded-lg border border-black animate-pop-in">
-                                                    {cart.length}
+                                                    {cartCount}
                                                 </span>
                                             )}
                                         </Link>
