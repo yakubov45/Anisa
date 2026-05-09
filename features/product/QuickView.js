@@ -1,5 +1,6 @@
 "use client";
-
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
 import useStore from "@/store/useStore";
@@ -8,14 +9,27 @@ import { useTranslation } from "@/lib/LanguageContext";
 import PriceDisplay from "@/components/common/PriceDisplay";
 
 export default function QuickView({ product, isOpen, onClose }) {
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isOpen]);
     const { t } = useTranslation();
     const { wishlist, toggleWishlist, addToCart } = useStore();
     const { addToast, triggerCartAnimation } = useUIStore();
     const isFavorite = wishlist.some(item => item.id === product.id);
 
-    if (!isOpen) return null;
+    if (!mounted || !isOpen) return null;
 
-    return (
+    const modalContent = (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 md:p-12 animate-fade-in">
             <div className="absolute inset-0 bg-surface-900/60 dark:bg-black/80 backdrop-blur-md" onClick={onClose} />
 
@@ -103,4 +117,6 @@ export default function QuickView({ product, isOpen, onClose }) {
             </div>
         </div>
     );
+
+    return createPortal(modalContent, document.body);
 }

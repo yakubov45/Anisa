@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation"
 import ProductGrid from "./ProductGrid"
 import { useTranslation } from "@/lib/LanguageContext"
 import { motion, AnimatePresence } from "framer-motion"
+import DualRangeSlider from "@/components/common/DualRangeSlider"
 
 export default function ProductListing({ initialProducts = [], allCategories = [] }) {
     const { t } = useTranslation()
@@ -177,13 +178,12 @@ export default function ProductListing({ initialProducts = [], allCategories = [
                                     </div>
                                 </div>
                                 
-                                <input 
-                                    type="range" 
-                                    min="0" 
-                                    max={maxProductPrice} 
-                                    value={priceRange.max}
-                                    onChange={(e) => setPriceRange(prev => ({ ...prev, max: Number(e.target.value) }))}
-                                    className="w-full accent-primary"
+                                <DualRangeSlider 
+                                    min={priceRange.min}
+                                    max={priceRange.max}
+                                    minLimit={0}
+                                    maxLimit={maxProductPrice}
+                                    onChange={(vals) => setPriceRange(vals)}
                                 />
                             </div>
                         </div>

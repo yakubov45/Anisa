@@ -125,7 +125,7 @@ export default function DashboardLayout({ children }) {
                 )}
 
                 <Sidebar />
-                <main className="flex-1 min-h-[calc(100vh-120px)] animate-fade-in translate-y-4 opacity-0 [animation-fill-mode:forwards] p-4 lg:p-0">
+                <main className="flex-1 min-h-[calc(100vh-120px)] animate-fade-in p-4 lg:p-0">
                     {children}
                 </main>
             </div>
