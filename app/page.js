@@ -8,7 +8,7 @@ import HeroSlider from "@/components/home/HeroSlider"
 import DiscountBanner from "@/components/home/DiscountBanner"
 import PromotionSlider from "@/components/home/PromotionSlider"
 import SectionHeading from "@/components/common/SectionHeading"
-import { getProductsAction, getBannersAction, getProductsByIdsAction } from "@/lib/actions/product.actions"
+import { getProductsAction, getBannersAction } from "@/lib/actions/product.actions"
 import { getFlashDealsSettingsAction } from "@/lib/actions/flash-deals.actions"
 
 export default async function HomePage() {
@@ -17,34 +17,30 @@ export default async function HomePage() {
     let flashDeals = null;
 
     try {
-        // Parallel fetch — server tomonida, blokirovkasiz
-        const [productsResult, bannersResult, flashSettingsResult] = await Promise.allSettled([
+        // Parallel fetch — faqat 2 ta asosiy so'rov (kamroq so'rov = tezroq)
+        const [productsResult, bannersResult] = await Promise.allSettled([
             getProductsAction(20),
             getBannersAction(),
-            getFlashDealsSettingsAction()
         ]);
 
-        allProducts = productsResult.status === 'fulfilled' ? productsResult.value : [];
-        banners = bannersResult.status === 'fulfilled' ? bannersResult.value : [];
-        
-        const flashSettings = flashSettingsResult.status === 'fulfilled' ? flashSettingsResult.value : null;
-        
+        allProducts = productsResult.status === 'fulfilled' ? productsResult.value ?? [] : [];
+        banners = bannersResult.status === 'fulfilled' ? bannersResult.value ?? [] : [];
+
+        // Flash deals — faqat allProducts tayyor bo'lgandan keyin, alohida
+        const flashSettings = await getFlashDealsSettingsAction().catch(() => null);
         if (flashSettings) {
-            let flashProducts = [];
-            if (flashSettings.productIds?.length > 0) {
-                const r = await getProductsByIdsAction(flashSettings.productIds);
-                flashProducts = r || [];
-            } else {
-                flashProducts = allProducts.slice(0, 10);
-            }
-            flashDeals = { settings: flashSettings, products: flashProducts };
+            flashDeals = {
+                settings: flashSettings,
+                // Flash deals uchun alohida so'rov qilmaymiz — allaqachon olgan mahsulotlardan foydalanamiz
+                products: allProducts.slice(0, 8)
+            };
         }
     } catch (error) {
-        console.error("Critical error in HomePage data fetching:", error);
+        console.error("HomePage data fetch error:", error);
     }
-    
-    const hotProducts = (allProducts || []).slice(0, 12);
-    const topSelling = (allProducts || []).slice(12, 20);
+
+    const hotProducts = allProducts.slice(0, 12);
+    const topSelling = allProducts.slice(12, 20);
     const heroSlides = banners.filter(b => b.type !== "promo");
     const promoSlides = banners.filter(b => b.type === "promo");
 
@@ -77,7 +73,7 @@ export default async function HomePage() {
             {/* 5. WHY CHOOSE US */}
             <TrustSection />
 
-            {/* 5.1 FLASH DEALS BANNER — data server tomonidan keladi */}
+            {/* 5.1 FLASH DEALS BANNER */}
             <DiscountBanner flashDeals={flashDeals} />
 
             {/* 6. SETUP IDEAS */}

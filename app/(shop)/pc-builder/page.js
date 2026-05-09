@@ -8,7 +8,6 @@ import ComponentPickerModal from "@/features/builder/ComponentPickerModal"
 import BuildSummary from "@/features/builder/BuildSummary"
 import ReadyBuilds from "@/features/builder/ReadyBuilds"
 import BuilderGuide from "@/features/builder/BuilderGuide"
-import { getPCBuilderHeroAction } from "@/lib/actions/pc-builder.actions"
 import AutoBuilder from "@/features/builder/AutoBuilder"
 
 const COMPONENT_STRUCTURE = [
@@ -35,36 +34,9 @@ export default function PCBuilderPage() {
     const { selectedParts, setPart, removePart } = useBuildStore()
     const [pickerState, setPickerState] = useState({ isOpen: false, category: '', id: '' })
     
-    // Video Slider & Intersection State
-    const [activeVideo, setActiveVideo] = useState(0)
-    const [isVisible, setIsVisible] = useState(true)
-    const videoRef0 = useRef(null)
-    const videoRef1 = useRef(null)
-    const sectionRef = useRef(null)
-
-    // Dynamic Videos State
-    const [heroVideos, setHeroVideos] = useState({ 
-        video1: "/videos/0508.mp4", 
-        video2: "/videos/0508%20(2).mp4" 
-    });
-
-    // Fetch Custom Videos from Server Action
-    useEffect(() => {
-        const fetchVideos = async () => {
-            try {
-                const data = await getPCBuilderHeroAction()
-                if (data) {
-                    setHeroVideos({
-                        video1: data.video1 || "/videos/0508.mp4",
-                        video2: data.video2 || "/videos/0508%20(2).mp4"
-                    });
-                }
-            } catch (err) {
-                console.error("Error fetching custom hero videos:", err);
-            }
-        };
-        fetchVideos();
-    }, []);
+    // Static video paths — admindan olib tashlandi, kod orqali o'zgartiriladi
+    const VIDEO1 = "/videos/0508.mp4";
+    const VIDEO2 = "/videos/0508%20(2).mp4";
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -193,7 +165,7 @@ export default function PCBuilderPage() {
                         </div>
                         <div className="relative w-full h-full rounded-[2rem] md:rounded-[2.2rem] overflow-hidden bg-black transform-gpu">
                             <video ref={videoRef0} onEnded={handleVideoEnd} muted playsInline preload="metadata" className="absolute inset-0 object-cover w-full h-full scale-105">
-                                <source src={heroVideos.video1} type="video/mp4" />
+                                <source src={VIDEO1} type="video/mp4" />
                             </video>
                             <div className={`absolute inset-0 bg-black transition-opacity duration-700 pointer-events-none ${activeVideo === 0 ? 'opacity-0' : 'opacity-50'}`} />
                         </div>
@@ -213,7 +185,7 @@ export default function PCBuilderPage() {
                         </div>
                         <div className="relative w-full h-full rounded-[2rem] md:rounded-[2.2rem] overflow-hidden bg-black transform-gpu">
                             <video ref={videoRef1} onEnded={handleVideoEnd} muted playsInline preload="metadata" className="absolute inset-0 object-cover w-full h-full scale-105">
-                                <source src={heroVideos.video2} type="video/mp4" />
+                                <source src={VIDEO2} type="video/mp4" />
                             </video>
                             <div className={`absolute inset-0 bg-black transition-opacity duration-700 pointer-events-none ${activeVideo === 1 ? 'opacity-0' : 'opacity-50'}`} />
                         </div>
