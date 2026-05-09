@@ -38,6 +38,13 @@ export default function PCBuilderPage() {
     const VIDEO1 = "/videos/0508.mp4";
     const VIDEO2 = "/videos/0508%20(2).mp4";
 
+    // Video Slider & Intersection State
+    const [activeVideo, setActiveVideo] = useState(0)
+    const [isVisible, setIsVisible] = useState(true)
+    const videoRef0 = useRef(null)
+    const videoRef1 = useRef(null)
+    const sectionRef = useRef(null)
+
     useEffect(() => {
         const observer = new IntersectionObserver(
             ([entry]) => {
