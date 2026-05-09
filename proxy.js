@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export function middleware(request) {
+export function proxy(request) {
     const nonce = crypto.randomUUID();
     const isDev = process.env.NODE_ENV === 'development';
     
