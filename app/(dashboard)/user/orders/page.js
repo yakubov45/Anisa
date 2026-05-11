@@ -34,16 +34,16 @@ export default function UserOrdersPage() {
     return (
         <div className="space-y-10">
             <div className="space-y-1">
-                <h1 className="text-3xl font-black text-surface-900 tracking-tighter">My Orders</h1>
-                <p className="text-surface-500 font-medium text-sm">Track your hardware acquisitions and shipment progress.</p>
+                <h1 className="text-3xl font-black text-surface-900 tracking-tighter">{t('dash_my_orders')}</h1>
+                <p className="text-surface-500 font-medium text-sm">{t('dash_orders_desc')}</p>
             </div>
 
             {orders.length === 0 ? (
                 <div className="bg-surface p-20 rounded-[2.5rem] shadow-premium text-center space-y-4">
                     <div className="text-5xl opacity-20 grayscale">📦</div>
-                    <h3 className="text-xl font-bold text-surface-900">No orders yet</h3>
-                    <p className="text-surface-500 font-medium">Your setup is waiting to be built.</p>
-                    <Link href="/products" className="inline-block bg-primary text-white font-black px-10 py-4 rounded-xl shadow-lg shadow-primary/20 mt-4">Start Shopping</Link>
+                    <h3 className="text-xl font-bold text-surface-900">{t('ord_empty')}</h3>
+                    <p className="text-surface-500 font-medium">{t('ord_empty_desc')}</p>
+                    <Link href="/products" className="inline-block bg-primary text-white font-black px-10 py-4 rounded-xl shadow-lg shadow-primary/20 mt-4">{t('ord_start_shopping')}</Link>
                 </div>
             ) : (
                 <div className="space-y-6">
@@ -54,14 +54,14 @@ export default function UserOrdersPage() {
                                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>
                                 </div>
                                 <div>
-                                    <p className="text-xs font-black text-surface-400 uppercase tracking-widest mb-1">Order #{o.id.slice(-6).toUpperCase()}</p>
+                                    <p className="text-xs font-black text-surface-400 uppercase tracking-widest mb-1">{t('ord_number')}{o.id.slice(-6).toUpperCase()}</p>
                                     <h4 className="text-lg font-black text-surface-900">{formatPrice(o.totalAmount || o.total)}</h4>
                                     <p className="text-xs text-surface-400 font-bold">{formatDate(o.createdAt)}</p>
                                 </div>
                             </div>
                             <div className="flex flex-col items-end gap-3">
                                 <span className="bg-yellow-50 text-yellow-600 text-[10px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest">{o.status}</span>
-                                <Link href={`/user/orders/${o.id}`} className="text-primary font-bold text-sm hover:underline">Track Shipment</Link>
+                                <Link href={`/user/orders/${o.id}`} className="text-primary font-bold text-sm hover:underline">{t('ord_track')}</Link>
                             </div>
                         </div>
                     ))}
