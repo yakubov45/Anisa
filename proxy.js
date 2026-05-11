@@ -5,13 +5,13 @@ export function proxy(request) {
 
     // Xavfsiz va Next.js bilan mos keladigan CSP
     const csp = [
-        "default-src 'self' https://*.firebaseio.com https://*.googleapis.com",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://apis.google.com https://*.firebaseapp.com",
+        "default-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://apis.google.com https://*.firebaseapp.com https://www.google.com https://www.googletagmanager.com",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "img-src * blob: data:",
         "font-src 'self' data: https://fonts.gstatic.com",
         "connect-src *",
-        "frame-src 'self' https://*.firebaseapp.com https://accounts.google.com",
+        "frame-src 'self' https://*.firebaseapp.com https://accounts.google.com https://www.google.com",
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",

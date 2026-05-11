@@ -6,8 +6,10 @@ import { orderService } from "@/lib/services/order.service";
 import OrderQRCode from "@/components/orders/OrderQRCode";
 import PriceDisplay from "@/components/common/PriceDisplay";
 import Link from "next/link";
+import { useTranslation } from "@/lib/LanguageContext";
 
 export default function UserOrderDetails() {
+    const { t } = useTranslation();
     const { id } = useParams();
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -29,8 +31,8 @@ export default function UserOrderDetails() {
 
     if (!order) return (
         <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-6">
-            <h1 className="text-2xl font-black uppercase">Order Not Found</h1>
-            <Link href="/dashboard/user/orders" className="text-primary font-black uppercase text-xs tracking-widest underline">Return to Registry</Link>
+            <h1 className="text-2xl font-black uppercase">{t('det_not_found')}</h1>
+            <Link href="/dashboard/user/orders" className="text-primary font-black uppercase text-xs tracking-widest underline">{t('det_back_registry')}</Link>
         </div>
     );
 
@@ -46,11 +48,11 @@ export default function UserOrderDetails() {
                             {order.status}
                         </span>
                     </div>
-                    <p className="text-surface-500 font-bold uppercase text-[10px] tracking-widest">Hardware Acquisition Registry</p>
+                    <p className="text-surface-500 font-bold uppercase text-[10px] tracking-widest">{t('ord_global_desc')}</p>
                 </div>
                 
                 <Link href="/dashboard/user/orders" className="bg-surface-100 dark:bg-white/5 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-surface-200 transition-all">
-                    Back to History
+                    {t('det_back_history')}
                 </Link>
             </div>
 
@@ -60,8 +62,8 @@ export default function UserOrderDetails() {
                     {/* ITEMS */}
                     <div className="bg-white dark:bg-zinc-900 border border-surface-200 dark:border-white/10 rounded-[3rem] p-10 shadow-xl space-y-8">
                         <div className="border-l-4 border-primary pl-6">
-                            <h2 className="text-xl font-black text-foreground uppercase tracking-tighter">Manifest</h2>
-                            <p className="text-surface-500 font-bold uppercase text-[9px] tracking-widest mt-1">Configured hardware components</p>
+                            <h2 className="text-xl font-black text-foreground uppercase tracking-tighter">{t('det_manifest')}</h2>
+                            <p className="text-surface-500 font-bold uppercase text-[9px] tracking-widest mt-1">{t('det_cargo_inventory')}</p>
                         </div>
 
                         <div className="space-y-6">
@@ -72,7 +74,7 @@ export default function UserOrderDetails() {
                                     </div>
                                     <div className="flex-1">
                                         <h4 className="text-xs font-black text-foreground uppercase tracking-tight group-hover:text-primary transition-colors">{item.name}</h4>
-                                        <p className="text-[10px] text-surface-500 font-bold uppercase tracking-widest mt-1">Quantity: {item.quantity}</p>
+                                        <p className="text-[10px] text-surface-500 font-bold uppercase tracking-widest mt-1">{t('ord_quantity')}: {item.quantity}</p>
                                     </div>
                                     <PriceDisplay price={item.price * item.quantity} className="text-sm font-black text-foreground" />
                                 </div>
@@ -81,8 +83,8 @@ export default function UserOrderDetails() {
 
                         <div className="pt-8 border-t border-surface-100 dark:border-white/5 flex justify-between items-end">
                             <div className="space-y-1">
-                                <p className="text-[10px] font-black text-surface-400 uppercase tracking-widest">Total Valuation</p>
-                                <p className="text-xs text-surface-500 font-bold uppercase tracking-widest">Inclusive of all duties</p>
+                                <p className="text-[10px] font-black text-surface-400 uppercase tracking-widest">{t('det_total_valuation')}</p>
+                                <p className="text-xs text-surface-500 font-bold uppercase tracking-widest">{t('det_inclusive_duties')}</p>
                             </div>
                             <PriceDisplay price={order.totalAmount} className="text-3xl font-black text-foreground tracking-tighter" />
                         </div>
@@ -91,23 +93,23 @@ export default function UserOrderDetails() {
                     {/* SHIPPING INFO */}
                     <div className="bg-surface-50 dark:bg-zinc-900/50 border border-surface-200 dark:border-white/5 rounded-[3rem] p-10 space-y-8">
                         <div className="border-l-4 border-surface-300 pl-6">
-                            <h2 className="text-xl font-black text-foreground uppercase tracking-tighter">Deployment Logistics</h2>
-                            <p className="text-surface-500 font-bold uppercase text-[9px] tracking-widest mt-1">Destination coordinates</p>
+                            <h2 className="text-xl font-black text-foreground uppercase tracking-tighter">{t('det_deployment_logistics')}</h2>
+                            <p className="text-surface-500 font-bold uppercase text-[9px] tracking-widest mt-1">{t('det_destination_coords')}</p>
                         </div>
                         
                         <div className="grid grid-cols-2 gap-8">
                             <div className="space-y-1">
-                                <p className="text-[10px] font-black text-surface-400 uppercase tracking-widest">Recipient</p>
-                                <p className="text-sm font-black text-foreground uppercase">{order.customer.fullName}</p>
+                                <p className="text-[10px] font-black text-surface-400 uppercase tracking-widest">{t('det_recipient')}</p>
+                                <p className="text-sm font-black text-foreground uppercase">{order.customer?.fullName || order.fullName}</p>
                             </div>
                             <div className="space-y-1">
-                                <p className="text-[10px] font-black text-surface-400 uppercase tracking-widest">Contact</p>
-                                <p className="text-sm font-black text-foreground uppercase">{order.customer.phone}</p>
+                                <p className="text-[10px] font-black text-surface-400 uppercase tracking-widest">{t('det_contact')}</p>
+                                <p className="text-sm font-black text-foreground uppercase">{order.customer?.phone || order.phone}</p>
                             </div>
                             <div className="space-y-1 col-span-2">
-                                <p className="text-[10px] font-black text-surface-400 uppercase tracking-widest">Address</p>
+                                <p className="text-[10px] font-black text-surface-400 uppercase tracking-widest">{t('det_address')}</p>
                                 <p className="text-sm font-black text-foreground uppercase leading-relaxed">
-                                    {order.customer.region}, {order.customer.address}
+                                    {order.customer?.region || order.region}, {order.customer?.address || order.address}
                                 </p>
                             </div>
                         </div>
@@ -121,8 +123,8 @@ export default function UserOrderDetails() {
                             <div className="absolute top-0 left-0 w-full h-2 bg-primary" />
                             
                             <div className="space-y-2">
-                                <h3 className="text-2xl font-black text-foreground uppercase tracking-tighter">Security Pass</h3>
-                                <p className="text-surface-500 font-bold uppercase text-[9px] tracking-widest max-w-[200px] mx-auto">Present this code to the delivery specialist to authenticate deployment</p>
+                                <h3 className="text-2xl font-black text-foreground uppercase tracking-tighter">{t('det_security_pass')}</h3>
+                                <p className="text-surface-500 font-bold uppercase text-[9px] tracking-widest max-w-[200px] mx-auto">{t('det_present_code')}</p>
                             </div>
 
                             {order.verification?.token ? (
@@ -135,7 +137,7 @@ export default function UserOrderDetails() {
                                     />
 
                                     <div className="bg-surface-50 dark:bg-black/40 p-6 rounded-2xl border border-surface-200 dark:border-white/5 w-full">
-                                        <p className="text-[9px] font-black text-surface-400 uppercase tracking-widest mb-2">Manual Token Fallback</p>
+                                        <p className="text-[9px] font-black text-surface-400 uppercase tracking-widest mb-2">{t('det_manual_token')}</p>
                                         <p className="text-sm font-black text-primary tracking-[0.3em] font-mono select-all">
                                             {order.verification.token.toUpperCase()}
                                         </p>
@@ -145,7 +147,7 @@ export default function UserOrderDetails() {
                                         <span className="animate-pulse">
                                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                         </span>
-                                        <span className="text-[9px] font-black uppercase tracking-widest">Expires in 72 hours</span>
+                                        <span className="text-[9px] font-black uppercase tracking-widest">{t('det_expires_72')}</span>
                                     </div>
                                 </>
                             ) : (
@@ -154,12 +156,12 @@ export default function UserOrderDetails() {
                                         <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                     </div>
                                     <div className="space-y-1">
-                                        <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest">Legacy Acquisition</p>
+                                        <p className="text-[10px] font-black text-orange-500 uppercase tracking-widest">{t('det_legacy_acq')}</p>
                                         <p className="text-[11px] font-bold text-surface-500 uppercase leading-relaxed">
-                                            This order was created before the modern security handshake protocol. Manual verification by Admin is required for delivery.
+                                            {t('det_legacy_desc')}
                                         </p>
                                     </div>
-                                    <Link href="/faq?q=legacy-order" className="text-[9px] font-black text-primary uppercase tracking-[0.2em] underline">Protocol Documentation</Link>
+                                    <Link href="/faq?q=legacy-order" className="text-[9px] font-black text-primary uppercase tracking-[0.2em] underline">{t('det_protocol_doc')}</Link>
                                 </div>
                             )}
                         </div>
@@ -168,19 +170,19 @@ export default function UserOrderDetails() {
                             <div className="flex justify-center">
                                 <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7M9 19H5a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-4"/></svg>
                             </div>
-                            <h3 className="text-2xl font-black uppercase tracking-tighter">Mission Accomplished</h3>
-                            <p className="text-xs font-bold uppercase tracking-widest opacity-80">Hardware has been successfully deployed and verified.</p>
+                            <h3 className="text-2xl font-black uppercase tracking-tighter">{t('det_mission_accomplished')}</h3>
+                            <p className="text-xs font-bold uppercase tracking-widest opacity-80">{t('det_mission_desc')}</p>
                             <div className="h-px bg-white/20" />
                             <div className="text-[10px] font-black uppercase tracking-widest">
-                                Delivered At: {new Date(order.delivery?.deliveredAt).toLocaleString()}
+                                {t('det_delivered_at')}: {new Date(order.delivery?.deliveredAt).toLocaleString()}
                             </div>
                         </div>
                     )}
 
                     <div className="bg-surface-900 text-white p-8 rounded-[2rem] space-y-4">
-                        <h4 className="text-sm font-black uppercase tracking-widest">Protocol Support</h4>
-                        <p className="text-xs text-surface-400 font-medium">Need help with your deployment? Our FAQ hub covers all acquisition and technical protocols.</p>
-                        <Link href="/faq" className="text-primary text-[10px] font-black uppercase tracking-widest hover:underline inline-block">Visit FAQ Hub →</Link>
+                        <h4 className="text-sm font-black uppercase tracking-widest">{t('det_protocol_support')}</h4>
+                        <p className="text-xs text-surface-400 font-medium">{t('det_support_desc')}</p>
+                        <Link href="/faq" className="text-primary text-[10px] font-black uppercase tracking-widest hover:underline inline-block">{t('det_visit_faq')}</Link>
                     </div>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { orderService } from "@/lib/services/order.service";
+import { getDeliveryOrdersAction } from "@/lib/actions/order.actions";
 import { formatPrice, formatDate } from "@/lib/utils";
 import Link from 'next/link';
 import useStore from "@/store/useStore";
@@ -15,8 +15,8 @@ export default function AdminOrdersPage() {
 
     useEffect(() => {
         const fetch = async () => {
-            const data = await orderService.getAllOrders();
-            setOrders(data);
+            const result = await getDeliveryOrdersAction(null, "all");
+            if (result.success) setOrders(result.orders);
             setLoading(false);
         };
         fetch();

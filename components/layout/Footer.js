@@ -11,9 +11,9 @@ export default function Footer() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { addToast } = useUIStore();
     const [counts, setCounts] = useState({
-        youtube: 4250,
-        telegram: 12800,
-        instagram: 8430,
+        youtube: 4261,
+        telegram: 12808,
+        instagram: 8441,
         facebook: 2100
     });
 
@@ -188,7 +188,6 @@ export default function Footer() {
                     </p>
                     <div className="flex gap-6 md:gap-5">
                         <span className="text-zinc-600 text-[10px] md:text-[10px] font-black uppercase tracking-[0.4em] opacity-30">{getLangLabel()}</span>
-                        <span className="text-zinc-600 text-[10px] md:text-[10px] font-black uppercase tracking-[0.4em] opacity-30">UTC +5:00</span>
                     </div>
                 </div>
             </div>

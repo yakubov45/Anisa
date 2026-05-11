@@ -7,7 +7,7 @@ import { useTranslation } from "@/lib/LanguageContext"
 import { motion, AnimatePresence } from "framer-motion"
 import DualRangeSlider from "@/components/common/DualRangeSlider"
 
-export default function ProductListing({ initialProducts = [], allCategories = [] }) {
+export default function ProductListing({ initialProducts = [], allCategories = [], totalProducts = 0, currentPage: serverPage = 1 }) {
     const { t } = useTranslation()
     const searchParams = useSearchParams()
     const router = useRouter()
@@ -18,7 +18,6 @@ export default function ProductListing({ initialProducts = [], allCategories = [
     const [selectedCategories, setSelectedCategories] = useState([])
     const [priceRange, setPriceRange] = useState({ min: 0, max: 5000 })
     const [sortBy, setSortBy] = useState("newest")
-    const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 12
 
     // Sync categories from URL
@@ -31,8 +30,10 @@ export default function ProductListing({ initialProducts = [], allCategories = [
     }, [categoryQuery])
 
     const maxProductPrice = useMemo(() => {
-        if (initialProducts.length === 0) return 5000
-        return Math.max(...initialProducts.map(p => p.price))
+        if (!initialProducts || initialProducts.length === 0) return 5000
+        const prices = initialProducts.map(p => Number(p.price)).filter(p => !isNaN(p) && p > 0)
+        if (prices.length === 0) return 5000
+        return Math.max(...prices)
     }, [initialProducts])
 
     useEffect(() => {
@@ -64,20 +65,23 @@ export default function ProductListing({ initialProducts = [], allCategories = [
         })
     }, [filteredProducts, sortBy])
 
-    const paginatedProducts = useMemo(() => {
-        const start = (currentPage - 1) * itemsPerPage
-        return sortedProducts.slice(start, start + itemsPerPage)
-    }, [sortedProducts, currentPage])
+    const totalPages = Math.ceil(totalProducts / itemsPerPage)
 
-    const totalPages = Math.ceil(sortedProducts.length / itemsPerPage)
+    const handlePageChange = (pageNum) => {
+        const params = new URLSearchParams(searchParams.toString())
+        params.set("page", pageNum.toString())
+        router.push(`/products?${params.toString()}`, { scroll: true })
+    }
 
     const toggleCategory = (categoryId) => {
-        setSelectedCategories(prev => 
-            prev.includes(categoryId) 
-                ? prev.filter(id => id !== categoryId)
-                : [...prev, categoryId]
-        )
-        setCurrentPage(1)
+        const params = new URLSearchParams(searchParams.toString())
+        if (params.get("category") === categoryId) {
+            params.delete("category")
+        } else {
+            params.set("category", categoryId)
+        }
+        params.set("page", "1") // Reset to page 1 on filter change
+        router.push(`/products?${params.toString()}`)
     }
 
     const resetFilters = () => {
@@ -195,8 +199,8 @@ export default function ProductListing({ initialProducts = [], allCategories = [
                     <div className="flex items-center justify-between border-b border-border-alpha pb-6">
                         <span className="text-[10px] font-black text-surface-500 uppercase tracking-[0.3em]">
                             {t('showing_results_count')
-                                .replace('{count}', paginatedProducts.length)
-                                .replace('{total}', sortedProducts.length)}
+                                .replace('{count}', initialProducts.length)
+                                .replace('{total}', totalProducts)}
                         </span>
 
                         <div className="flex items-center p-1 bg-surface-100/50 dark:bg-white/5 rounded-xl border border-white/5">
@@ -224,8 +228,8 @@ export default function ProductListing({ initialProducts = [], allCategories = [
                         </div>
                     </div>
 
-                    {paginatedProducts.length > 0 ? (
-                        <ProductGrid products={paginatedProducts} />
+                    {initialProducts.length > 0 ? (
+                        <ProductGrid products={initialProducts} />
                     ) : (
                         <div className="flex flex-col items-center justify-center py-32 text-center space-y-6 animate-fade-in">
                             <div className="w-20 h-20 bg-surface-100 rounded-full flex items-center justify-center border border-border-alpha">
@@ -250,12 +254,9 @@ export default function ProductListing({ initialProducts = [], allCategories = [
                             {getPageNumbers().map(num => (
                                 <button
                                     key={num}
-                                    onClick={() => {
-                                        setCurrentPage(num)
-                                        window.scrollTo({ top: 0, behavior: 'smooth' })
-                                    }}
+                                    onClick={() => handlePageChange(num)}
                                     className={`w-12 h-12 rounded-xl text-xs font-black transition-all ${
-                                        currentPage === num 
+                                        serverPage === num 
                                             ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-110' 
                                             : 'bg-surface-100 text-surface-500 hover:bg-surface-200'
                                     }`}

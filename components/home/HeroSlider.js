@@ -127,7 +127,7 @@ export default function HeroSlider({ initialSlides }) {
                                         src={imgSrc || "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=1200&auto=format&fit=crop&q=90"}
                                         alt={slide.title}
                                         fill
-                                        priority={idx === 0}
+                                        priority={idx < 2}
                                         className="object-cover opacity-40 transition-transform duration-1000"
                                         style={{ transform: idx === current ? 'scale(1)' : 'scale(1.1)' }}
                                     />

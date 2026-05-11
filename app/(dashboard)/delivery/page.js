@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useUser } from "@/lib/UserContext"
-import { orderService } from "@/lib/services/order.service"
+import { getDeliveryOrdersAction } from "@/lib/actions/order.actions"
 import Link from "next/link"
 import { ORDER_STATUS } from "@/lib/constants"
 import { useTranslation } from "@/lib/LanguageContext"
@@ -22,53 +22,61 @@ export default function DeliveryDashboard() {
     });
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
+    const fetchOrders = useCallback(async () => {
         if (!user) return;
 
-        // Real-time listener for delivery orders
-        const unsubscribe = orderService.listenToDeliveryOrders(user.uid, (orders) => {
+        try {
+            const result = await getDeliveryOrdersAction(user.uid, "my");
+            if (!result.success) return;
+
+            const orders = result.orders;
             const today = new Date().toDateString();
 
-            const myActiveOrders = orders.filter(o => 
+            const myActiveOrders = orders.filter(o =>
                 o.status?.toLowerCase() === ORDER_STATUS.SHIPPED || o.status?.toLowerCase() === ORDER_STATUS.ASSIGNED
             );
-            
-            const myDeliveredOrders = orders.filter(o => 
+            const myDeliveredOrders = orders.filter(o =>
                 o.status?.toLowerCase() === ORDER_STATUS.DELIVERED
             );
 
-            // Note: We might still need a separate fetch for available orders if they don't have deliveryId
-            // but for now let's focus on the assigned ones.
-            
             const cargoValue = myActiveOrders.reduce((sum, o) => sum + (Number(o.total) || Number(o.totalAmount) || 0), 0);
 
             setStats({
                 active: myActiveOrders.length,
                 deliveredToday: myDeliveredOrders.filter(o => {
-                    const orderDate = new Date(o.updatedAt?.toDate?.() || Date.now()).toDateString();
+                    const orderDate = new Date(typeof o.updatedAt === 'string' ? o.updatedAt : o.updatedAt?.toDate?.() || Date.now()).toDateString();
                     return today === orderDate;
                 }).length,
-                pending: 0, // This would need a separate global listener
+                pending: 0,
                 totalCargoValue: cargoValue,
                 completedJobs: myDeliveredOrders.length
             });
 
             setActiveOrders(myActiveOrders);
-            
-            // Auto-select first mission if none selected
+
             if (myActiveOrders.length > 0) {
-                if (!selectedOrder || !myActiveOrders.find(o => o.id === selectedOrder.id)) {
-                    setSelectedOrder(myActiveOrders[0]);
-                }
+                setSelectedOrder(prev => {
+                    if (!prev || !myActiveOrders.find(o => o.id === prev.id)) {
+                        return myActiveOrders[0];
+                    }
+                    return prev;
+                });
             } else {
                 setSelectedOrder(null);
             }
-            
+        } catch (err) {
+            console.error("Delivery dashboard fetch error:", err);
+        } finally {
             setLoading(false);
-        });
-
-        return () => unsubscribe();
+        }
     }, [user]);
+
+    useEffect(() => {
+        fetchOrders();
+        // Refresh every 30 seconds
+        const interval = setInterval(fetchOrders, 30000);
+        return () => clearInterval(interval);
+    }, [fetchOrders]);
 
     if (loading) {
         return (
@@ -191,11 +199,12 @@ export default function DeliveryDashboard() {
                         ) : (
                             <>
                                 <iframe 
-                                    src={`https://yandex.ru/map-widget/v1/?text=${encodeURIComponent(manualSearch || latestAddress)}&z=14`}
+                                    src={`https://maps.google.com/maps?q=${encodeURIComponent(manualSearch || latestAddress)}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
                                     width="100%" 
                                     height="100%" 
                                     style={{ border: 0 }} 
                                     allowFullScreen={true}
+                                    loading="lazy"
                                 />
                                 {/* Map Overlay Controls */}
                                 <div className="absolute top-6 left-6 right-6 flex flex-col gap-4 pointer-events-none">

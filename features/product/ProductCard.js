@@ -106,7 +106,7 @@ function ProductCard({ product, badge = null, rating = null }) {
 
                 {/* Buttons */}
                 <div className="flex gap-2 pt-1 md:pt-2">
-                    <Link href={`/products/${product.id}`} className="flex-1 h-9 md:h-14 border border-border-alpha hover:border-primary/50 text-surface-500 hover:text-primary font-black text-[9px] md:text-[10px] uppercase tracking-widest rounded-lg md:rounded-xl bg-surface-50 flex items-center justify-center transition-all active:scale-95">
+                    <Link href={`/products/${product.id}`} className="flex-1 h-9 md:h-11 border border-border-alpha hover:border-primary/50 text-surface-500 hover:text-primary font-black text-[9px] md:text-[10px] uppercase tracking-widest rounded-lg md:rounded-xl bg-surface-50 flex items-center justify-center transition-all active:scale-95">
                         {t('details')}
                     </Link>
                     <button
@@ -116,7 +116,7 @@ function ProductCard({ product, badge = null, rating = null }) {
                             triggerCartAnimation();
                             addToast(t('cart_added_msg').replace('{name}', product.name));
                         }}
-                        className="flex-[2] h-9 md:h-14 bg-foreground text-background font-black text-[8px] md:text-[10px] uppercase tracking-widest rounded-lg md:rounded-xl hover:bg-primary hover:text-white transition-all active:scale-95 shadow-lg"
+                        className="flex-[2] h-9 md:h-11 bg-foreground text-background font-black text-[8px] md:text-[10px] uppercase tracking-widest rounded-lg md:rounded-xl hover:bg-primary hover:text-white transition-all active:scale-95 shadow-lg"
                     >
                         {t('buy_now')}
                     </button>

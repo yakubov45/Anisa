@@ -22,7 +22,7 @@ export default function SearchSuggestions({ query, onClose }) {
 
     useEffect(() => {
         async function fetchFeatured() {
-            const products = await getProductsAction(3);
+            const products = await getProductsAction(1, 3);
             setFeatured(products);
         }
         fetchFeatured();
@@ -32,7 +32,7 @@ export default function SearchSuggestions({ query, onClose }) {
         if (query.length > 0) {
             setLoading(true);
             const timer = setTimeout(async () => {
-                const products = await getProductsAction(100);
+                const products = await getProductsAction(1, 100);
                 const filtered = (products || []).filter(p =>
                     p.name?.toLowerCase().includes(query.toLowerCase()) ||
                     p.category?.toLowerCase().includes(query.toLowerCase()) ||

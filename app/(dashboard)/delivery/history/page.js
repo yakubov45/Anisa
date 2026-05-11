@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useUser } from "@/lib/UserContext"
-import { orderService } from "@/lib/services/order.service"
+import { getDeliveryOrdersAction } from "@/lib/actions/order.actions"
 import Link from "next/link"
 import { ORDER_STATUS } from "@/lib/constants"
 import { useTranslation } from "@/lib/LanguageContext"
@@ -17,9 +17,10 @@ export default function DeliveryHistory() {
         async function fetchHistory() {
             if (!user) return
             try {
-                const allOrders = await orderService.getAllOrders()
-                // Filter for delivered by this person
-                setOrders(allOrders.filter(o => o.deliveryId === user.uid && o.status === ORDER_STATUS.DELIVERED))
+                const result = await getDeliveryOrdersAction(user.uid, "my")
+                if (result.success) {
+                    setOrders(result.orders.filter(o => o.status === ORDER_STATUS.DELIVERED))
+                }
             } catch (error) {
                 console.error("Failed to fetch delivery history:", error)
             } finally {
@@ -29,7 +30,7 @@ export default function DeliveryHistory() {
         fetchHistory()
     }, [user])
 
-    const totalEarnings = orders.reduce((sum, o) => sum + (o.total || 0), 0)
+    const totalEarnings = orders.reduce((sum, o) => sum + (o.total || o.totalAmount || 0), 0)
 
     return (
         <div className="space-y-10 animate-fade-in">
@@ -85,13 +86,17 @@ export default function DeliveryHistory() {
                                             <span className="text-[10px] font-mono font-black text-primary uppercase">#{order.id.slice(-6).toUpperCase()}</span>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <p className="text-[11px] font-black text-white uppercase">{order.customerName}</p>
+                                            <p className="text-[11px] font-black text-white uppercase">
+                                                {order.shippingAddress?.fullName || order.customer?.fullName || order.customerName || "—"}
+                                            </p>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <p className="text-[11px] font-bold text-white/60">{new Date(order.updatedAt?.toDate?.() || Date.now()).toLocaleString()}</p>
+                                            <p className="text-[11px] font-bold text-white/60">
+                                                {order.updatedAt ? new Date(typeof order.updatedAt === 'string' ? order.updatedAt : order.updatedAt.toDate?.() || Date.now()).toLocaleString() : '-'}
+                                            </p>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <p className="text-[11px] font-black text-white">$ {order.total}</p>
+                                            <p className="text-[11px] font-black text-white">$ {order.total || order.totalAmount || 0}</p>
                                         </td>
                                         <td className="px-8 py-6 text-right">
                                             <Link href={`/delivery/orders/${order.id}`} className="text-[9px] font-black text-white/40 uppercase tracking-widest hover:text-white transition-colors">

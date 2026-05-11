@@ -1,4 +1,5 @@
 "use client";
+// Route fixed for authentication flow
 
 import { useEffect } from "react";
 import { useUser } from "@/lib/UserContext";
@@ -11,7 +12,7 @@ export default function LoginPage() {
 
     useEffect(() => {
         if (!authLoading && user) {
-            router.push("/dashboard");
+            router.push("/user");
         }
     }, [user, authLoading, router]);
 

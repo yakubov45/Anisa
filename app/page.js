@@ -19,7 +19,7 @@ export default async function HomePage() {
     try {
         // Parallel fetch — faqat 2 ta asosiy so'rov (kamroq so'rov = tezroq)
         const [productsResult, bannersResult] = await Promise.allSettled([
-            getProductsAction(20),
+            getProductsAction(1, 20),
             getBannersAction(),
         ]);
 

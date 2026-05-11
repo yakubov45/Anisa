@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useUser } from "@/lib/UserContext"
-import { orderService } from "@/lib/services/order.service"
+import { getOrderByIdAction, updateOrderAction } from "@/lib/actions/order.actions"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ORDER_STATUS } from "@/lib/constants"
 import { useTranslation } from "@/lib/LanguageContext"
@@ -48,13 +48,15 @@ export default function DeliveryScanner() {
 
         setStatus("verifying")
         try {
-            const order = await orderService.getById(id)
-            
-            if (!order) {
+            const result = await getOrderByIdAction(id)
+
+            if (!result.success || !result.order) {
                 setStatus("error")
                 setMessage(t('scan_error_not_found'))
                 return
             }
+
+            const order = result.order
 
             if (order.status === ORDER_STATUS.DELIVERED) {
                 setStatus("error")
@@ -62,11 +64,10 @@ export default function DeliveryScanner() {
                 return
             }
 
-            // Perform verification
-            await orderService.updateStatus(id, ORDER_STATUS.DELIVERED)
+            await updateOrderAction(id, { status: ORDER_STATUS.DELIVERED })
             setStatus("success")
             setMessage(t('scan_success_msg'))
-            
+
             setTimeout(() => {
                 router.push("/delivery/history")
             }, 2000)
@@ -82,8 +83,9 @@ export default function DeliveryScanner() {
         <div className="space-y-10 animate-fade-in max-w-xl mx-auto pb-20">
             <Script 
                 src="https://unpkg.com/html5-qrcode" 
-                strategy="lazyOnload"
+                strategy="afterInteractive"
                 onLoad={() => setScriptLoaded(true)}
+                onError={() => console.error("Failed to load QR scanner script")}
             />
 
             {/* Header */}

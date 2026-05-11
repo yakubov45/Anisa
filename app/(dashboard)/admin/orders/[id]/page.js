@@ -1,13 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react";
-import { orderService } from "@/lib/services/order.service";
-import { userService } from "@/lib/services/user.service";
+import { getOrderByIdAction, updateOrderAction } from "@/lib/actions/order.actions";
+import { getUsersByRoleAction } from "@/lib/actions/user.actions";
 import { useParams, useRouter } from "next/navigation";
 import { formatPrice, formatDate } from "@/lib/utils";
 import Link from "next/link";
 import useStore from "@/store/useStore";
-
 import { useTranslation } from "@/lib/LanguageContext";
 
 export default function OrderDetailsPage() {
@@ -24,10 +23,10 @@ export default function OrderDetailsPage() {
     useEffect(() => {
         const fetchOrder = async () => {
             try {
-                const data = await orderService.getById(id);
-                if (data) {
-                    setOrder(data);
-                    setSelectedCourier(data.deliveryId || "");
+                const result = await getOrderByIdAction(id);
+                if (result.success && result.order) {
+                    setOrder(result.order);
+                    setSelectedCourier(result.order.deliveryId || "");
                 } else {
                     router.push("/admin/orders");
                 }
@@ -38,8 +37,12 @@ export default function OrderDetailsPage() {
             }
         };
         const fetchCouriers = async () => {
-            const data = await userService.getAllUsers("delivery");
-            setCouriers(data);
+            try {
+                const result = await getUsersByRoleAction("delivery");
+                if (result.success) setCouriers(result.users);
+            } catch (e) {
+                console.error("Couriers fetch error:", e);
+            }
         };
         fetchOrder();
         fetchCouriers();
@@ -48,8 +51,8 @@ export default function OrderDetailsPage() {
     const handleStatusChange = async (newStatus) => {
         setUpdating(true);
         try {
-            await orderService.updateStatus(id, newStatus);
-            setOrder({ ...order, status: newStatus });
+            const result = await updateOrderAction(id, { status: newStatus });
+            if (result.success) setOrder({ ...order, status: newStatus });
         } catch (error) {
             console.error("Error updating status:", error);
         } finally {
@@ -61,12 +64,14 @@ export default function OrderDetailsPage() {
         if (!selectedCourier) return;
         setUpdating(true);
         try {
-            await orderService.updateOrder(id, { 
+            const result = await updateOrderAction(id, {
                 deliveryId: selectedCourier,
-                status: "Shipped" // Auto transition to shipped when assigned
+                status: "Shipped"
             });
-            setOrder({ ...order, deliveryId: selectedCourier, status: "Shipped" });
-            alert("Courier assigned and shipment initiated.");
+            if (result.success) {
+                setOrder({ ...order, deliveryId: selectedCourier, status: "Shipped" });
+                alert("Courier assigned and shipment initiated.");
+            }
         } catch (error) {
             console.error("Error assigning courier:", error);
         } finally {

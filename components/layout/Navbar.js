@@ -242,7 +242,7 @@ export default function Navbar() {
                                                         {(user.photoURL || user.avatar) ? (
                                                             <img src={user.photoURL || user.avatar} alt={user.displayName} className="w-full h-full object-cover" />
                                                         ) : (
-                                                            user.displayName?.[0] || user.email?.[0].toUpperCase()
+                                                            <span className="uppercase">{user.displayName?.[0] || user.email?.[0] || 'U'}</span>
                                                         )}
                                                     </div>
                                                 </button>

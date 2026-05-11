@@ -70,7 +70,7 @@ async function fetchFromRest(collectionName, limitCount = null) {
     try {
         const response = await fetch(url, { 
             next: { revalidate: 60 },
-            signal: AbortSignal.timeout(5000)
+            signal: AbortSignal.timeout(10000)
         });
         if (!response.ok) {
             const errorText = await response.text();

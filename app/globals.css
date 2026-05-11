@@ -61,6 +61,34 @@
       radial-gradient(at 100% 0%, var(--primary-glow) 0px, transparent 50%);
     transition: background-color 0.5s ease, color 0.5s ease;
   }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #E31E24;
+    border-radius: 5px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #B91C1C;
+    background-clip: content-box;
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #E31E24 transparent;
+  }
 }
 
 @layer components {

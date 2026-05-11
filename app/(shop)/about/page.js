@@ -31,11 +31,13 @@ export default function AboutPage() {
                     loop
                     muted
                     playsInline
+                    disablePictureInPicture
+                    disableRemotePlayback
                     className="absolute inset-0 object-cover w-full h-full transition-all duration-1000 scale-110 group-hover:scale-100"
                 >
                     <source src="/videos/A_hyper_realistic_macro_animat.mp4" type="video/mp4" />
                 </video>
-                <div className="absolute inset-0 bg-black/60 pointer-events-none" />
+                <div className="absolute inset-0 bg-black/60 pointer-events-none transform-gpu" />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent pointer-events-none" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 text-white">
                     <motion.h1
@@ -75,12 +77,14 @@ export default function AboutPage() {
                         loop
                         muted
                         playsInline
+                        disablePictureInPicture
+                        disableRemotePlayback
                         className="object-cover w-full h-full scale-105"
                     >
                         <source src="/videos/Youtube retroo.mp4" type="video/mp4" />
                     </video>
                     {/* Darkening overlay */}
-                    <div className="absolute inset-0 bg-black/40 pointer-events-none" />
+                    <div className="absolute inset-0 bg-black/40 pointer-events-none transform-gpu" />
                     {/* Primary tint overlay */}
                     <div className="absolute inset-0 bg-primary/10 mix-blend-overlay pointer-events-none" />
                 </div>
@@ -101,7 +105,7 @@ export default function AboutPage() {
                     <div className="relative h-full flex flex-col justify-start bg-gradient-to-b from-white/[0.08] to-transparent border border-white/10 group-hover:border-primary/50 p-10 md:p-16 rounded-[3rem] transition-all duration-500 overflow-hidden shadow-2xl">
 
                         {/* Glow effect behind icon */}
-                        <div className="absolute -top-10 -left-10 w-64 h-64 bg-primary/20 blur-[80px] rounded-full group-hover:bg-primary/40 transition-colors duration-700" />
+                        <div className="absolute -top-10 -left-10 w-64 h-64 bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.4)_0%,transparent_70%)] rounded-full opacity-50 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
                         {/* Icon */}
                         <div className="relative mb-10 w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-[1.5rem] border border-primary/20 flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-transform duration-500 shadow-lg shadow-primary/10">
@@ -141,7 +145,7 @@ export default function AboutPage() {
                         </div>
 
                         {/* Glow effect behind icon */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-indigo-500/10 blur-[100px] rounded-full group-hover:bg-indigo-500/20 transition-colors duration-700 pointer-events-none" />
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.3)_0%,transparent_70%)] rounded-full opacity-50 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
                         {/* Icon */}
                         <div className="relative mb-10 w-20 h-20 bg-gradient-to-br from-indigo-500/20 to-indigo-500/5 rounded-[1.5rem] border border-indigo-500/20 flex items-center justify-center group-hover:-translate-y-3 group-hover:scale-110 transition-transform duration-500 shadow-lg shadow-indigo-500/10">
@@ -231,7 +235,7 @@ export default function AboutPage() {
 
             {/* Contact Form */}
             <section className="bg-zinc-900 text-white rounded-3xl md:rounded-[4rem] p-8 md:p-24 space-y-8 md:space-y-12 relative overflow-hidden shadow-2xl mx-6">
-                <div className="absolute right-0 top-0 w-96 h-96 bg-primary/20 rounded-full blur-[100px] -mr-48 -mt-48" />
+                <div className="absolute right-0 top-0 w-96 h-96 bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.3)_0%,transparent_70%)] rounded-full -mr-48 -mt-48 pointer-events-none" />
 
                 <div className="max-w-2xl space-y-6 relative">
                     <h2 className="text-5xl font-black uppercase tracking-tighter leading-none">{t('about_contact_core')}</h2>

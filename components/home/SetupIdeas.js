@@ -62,13 +62,10 @@ export default function SetupIdeas() {
                                 <h3 className="text-2xl font-black text-foreground uppercase tracking-tight leading-tight">{setup.name}</h3>
                                 <p className="text-surface-500 text-[10px] font-bold uppercase tracking-[0.2em] leading-relaxed">{setup.items}</p>
                             </div>
-                            <div className="flex gap-4 mt-auto">
-                                <Link href="/pc-builder" className="flex-1 bg-primary text-white text-center py-5 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-foreground hover:text-background transition-all shadow-xl shadow-primary/20">
+                            <div className="flex mt-auto">
+                                <Link href="/pc-builder" className="flex-1 bg-primary text-white text-center py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-foreground hover:text-background transition-all shadow-xl shadow-primary/20">
                                     {t('acquire_setup')}
                                 </Link>
-                                <button className="w-16 h-16 flex items-center justify-center border border-border-alpha rounded-2xl hover:bg-surface-100 transition-all text-foreground">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                                </button>
                             </div>
                         </div>
                     </div>

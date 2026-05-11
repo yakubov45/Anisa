@@ -114,8 +114,8 @@ export default function PCBuilderPage() {
                 {/* Background Decor (Optimized for performance) */}
                 <div className="absolute inset-0 pointer-events-none opacity-20">
                     <div className="absolute top-0 left-0 w-full h-full bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
-                    <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-primary/20 blur-[80px] rounded-full transform-gpu" />
-                    <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] bg-blue-500/10 blur-[80px] rounded-full transform-gpu" />
+                    <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.3)_0%,transparent_70%)] rounded-full transform-gpu" />
+                    <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.3)_0%,transparent_70%)] rounded-full transform-gpu" />
                 </div>
 
                 {/* Left: Enhanced Text Content */}
@@ -164,17 +164,17 @@ export default function PCBuilderPage() {
                         className={`absolute top-0 left-0 md:left-4 w-[200px] sm:w-[240px] md:w-[260px] aspect-[9/16] rounded-[2.5rem] md:rounded-[3rem] p-2 md:p-3 bg-zinc-900 border-2 md:border-4 border-zinc-800 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] cursor-pointer group will-change-transform ${
                             activeVideo === 0 
                             ? 'z-30 scale-105 -translate-y-4 shadow-[20px_20px_60px_rgba(0,0,0,0.9),0_0_40px_rgba(34,197,94,0.3)] opacity-100' 
-                            : 'z-10 scale-90 opacity-60 blur-[2px] shadow-lg hover:opacity-80 hover:scale-95'
+                            : 'z-10 scale-90 opacity-60 shadow-lg hover:opacity-80 hover:scale-95'
                         }`}
                     >
                         <div className="absolute top-4 md:top-6 left-1/2 -translate-x-1/2 w-16 md:w-20 h-4 md:h-6 bg-black rounded-full z-20 flex items-center justify-end px-2 md:px-3">
                             <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-white/10" />
                         </div>
                         <div className="relative w-full h-full rounded-[2rem] md:rounded-[2.2rem] overflow-hidden bg-black transform-gpu">
-                            <video ref={videoRef0} onEnded={handleVideoEnd} muted playsInline preload="metadata" className="absolute inset-0 object-cover w-full h-full scale-105">
+                            <video ref={videoRef0} onEnded={handleVideoEnd} muted playsInline preload="metadata" disablePictureInPicture disableRemotePlayback className="absolute inset-0 object-cover w-full h-full scale-105">
                                 <source src={VIDEO1} type="video/mp4" />
                             </video>
-                            <div className={`absolute inset-0 bg-black transition-opacity duration-700 pointer-events-none ${activeVideo === 0 ? 'opacity-0' : 'opacity-50'}`} />
+                            <div className={`absolute inset-0 bg-black transition-opacity duration-700 pointer-events-none ${activeVideo === 0 ? 'opacity-0' : 'opacity-60'}`} />
                         </div>
                     </div>
 
@@ -184,17 +184,17 @@ export default function PCBuilderPage() {
                         className={`absolute bottom-0 right-0 md:right-4 w-[220px] sm:w-[260px] md:w-[280px] aspect-[9/16] rounded-[2.5rem] md:rounded-[3rem] p-2 md:p-3 bg-zinc-900 border-2 md:border-4 border-zinc-800 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] cursor-pointer group will-change-transform ${
                             activeVideo === 1 
                             ? 'z-30 scale-105 -translate-y-4 shadow-[30px_30px_60px_rgba(0,0,0,0.9),0_0_40px_rgba(59,130,246,0.3)] opacity-100' 
-                            : 'z-10 scale-90 opacity-60 blur-[2px] shadow-lg hover:opacity-80 hover:scale-95'
+                            : 'z-10 scale-90 opacity-60 shadow-lg hover:opacity-80 hover:scale-95'
                         }`}
                     >
                         <div className="absolute top-4 md:top-6 left-1/2 -translate-x-1/2 w-16 md:w-20 h-4 md:h-6 bg-black rounded-full z-20 flex items-center justify-end px-2 md:px-3">
                             <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-white/10" />
                         </div>
                         <div className="relative w-full h-full rounded-[2rem] md:rounded-[2.2rem] overflow-hidden bg-black transform-gpu">
-                            <video ref={videoRef1} onEnded={handleVideoEnd} muted playsInline preload="metadata" className="absolute inset-0 object-cover w-full h-full scale-105">
+                            <video ref={videoRef1} onEnded={handleVideoEnd} muted playsInline preload="metadata" disablePictureInPicture disableRemotePlayback className="absolute inset-0 object-cover w-full h-full scale-105">
                                 <source src={VIDEO2} type="video/mp4" />
                             </video>
-                            <div className={`absolute inset-0 bg-black transition-opacity duration-700 pointer-events-none ${activeVideo === 1 ? 'opacity-0' : 'opacity-50'}`} />
+                            <div className={`absolute inset-0 bg-black transition-opacity duration-700 pointer-events-none ${activeVideo === 1 ? 'opacity-0' : 'opacity-60'}`} />
                         </div>
                     </div>
 
