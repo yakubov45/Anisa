@@ -14,13 +14,32 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata = {
-    title: "OnePC | Premium Hardware Store",
-    description: "Elite PC systems and hardware for professionals.",
+    metadataBase: new URL('https://onepc.uz'),
+    title: {
+        template: '%s | OnePC',
+        default: 'OnePC | Premium Hardware & Gaming Setup',
+    },
+    description: "Elite PC systems, custom builds, hardware components and gaming setups for professionals. Top quality hardware acquisition ecosystem.",
+    openGraph: {
+        title: 'OnePC | Premium Hardware Store',
+        description: 'Elite PC systems and hardware for professionals.',
+        url: 'https://onepc.uz',
+        siteName: 'OnePC',
+        images: [
+            {
+                url: '/videos/og-banner.jpg', // Placeholder for now
+                width: 1200,
+                height: 630,
+            },
+        ],
+        locale: 'uz_UZ',
+        type: 'website',
+    },
     manifest: "/manifest.json",
     icons: {
         icon: "/favicon.ico",
-        shortcut: "/icons/icon-192x192.png",
-        apple: "/icons/icon-512x512.png",
+        shortcut: "/icons/logo.svg",
+        apple: "/icons/logo.svg",
     }
 };
 

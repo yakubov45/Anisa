@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { orderService } from "@/lib/services/order.service";
 import OrderQRCode from "@/components/orders/OrderQRCode";
 import PriceDisplay from "@/components/common/PriceDisplay";
+import SkeletonLoading from "@/components/common/SkeletonLoading";
 import Link from "next/link";
 import { useTranslation } from "@/lib/LanguageContext";
 
@@ -24,8 +25,8 @@ export default function UserOrderDetails() {
     }, [id]);
 
     if (loading) return (
-        <div className="min-h-[60vh] flex items-center justify-center">
-            <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        <div className="py-10">
+            <SkeletonLoading text={t('loading_manifest') || "LOADING MANIFEST..."} />
         </div>
     );
 

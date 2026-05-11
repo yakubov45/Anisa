@@ -1,26 +1,35 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { orderService } from "@/lib/services/order.service";
-import { formatPrice, formatDate } from "@/lib/utils";
 import { useUser } from "@/lib/UserContext";
+import { useTranslation } from "@/lib/LanguageContext";
+import { getUserOrdersAction } from "@/lib/actions/order.actions";
+import SkeletonLoading from "@/components/common/SkeletonLoading";
 import Link from 'next/link';
+import { formatPrice, formatDate } from "@/lib/utils";
 
 export default function UserOrdersPage() {
     const { user } = useUser();
+    const { t } = useTranslation();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (user?.uid) {
-            const fetch = async () => {
-                const data = await orderService.getUserOrders(user.uid);
-                setOrders(data);
+            getUserOrdersAction(user.uid).then(res => {
+                if (res.success) {
+                    setOrders(res.orders);
+                }
                 setLoading(false);
-            };
-            fetch();
+            });
         }
     }, [user]);
+
+    if (loading) return (
+        <div className="py-10">
+            <SkeletonLoading text={t('loading_manifest') || "LOADING MANIFEST..."} />
+        </div>
+    );
 
     return (
         <div className="space-y-10">
@@ -29,11 +38,7 @@ export default function UserOrdersPage() {
                 <p className="text-surface-500 font-medium text-sm">Track your hardware acquisitions and shipment progress.</p>
             </div>
 
-            {loading ? (
-                <div className="animate-pulse space-y-6">
-                    {[1, 2, 3].map(i => <div key={i} className="bg-surface-100 h-24 rounded-3xl" />)}
-                </div>
-            ) : orders.length === 0 ? (
+            {orders.length === 0 ? (
                 <div className="bg-surface p-20 rounded-[2.5rem] shadow-premium text-center space-y-4">
                     <div className="text-5xl opacity-20 grayscale">📦</div>
                     <h3 className="text-xl font-bold text-surface-900">No orders yet</h3>

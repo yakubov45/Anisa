@@ -6,8 +6,10 @@ import { userService } from "@/lib/services/user.service";
 import { authService } from "@/lib/services/auth.service";
 import { checkEmailExistsAction, updateEmailAdminAction, updatePasswordAdminAction } from "@/lib/actions/user.actions";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "@/lib/LanguageContext";
 
 export default function ProfilePage() {
+    const { t, language } = useTranslation();
     const { user, refreshUser } = useUser();
     const fileInputRef = useRef(null);
     const [formData, setFormData] = useState({
@@ -109,6 +111,9 @@ export default function ProfilePage() {
 
             // 3. Handle Password Set/Update via Admin (to bypass recent login)
             if (formData.newPassword) {
+                if (formData.newPassword !== formData.confirmPassword) {
+                    throw new Error("Passwords do not match. Please confirm your password.");
+                }
                 const updateRes = await updatePasswordAdminAction(user.uid, formData.newPassword);
                 if (!updateRes.success) {
                     throw new Error(updateRes.error || "Failed to link security password.");
@@ -117,7 +122,7 @@ export default function ProfilePage() {
                 // Still update Firestore flag
                 await userService.updateProfile(user.uid, { hasPassword: true });
                 
-                setFormData(prev => ({ ...prev, newPassword: "" }));
+                setFormData(prev => ({ ...prev, newPassword: "", confirmPassword: "" }));
                 setStatus({ type: "success", message: "Security clearance updated. New password linked via Admin." });
             }
 
@@ -163,21 +168,21 @@ export default function ProfilePage() {
             {/* HEADER */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-l-4 border-primary pl-6">
                 <div className="space-y-2">
-                    <h1 className="text-4xl font-black text-foreground tracking-tighter uppercase">Profile Settings</h1>
-                    <p className="text-surface-500 font-bold uppercase text-[10px] tracking-[0.3em]">Identity & Security Management Protocol</p>
+                    <h1 className="text-4xl font-black text-foreground tracking-tighter uppercase">{t('profile_settings')}</h1>
+                    <p className="text-surface-500 font-bold uppercase text-[10px] tracking-[0.3em]">{t('profile_security_mgmt')}</p>
                 </div>
                 
                 <button 
                     onClick={() => setIsEditing(!isEditing)}
                     className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${isEditing ? 'bg-zinc-800 text-white' : 'bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20'}`}
                 >
-                    {isEditing ? "Cancel Editing" : "Edit Profile"}
+                    {isEditing ? t('profile_cancel_edit') : t('profile_edit')}
                 </button>
             </div>
 
             {/* NOTIFICATION BANNER */}
             <AnimatePresence>
-                {(isMissingInfo || (user?.email && !user?.emailVerified)) && (
+                {(isMissingInfo || (user?.email && !user?.emailVerified && user?.role === 'user')) && (
                     <motion.div 
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -188,12 +193,12 @@ export default function ProfilePage() {
                         </div>
                         <div className="space-y-1">
                             <h3 className="text-sm font-black text-primary uppercase tracking-tighter">
-                                {user?.email && !user?.emailVerified ? "Email Verification Pending" : "Incomplete Profile Detected"}
+                                {user?.email && !user?.emailVerified ? t('profile_email_pending_title') : t('profile_incomplete_title')}
                             </h3>
                             <p className="text-[10px] font-bold text-surface-500 uppercase tracking-widest">
-                                {user?.email && !user?.emailVerified 
-                                    ? "Please check your inbox and verify your email address to secure your account."
-                                    : "Please provide your Full Name and Email Address to ensure full access to the terminal."}
+                                {user?.email && !user?.emailVerified && user?.role === 'user'
+                                    ? t('profile_email_pending_desc')
+                                    : t('profile_incomplete_desc')}
                             </p>
                         </div>
                     </motion.div>
@@ -207,14 +212,14 @@ export default function ProfilePage() {
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
                         
                         <div className="space-y-8 relative z-10">
-                            <h2 className="text-xl font-black text-foreground uppercase tracking-tighter">Personal Data</h2>
+                            <h2 className="text-xl font-black text-foreground uppercase tracking-tighter">{t('profile_personal_data')}</h2>
                             
                             <form onSubmit={handleUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">First Name</label>
+                                    <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">{t('profile_first_name')}</label>
                                     <input
                                         type="text"
-                                        placeholder="Enter First Name"
+                                        placeholder={t('profile_first_name')}
                                         value={formData.firstName}
                                         readOnly={!isEditing}
                                         onChange={(e) => setFormData({...formData, firstName: e.target.value})}
@@ -223,10 +228,10 @@ export default function ProfilePage() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Last Name</label>
+                                    <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">{t('profile_last_name')}</label>
                                     <input
                                         type="text"
-                                        placeholder="Enter Last Name"
+                                        placeholder={t('profile_last_name')}
                                         value={formData.lastName}
                                         readOnly={!isEditing}
                                         onChange={(e) => setFormData({...formData, lastName: e.target.value})}
@@ -236,7 +241,7 @@ export default function ProfilePage() {
                                 </div>
                                 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Phone Number</label>
+                                    <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">{t('profile_phone')}</label>
                                     <input
                                         type="tel"
                                         value={formData.phone}
@@ -248,10 +253,10 @@ export default function ProfilePage() {
 
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between ml-1">
-                                        <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest">Email Address</label>
+                                        <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest">{t('profile_email')}</label>
                                         {user?.email && (
                                             <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full ${user.emailVerified ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}`}>
-                                                {user.emailVerified ? 'Verified' : 'Pending'}
+                                                {user.emailVerified ? t('profile_verified') : t('profile_pending')}
                                             </span>
                                         )}
                                     </div>
@@ -267,19 +272,60 @@ export default function ProfilePage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Date of Birth</label>
-                                    <input
-                                        type="date"
-                                        value={formData.dob}
-                                        onChange={(e) => setFormData({...formData, dob: e.target.value})}
-                                        className="w-full bg-surface-50 dark:bg-black border border-surface-200 dark:border-white/10 rounded-xl px-6 py-4 text-sm text-foreground focus:ring-2 focus:ring-primary outline-none transition-all uppercase"
-                                    />
+                                    <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">{t('profile_dob')}</label>
+                                    <div className="flex gap-2 w-full">
+                                        <select
+                                            value={formData.dob ? formData.dob.split('-')[1] : ""}
+                                            onChange={(e) => {
+                                                const parts = formData.dob ? formData.dob.split('-') : ['2000', '01', '01'];
+                                                parts[1] = e.target.value;
+                                                setFormData({...formData, dob: parts.join('-')});
+                                            }}
+                                            className={`flex-[2] ${!isEditing ? 'bg-surface-100 dark:bg-white/5 cursor-not-allowed opacity-60' : 'bg-surface-50 dark:bg-black focus:ring-2 focus:ring-primary'} border border-surface-200 dark:border-white/10 rounded-xl px-3 py-4 text-sm text-foreground outline-none transition-all appearance-none text-center font-bold`}
+                                            disabled={!isEditing}
+                                        >
+                                            <option value="" disabled>{t('profile_month')}</option>
+                                            {["01","02","03","04","05","06","07","08","09","10","11","12"].map((m, i) => (
+                                                <option key={m} value={m}>{new Date(2000, i).toLocaleString(language || 'en', {month: 'long'})}</option>
+                                            ))}
+                                        </select>
+                                        <select
+                                            value={formData.dob ? formData.dob.split('-')[2] : ""}
+                                            onChange={(e) => {
+                                                const parts = formData.dob ? formData.dob.split('-') : ['2000', '01', '01'];
+                                                parts[2] = e.target.value;
+                                                setFormData({...formData, dob: parts.join('-')});
+                                            }}
+                                            className={`flex-1 ${!isEditing ? 'bg-surface-100 dark:bg-white/5 cursor-not-allowed opacity-60' : 'bg-surface-50 dark:bg-black focus:ring-2 focus:ring-primary'} border border-surface-200 dark:border-white/10 rounded-xl px-3 py-4 text-sm text-foreground outline-none transition-all appearance-none text-center font-bold`}
+                                            disabled={!isEditing}
+                                        >
+                                            <option value="" disabled>{t('profile_day')}</option>
+                                            {Array.from({length: 31}, (_, i) => String(i + 1).padStart(2, '0')).map(d => (
+                                                <option key={d} value={d}>{d}</option>
+                                            ))}
+                                        </select>
+                                        <select
+                                            value={formData.dob ? formData.dob.split('-')[0] : ""}
+                                            onChange={(e) => {
+                                                const parts = formData.dob ? formData.dob.split('-') : ['2000', '01', '01'];
+                                                parts[0] = e.target.value;
+                                                setFormData({...formData, dob: parts.join('-')});
+                                            }}
+                                            className={`flex-[1.5] ${!isEditing ? 'bg-surface-100 dark:bg-white/5 cursor-not-allowed opacity-60' : 'bg-surface-50 dark:bg-black focus:ring-2 focus:ring-primary'} border border-surface-200 dark:border-white/10 rounded-xl px-3 py-4 text-sm text-foreground outline-none transition-all appearance-none text-center font-bold`}
+                                            disabled={!isEditing}
+                                        >
+                                            <option value="" disabled>{t('profile_year')}</option>
+                                            {Array.from({length: 100}, (_, i) => String(new Date().getFullYear() - i)).map(y => (
+                                                <option key={y} value={y}>{y}</option>
+                                            ))}
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Security Update</label>
+                                    <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">{t('profile_security_update')}</label>
                                     <div className="w-full bg-surface-100 dark:bg-white/5 border border-surface-200 dark:border-white/5 rounded-xl px-6 py-4 text-[10px] text-surface-400 font-bold uppercase tracking-widest">
-                                        Last sync: {user?.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : 'Initial Boot'}
+                                        {t('profile_last_sync')}: {user?.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : t('profile_initial_boot')}
                                     </div>
                                 </div>
 
@@ -289,7 +335,7 @@ export default function ProfilePage() {
                                         disabled={loading}
                                         className="w-full md:w-auto bg-primary text-white font-black px-12 py-5 rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 uppercase text-xs tracking-widest"
                                     >
-                                        {loading ? "Synchronizing..." : "Save Profile Changes"}
+                                        {loading ? t('profile_syncing') : t('profile_save_changes')}
                                     </button>
                                     
                                     {status.message && (
@@ -303,7 +349,7 @@ export default function ProfilePage() {
                                                     onClick={() => authService.logout()}
                                                     className="mt-3 w-full bg-red-500/10 text-red-500 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest border border-red-500/20 hover:bg-red-500 hover:text-white transition-all"
                                                 >
-                                                    Hozir chiqib ketish (Logout)
+                                                    {t('profile_logout_now')}
                                                 </button>
                                             )}
                                         </div>
@@ -317,18 +363,18 @@ export default function ProfilePage() {
                     <div className="bg-white dark:bg-zinc-900 rounded-[3rem] p-6 md:p-10 border border-surface-200 dark:border-white/5 shadow-2xl relative overflow-hidden">
                         <div className="space-y-8">
                             <div className="flex items-center justify-between">
-                                <h2 className="text-xl font-black text-foreground uppercase tracking-tighter">Security Protocol</h2>
+                                <h2 className="text-xl font-black text-foreground uppercase tracking-tighter">{t('profile_security_protocol')}</h2>
                                 <div className="px-3 py-1 bg-primary/10 rounded-full text-[8px] font-black text-primary uppercase tracking-widest animate-pulse">
-                                    Encrypted Connection
+                                    {t('profile_encrypted_conn')}
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">New Password</label>
+                                    <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">{t('profile_new_password')}</label>
                                     <input
                                         type="password"
-                                        placeholder={isEditing ? "••••••••" : "PASSWORD PROTECTED"}
+                                        placeholder={isEditing ? "••••••••" : t('profile_password_protected')}
                                         value={formData.newPassword}
                                         readOnly={!isEditing}
                                         onChange={(e) => setFormData({...formData, newPassword: e.target.value})}
@@ -336,19 +382,21 @@ export default function ProfilePage() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Account Security</label>
-                                    <div className="w-full bg-surface-100 dark:bg-white/5 border border-surface-200 dark:border-white/5 rounded-xl px-6 py-4 flex items-center gap-3">
-                                        <div className={`w-2 h-2 rounded-full ${user?.hasPassword ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]' : 'bg-yellow-500'}`} />
-                                        <span className="text-[10px] text-surface-500 font-black uppercase tracking-widest">
-                                            {user?.hasPassword ? 'Password Protection Active' : 'OTP Only - Password Not Set'}
-                                        </span>
-                                    </div>
+                                    <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">{t('profile_confirm_password')}</label>
+                                    <input
+                                        type="password"
+                                        placeholder={isEditing ? "••••••••" : t('profile_password_protected')}
+                                        value={formData.confirmPassword || ""}
+                                        readOnly={!isEditing}
+                                        onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                                        className={`w-full ${!isEditing ? 'bg-surface-100 dark:bg-white/5 cursor-not-allowed opacity-60' : 'bg-surface-50 dark:bg-black focus:ring-2 focus:ring-primary'} border border-surface-200 dark:border-white/10 rounded-xl px-6 py-4 text-sm text-foreground outline-none transition-all`}
+                                    />
                                 </div>
                             </div>
                             
                             {!isEditing && (
                                 <p className="text-[9px] text-surface-400 font-bold uppercase tracking-widest italic">
-                                    Click "Edit Profile" at the top to modify security credentials.
+                                    {t('profile_click_edit')}
                                 </p>
                             )}
                         </div>
@@ -395,13 +443,15 @@ export default function ProfilePage() {
                                 className="flex-1 bg-surface-50 dark:bg-black border border-surface-200 dark:border-white/10 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-primary hover:text-white hover:border-primary transition-all group disabled:opacity-50"
                             >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"/></svg>
-                                {uploading ? "Uploading..." : "Upload"}
+                                {uploading ? t('profile_uploading') : t('profile_upload')}
                             </button>
                         </div>
 
                         <div className="text-center space-y-1">
-                            <p className="text-sm font-black text-foreground uppercase tracking-tight">{user?.displayName || "Accessing..."}</p>
-                            <p className="text-[9px] font-black text-primary uppercase tracking-[0.3em] opacity-60">Verified {user?.role || 'User'}</p>
+                            <p className="text-sm font-black text-foreground uppercase tracking-tight">{user?.displayName || t('profile_accessing')}</p>
+                            <p className="text-[9px] font-black text-primary uppercase tracking-[0.3em] opacity-60">
+                                {t('profile_verified_role').replace('{role}', user?.role || 'User')}
+                            </p>
                         </div>
                     </div>
                 </div>
