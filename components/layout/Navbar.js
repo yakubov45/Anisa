@@ -206,7 +206,7 @@ export default function Navbar() {
                                             </button>
                                             <button
                                                 onClick={toggleDarkMode}
-                                                className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary hover:text-white transition-all group flex"
+                                                className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 hidden md:flex items-center justify-center hover:bg-primary hover:text-white transition-all group"
                                             >
                                                 {isDarkMode ? (
                                                     <svg className="w-4 h-4 text-yellow-500 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" /></svg>
@@ -401,6 +401,45 @@ export default function Navbar() {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                 </svg>
                             </Link>
+
+                            {/* Settings Section (Language & Theme) */}
+                            <div className="px-8 py-8 space-y-6 border-b border-black dark:border-white/10 bg-surface-50 dark:bg-black/40">
+                                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-foreground/40 dark:text-white/30">{t('nav_settings') || "SETTINGS"}</p>
+                                
+                                <div className="flex bg-white dark:bg-white/5 rounded-xl p-1 border border-black/5 dark:border-white/10 flex-1">
+                                    {[
+                                        { id: 'uz', label: 'UZ' },
+                                        { id: 'ru', label: 'RU' },
+                                        { id: 'en', label: 'EN' }
+                                    ].map(l => (
+                                        <button
+                                            key={l.id}
+                                            onClick={() => setLang(l.id)}
+                                            className={`flex-1 py-2 text-[10px] font-black rounded-lg transition-all ${lang === l.id ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white'}`}
+                                        >
+                                            {l.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Categories Section */}
+                            <div className="px-8 py-8 space-y-6">
+                                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-foreground/40 dark:text-white/30">{t('nav_categories') || "CATEGORIES"}</p>
+                                <div className="grid grid-cols-1 gap-1">
+                                    {categories.map((cat) => (
+                                        <Link
+                                            key={cat.id}
+                                            href={`/products?category=${cat.id}`}
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className="flex items-center justify-between py-3 group transition-all"
+                                        >
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-foreground/70 dark:text-white/70 group-hover:text-primary transition-colors">{cat.name}</span>
+                                            <svg className="w-3 h-3 text-foreground/20 dark:text-white/10 group-hover:text-primary group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7" /></svg>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

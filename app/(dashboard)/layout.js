@@ -9,6 +9,7 @@ import { AdminGuard } from "@/lib/guards/admin.guard";
 import { UserGuard } from "@/lib/guards/user.guard";
 import { DeliveryGuard } from "@/lib/guards/delivery.guard";
 import { useTranslation } from "@/lib/LanguageContext";
+import { motion } from "framer-motion";
 
 export default function DashboardLayout({ children }) {
     const { t } = useTranslation();
@@ -23,19 +24,30 @@ export default function DashboardLayout({ children }) {
     const NavItem = ({ href, label, icon }) => {
         const active = pathname === href;
         return (
-            <Link href={href} className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm ${active ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-surface-500 hover:bg-surface-50 hover:text-surface-900"
-                }`}>
-                <span className={`w-5 h-5 flex items-center justify-center ${active ? "text-white" : "text-surface-400"}`}>
+            <Link href={href} className={`group flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-300 relative overflow-hidden ${active 
+                ? "bg-gradient-to-r from-primary to-primary-600 text-white shadow-[0_10px_20px_rgba(239,68,68,0.2)]" 
+                : "text-surface-400 hover:text-surface-900 dark:hover:text-white hover:bg-surface-50 dark:hover:bg-white/5"
+            }`}>
+                {active && (
+                    <motion.div 
+                        layoutId="activeTab"
+                        className="absolute left-0 top-0 bottom-0 w-1 bg-white"
+                        initial={false}
+                    />
+                )}
+                <span className={`w-6 h-6 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 ${active ? "text-white" : "text-surface-400 group-hover:text-primary"}`}>
                     {icon}
                 </span>
-                {label}
+                <span className={`text-[11px] font-black uppercase tracking-widest transition-colors ${active ? "opacity-100" : "opacity-70 group-hover:opacity-100"}`}>
+                    {label}
+                </span>
             </Link>
         );
     };
 
     const Sidebar = ({ isMobile = false }) => (
-        <aside className={`${isMobile ? 'w-full h-full' : 'w-72 hidden lg:flex'} bg-surface border-r border-surface-100 flex flex-col h-[calc(100vh-80px)] sticky top-20 p-6`}>
-            <div className="flex-1 space-y-2">
+        <aside className={`${isMobile ? 'w-full h-full' : 'w-80 hidden lg:flex'} bg-surface dark:bg-[#0A0A0A] border-r border-surface-100 dark:border-white/5 flex flex-col h-[calc(100vh-80px)] sticky top-20 p-6 z-[40]`}>
+            <div className="flex-1 space-y-2 overflow-y-auto no-scrollbar">
                 {isAdminRoute && (
                     <>
                         <p className="text-[10px] font-black text-surface-400 uppercase tracking-widest px-4 pb-2">{t('dash_admin_control')}</p>
@@ -75,18 +87,21 @@ export default function DashboardLayout({ children }) {
                 )}
             </div>
 
-            <div className="pt-6 border-t border-surface-100">
-                <div className="bg-surface-50 p-4 rounded-2xl flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl overflow-hidden bg-primary flex items-center justify-center text-white font-black">
+            <div className="pt-6 border-t border-surface-100 dark:border-white/5">
+                <div className="bg-surface-50 dark:bg-white/5 p-5 rounded-[2rem] flex items-center gap-4 border border-black/5 dark:border-white/5 group transition-all hover:bg-surface-100 dark:hover:bg-white/10">
+                    <div className="w-12 h-12 rounded-2xl overflow-hidden bg-primary flex items-center justify-center text-white font-black shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform">
                         {(user?.photoURL || user?.avatar) ? (
                             <img src={user.photoURL || user.avatar} alt="User" className="w-full h-full object-cover" />
                         ) : (
-                            <span>{user?.name?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}</span>
+                            <span className="text-xl uppercase">{user?.displayName?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}</span>
                         )}
                     </div>
                     <div className="flex-1 overflow-hidden">
-                        <p className="text-xs font-black text-surface-900 truncate">{user?.name || t('dash_guest')}</p>
-                        <p className="text-[10px] font-bold text-surface-400 capitalize">{user?.role || "user"}</p>
+                        <p className="text-xs font-black text-surface-900 dark:text-white truncate uppercase tracking-tighter">{user?.displayName || user?.name || t('dash_guest')}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                            <p className="text-[9px] font-black text-surface-400 uppercase tracking-widest">{user?.role || "user"}</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -104,25 +119,27 @@ export default function DashboardLayout({ children }) {
                 {/* Mobile Sidebar Toggle */}
                 <button 
                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                    className="lg:hidden fixed bottom-6 right-6 z-50 w-14 h-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center animate-bounce"
+                    className="lg:hidden fixed bottom-8 right-8 z-[100] w-16 h-16 bg-primary text-white rounded-2xl shadow-[0_20px_50px_rgba(239,68,68,0.4)] flex items-center justify-center active:scale-90 transition-all border-4 border-white dark:border-[#0A0A0A]"
                 >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         {isSidebarOpen ? (
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
                         ) : (
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16m-7 6h7" />
                         )}
                     </svg>
                 </button>
 
                 {/* Mobile Sidebar Overlay */}
-                {isSidebarOpen && (
-                    <div className="lg:hidden fixed inset-0 z-40 bg-background/80 backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)}>
-                        <div className="w-72 h-full" onClick={e => e.stopPropagation()}>
-                            <Sidebar isMobile />
-                        </div>
+                <div className={`lg:hidden fixed inset-0 z-50 transition-all duration-500 ${isSidebarOpen ? 'visible' : 'invisible'}`}>
+                    <div 
+                        className={`absolute inset-0 bg-background/80 backdrop-blur-md transition-opacity duration-500 ${isSidebarOpen ? 'opacity-100' : 'opacity-0'}`} 
+                        onClick={() => setIsSidebarOpen(false)}
+                    />
+                    <div className={`absolute left-0 top-0 bottom-0 w-80 bg-surface dark:bg-[#0A0A0A] shadow-2xl transition-transform duration-500 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`} onClick={e => e.stopPropagation()}>
+                        <Sidebar isMobile />
                     </div>
-                )}
+                </div>
 
                 <Sidebar />
                 <main className="flex-1 min-h-[calc(100vh-120px)] animate-fade-in p-4 lg:p-0">

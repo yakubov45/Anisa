@@ -25,7 +25,7 @@ export default function AboutPage() {
     return (
         <div className="space-y-16 md:space-y-32 py-10 px-4 sm:px-0">
             {/* Hero Section */}
-            <section className="relative h-[60vh] md:h-[70vh] rounded-3xl md:rounded-[4rem] overflow-hidden group mx-4 md:mx-0">
+            <section className="relative h-[60vh] md:h-[70vh] rounded-[2.5rem] md:rounded-[4rem] overflow-hidden group mx-2 md:mx-0">
                 <video
                     autoPlay
                     loop
@@ -33,7 +33,7 @@ export default function AboutPage() {
                     playsInline
                     disablePictureInPicture
                     disableRemotePlayback
-                    className="absolute inset-0 object-cover w-full h-full transition-all duration-1000 scale-110 group-hover:scale-100"
+                    className="absolute inset-0 object-cover w-full h-full transition-all duration-1000 scale-100 md:scale-110 group-hover:scale-100"
                 >
                     <source src="/videos/A_hyper_realistic_macro_animat.mp4" type="video/mp4" />
                 </video>
@@ -43,7 +43,7 @@ export default function AboutPage() {
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-6xl md:text-8xl font-black tracking-tighter uppercase leading-none drop-shadow-2xl"
+                        className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tighter uppercase leading-[0.9] drop-shadow-2xl px-2"
                     >
                         {t('about_title')} <br /> <span className="text-primary drop-shadow-lg">OnePC</span>
                     </motion.h1>
@@ -51,7 +51,7 @@ export default function AboutPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.3 }}
-                        className="mt-8 text-white/80 font-bold uppercase text-[10px] tracking-[0.5em] max-w-xl leading-loose drop-shadow"
+                        className="mt-8 text-white/80 font-bold uppercase text-[8px] sm:text-[10px] tracking-[0.3em] sm:tracking-[0.5em] max-w-xl leading-loose drop-shadow px-6"
                     >
                         {t('about_subtitle')}
                     </motion.p>
@@ -59,7 +59,7 @@ export default function AboutPage() {
             </section>
 
             {/* History and Story Section */}
-            <section className="grid grid-cols-1 lg:grid-cols-2 gap-20 px-6 items-center">
+            <section className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 px-2 sm:px-6 items-center">
                 <div className="space-y-10">
                     <div className="space-y-4">
                         <span className="text-primary font-black uppercase text-xs tracking-widest block">EST. 2016</span>
@@ -67,7 +67,7 @@ export default function AboutPage() {
                             {t('about_history_title')}
                         </h2>
                     </div>
-                    <p className="text-foreground/70 text-lg font-medium leading-relaxed italic border-l-4 border-primary/20 pl-8">
+                    <p className="text-foreground/70 text-base md:text-lg font-medium leading-relaxed italic border-l-4 border-primary/20 pl-6 md:pl-8">
                         {t('about_history_text')}
                     </p>
                 </div>
@@ -91,7 +91,7 @@ export default function AboutPage() {
             </section>
 
             {/* Quality and Why Choose Us Grid */}
-            <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 px-6">
+            <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-12 px-2 sm:px-6">
 
                 {/* Card 1: Quality and Innovation */}
                 <div className="relative group rounded-[3rem] overflow-hidden">
@@ -99,10 +99,10 @@ export default function AboutPage() {
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
                     {/* Base Glass Layer */}
-                    <div className="absolute inset-0 bg-zinc-900/90 dark:bg-black/60 backdrop-blur-3xl rounded-[3rem]" />
+                    <div className="absolute inset-0 bg-zinc-900/90 dark:bg-black/60 backdrop-blur-3xl rounded-[2.5rem]" />
 
                     {/* Content Container with Border */}
-                    <div className="relative h-full flex flex-col justify-start bg-gradient-to-b from-white/[0.08] to-transparent border border-white/10 group-hover:border-primary/50 p-10 md:p-16 rounded-[3rem] transition-all duration-500 overflow-hidden shadow-2xl">
+                    <div className="relative h-full flex flex-col justify-start bg-gradient-to-b from-white/[0.08] to-transparent border border-white/10 group-hover:border-primary/50 p-6 sm:p-10 md:p-16 rounded-[2.5rem] transition-all duration-500 overflow-hidden shadow-2xl">
 
                         {/* Glow effect behind icon */}
                         <div className="absolute -top-10 -left-10 w-64 h-64 bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.4)_0%,transparent_70%)] rounded-full opacity-50 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
@@ -134,10 +134,10 @@ export default function AboutPage() {
                     <div className="absolute inset-0 bg-gradient-to-bl from-indigo-500/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
                     {/* Base Glass Layer */}
-                    <div className="absolute inset-0 bg-zinc-900/90 dark:bg-black/60 backdrop-blur-3xl rounded-[3rem]" />
+                    <div className="absolute inset-0 bg-zinc-900/90 dark:bg-black/60 backdrop-blur-3xl rounded-[2.5rem]" />
 
                     {/* Content Container with Border */}
-                    <div className="relative h-full flex flex-col justify-start bg-gradient-to-b from-white/[0.08] to-transparent border border-white/10 group-hover:border-indigo-500/50 p-10 md:p-16 rounded-[3rem] transition-all duration-500 overflow-hidden shadow-2xl">
+                    <div className="relative h-full flex flex-col justify-start bg-gradient-to-b from-white/[0.08] to-transparent border border-white/10 group-hover:border-indigo-500/50 p-6 sm:p-10 md:p-16 rounded-[2.5rem] transition-all duration-500 overflow-hidden shadow-2xl">
 
                         {/* Massive Animated Watermark */}
                         <div className="absolute -bottom-10 -right-10 text-[15rem] font-black leading-none text-white/[0.02] group-hover:text-indigo-500/[0.05] group-hover:scale-110 group-hover:-rotate-12 transition-all duration-1000 pointer-events-none select-none">
@@ -178,7 +178,7 @@ export default function AboutPage() {
                     <p className="text-foreground/50 font-black uppercase text-[10px] tracking-widest">{t('about_hubs_subtitle')}</p>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 px-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-12 px-2 sm:px-6">
                     {loading ? (
                         <div className="col-span-full py-20 text-center animate-pulse">
                             <p className="text-foreground/20 font-black uppercase text-xs tracking-widest">Loading physical hubs...</p>
@@ -190,7 +190,7 @@ export default function AboutPage() {
                     ) : (
                         stores.map((store, idx) => (
                             <div key={idx} className="group relative bg-surface rounded-3xl md:rounded-[3.5rem] overflow-hidden border border-white/5 hover:border-primary/30 transition-all flex flex-col md:flex-row">
-                                <div className="relative w-full md:w-1/2 h-80 md:h-auto">
+                                <div className="relative w-full md:w-1/2 h-64 sm:h-80 md:h-auto">
                                     <Image
                                         src={store.image}
                                         alt={store.name}
@@ -199,7 +199,7 @@ export default function AboutPage() {
                                         className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                                     />
                                 </div>
-                                <div className="p-12 md:w-1/2 space-y-6">
+                                <div className="p-8 sm:p-12 md:w-1/2 space-y-6">
                                     <div className="space-y-1">
                                         <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">{store.city}</span>
                                         <h3 className="text-2xl font-black uppercase tracking-tight">{store.name}</h3>
@@ -234,12 +234,12 @@ export default function AboutPage() {
             </section>
 
             {/* Contact Form */}
-            <section className="bg-zinc-900 text-white rounded-3xl md:rounded-[4rem] p-8 md:p-24 space-y-8 md:space-y-12 relative overflow-hidden shadow-2xl mx-6">
+            <section className="bg-zinc-900 text-white rounded-[2.5rem] md:rounded-[4rem] p-6 sm:p-12 md:p-24 space-y-8 md:space-y-12 relative overflow-hidden shadow-2xl mx-0.1 md:mx-6">
                 <div className="absolute right-0 top-0 w-96 h-96 bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.3)_0%,transparent_70%)] rounded-full -mr-48 -mt-48 pointer-events-none" />
 
                 <div className="max-w-2xl space-y-6 relative">
-                    <h2 className="text-5xl font-black uppercase tracking-tighter leading-none">{t('about_contact_core')}</h2>
-                    <p className="text-zinc-400 font-medium leading-loose">{t('about_contact_desc')}</p>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none">{t('about_contact_core')}</h2>
+                    <p className="text-zinc-400 font-medium text-sm sm:text-base leading-loose">{t('about_contact_desc')}</p>
                 </div>
 
                 <form className="grid grid-cols-1 md:grid-cols-2 gap-8 relative">

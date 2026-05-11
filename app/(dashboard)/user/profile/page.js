@@ -166,10 +166,10 @@ export default function ProfilePage() {
     return (
         <div className="max-w-5xl mx-auto space-y-12 py-10 animate-fade-in px-4">
             {/* HEADER */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-l-4 border-primary pl-6">
-                <div className="space-y-2">
-                    <h1 className="text-4xl font-black text-foreground tracking-tighter uppercase">{t('profile_settings')}</h1>
-                    <p className="text-surface-500 font-bold uppercase text-[10px] tracking-[0.3em]">{t('profile_security_mgmt')}</p>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-l-4 border-primary pl-4 md:pl-6">
+                <div className="space-y-1">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-foreground tracking-tighter uppercase leading-none">{t('profile_settings')}</h1>
+                    <p className="text-surface-500 font-bold uppercase text-[8px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.3em]">{t('profile_security_mgmt')}</p>
                 </div>
                 
                 <button 
@@ -205,10 +205,10 @@ export default function ProfilePage() {
                 )}
             </AnimatePresence>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
                 {/* LEFT: FORM DATA */}
-                <div className="lg:col-span-8 space-y-10">
-                    <div className="bg-white dark:bg-zinc-900 rounded-[3rem] p-6 md:p-10 border border-surface-200 dark:border-white/5 shadow-2xl relative overflow-hidden">
+                <div className="lg:col-span-8 space-y-8 md:space-y-10">
+                    <div className="bg-white dark:bg-zinc-900 rounded-[2rem] md:rounded-[3rem] p-5 sm:p-8 md:p-10 border border-surface-200 dark:border-white/5 shadow-2xl relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
                         
                         <div className="space-y-8 relative z-10">
@@ -273,7 +273,7 @@ export default function ProfilePage() {
 
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">{t('profile_dob')}</label>
-                                    <div className="flex gap-2 w-full">
+                                    <div className="grid grid-cols-1 sm:flex gap-2 w-full">
                                         <select
                                             value={formData.dob ? formData.dob.split('-')[1] : ""}
                                             onChange={(e) => {
@@ -281,7 +281,7 @@ export default function ProfilePage() {
                                                 parts[1] = e.target.value;
                                                 setFormData({...formData, dob: parts.join('-')});
                                             }}
-                                            className={`flex-[2] ${!isEditing ? 'bg-surface-100 dark:bg-white/5 cursor-not-allowed opacity-60' : 'bg-surface-50 dark:bg-black focus:ring-2 focus:ring-primary'} border border-surface-200 dark:border-white/10 rounded-xl px-3 py-4 text-sm text-foreground outline-none transition-all appearance-none text-center font-bold`}
+                                            className={`sm:flex-[2] ${!isEditing ? 'bg-surface-100 dark:bg-white/5 cursor-not-allowed opacity-60' : 'bg-surface-50 dark:bg-black focus:ring-2 focus:ring-primary'} border border-surface-200 dark:border-white/10 rounded-xl px-3 py-4 text-sm text-foreground outline-none transition-all appearance-none text-center font-bold`}
                                             disabled={!isEditing}
                                         >
                                             <option value="" disabled>{t('profile_month')}</option>
@@ -289,36 +289,38 @@ export default function ProfilePage() {
                                                 <option key={m} value={m}>{new Date(2000, i).toLocaleString(language || 'en', {month: 'long'})}</option>
                                             ))}
                                         </select>
-                                        <select
-                                            value={formData.dob ? formData.dob.split('-')[2] : ""}
-                                            onChange={(e) => {
-                                                const parts = formData.dob ? formData.dob.split('-') : ['2000', '01', '01'];
-                                                parts[2] = e.target.value;
-                                                setFormData({...formData, dob: parts.join('-')});
-                                            }}
-                                            className={`flex-1 ${!isEditing ? 'bg-surface-100 dark:bg-white/5 cursor-not-allowed opacity-60' : 'bg-surface-50 dark:bg-black focus:ring-2 focus:ring-primary'} border border-surface-200 dark:border-white/10 rounded-xl px-3 py-4 text-sm text-foreground outline-none transition-all appearance-none text-center font-bold`}
-                                            disabled={!isEditing}
-                                        >
-                                            <option value="" disabled>{t('profile_day')}</option>
-                                            {Array.from({length: 31}, (_, i) => String(i + 1).padStart(2, '0')).map(d => (
-                                                <option key={d} value={d}>{d}</option>
-                                            ))}
-                                        </select>
-                                        <select
-                                            value={formData.dob ? formData.dob.split('-')[0] : ""}
-                                            onChange={(e) => {
-                                                const parts = formData.dob ? formData.dob.split('-') : ['2000', '01', '01'];
-                                                parts[0] = e.target.value;
-                                                setFormData({...formData, dob: parts.join('-')});
-                                            }}
-                                            className={`flex-[1.5] ${!isEditing ? 'bg-surface-100 dark:bg-white/5 cursor-not-allowed opacity-60' : 'bg-surface-50 dark:bg-black focus:ring-2 focus:ring-primary'} border border-surface-200 dark:border-white/10 rounded-xl px-3 py-4 text-sm text-foreground outline-none transition-all appearance-none text-center font-bold`}
-                                            disabled={!isEditing}
-                                        >
-                                            <option value="" disabled>{t('profile_year')}</option>
-                                            {Array.from({length: 100}, (_, i) => String(new Date().getFullYear() - i)).map(y => (
-                                                <option key={y} value={y}>{y}</option>
-                                            ))}
-                                        </select>
+                                        <div className="grid grid-cols-2 sm:flex sm:flex-1 gap-2">
+                                            <select
+                                                value={formData.dob ? formData.dob.split('-')[2] : ""}
+                                                onChange={(e) => {
+                                                    const parts = formData.dob ? formData.dob.split('-') : ['2000', '01', '01'];
+                                                    parts[2] = e.target.value;
+                                                    setFormData({...formData, dob: parts.join('-')});
+                                                }}
+                                                className={`w-full ${!isEditing ? 'bg-surface-100 dark:bg-white/5 cursor-not-allowed opacity-60' : 'bg-surface-50 dark:bg-black focus:ring-2 focus:ring-primary'} border border-surface-200 dark:border-white/10 rounded-xl px-3 py-4 text-sm text-foreground outline-none transition-all appearance-none text-center font-bold`}
+                                                disabled={!isEditing}
+                                            >
+                                                <option value="" disabled>{t('profile_day')}</option>
+                                                {Array.from({length: 31}, (_, i) => String(i + 1).padStart(2, '0')).map(d => (
+                                                    <option key={d} value={d}>{d}</option>
+                                                ))}
+                                            </select>
+                                            <select
+                                                value={formData.dob ? formData.dob.split('-')[0] : ""}
+                                                onChange={(e) => {
+                                                    const parts = formData.dob ? formData.dob.split('-') : ['2000', '01', '01'];
+                                                    parts[0] = e.target.value;
+                                                    setFormData({...formData, dob: parts.join('-')});
+                                                }}
+                                                className={`w-full sm:flex-[1.5] ${!isEditing ? 'bg-surface-100 dark:bg-white/5 cursor-not-allowed opacity-60' : 'bg-surface-50 dark:bg-black focus:ring-2 focus:ring-primary'} border border-surface-200 dark:border-white/10 rounded-xl px-3 py-4 text-sm text-foreground outline-none transition-all appearance-none text-center font-bold`}
+                                                disabled={!isEditing}
+                                            >
+                                                <option value="" disabled>{t('profile_year')}</option>
+                                                {Array.from({length: 100}, (_, i) => String(new Date().getFullYear() - i)).map(y => (
+                                                    <option key={y} value={y}>{y}</option>
+                                                ))}
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -360,7 +362,7 @@ export default function ProfilePage() {
                     </div>
 
                     {/* SECURITY PROTOCOL CARD */}
-                    <div className="bg-white dark:bg-zinc-900 rounded-[3rem] p-6 md:p-10 border border-surface-200 dark:border-white/5 shadow-2xl relative overflow-hidden">
+                    <div className="bg-white dark:bg-zinc-900 rounded-[2rem] md:rounded-[3rem] p-5 sm:p-8 md:p-10 border border-surface-200 dark:border-white/5 shadow-2xl relative overflow-hidden">
                         <div className="space-y-8">
                             <div className="flex items-center justify-between">
                                 <h2 className="text-xl font-black text-foreground uppercase tracking-tighter">{t('profile_security_protocol')}</h2>
@@ -405,7 +407,7 @@ export default function ProfilePage() {
 
                 {/* RIGHT: AVATAR MANAGEMENT */}
                 <div className="lg:col-span-4 space-y-6">
-                    <div className="bg-white dark:bg-zinc-900 border border-surface-200 dark:border-white/10 rounded-[3rem] p-10 flex flex-col items-center gap-8 shadow-xl">
+                    <div className="bg-white dark:bg-zinc-900 border border-surface-200 dark:border-white/10 rounded-[2rem] md:rounded-[3rem] p-6 sm:p-10 flex flex-col items-center gap-6 sm:gap-8 shadow-xl">
                         <div className="relative group">
                             <div className="w-48 h-48 rounded-[3rem] overflow-hidden bg-surface-100 dark:bg-black border-4 border-white dark:border-zinc-800 shadow-2xl relative z-10 transition-transform group-hover:scale-105 duration-500">
                                 <img 
