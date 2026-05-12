@@ -134,6 +134,7 @@ export default function Navbar() {
                                     <img src="/icons/search.svg" className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 opacity-60" alt="" />
                                     <input
                                         type="text"
+                                        aria-label="Search products"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         onKeyDown={handleSearch}
@@ -164,7 +165,7 @@ export default function Navbar() {
                                 <div className="flex items-center gap-3 lg:gap-5">
                                     {/* Language Switcher */}
                                     <div className="relative group hidden md:block">
-                                        <button className="h-9 px-4 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2 hover:bg-white/10 transition-all text-white">
+                                        <button aria-label="Toggle language menu" className="h-9 px-4 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2 hover:bg-white/10 transition-all text-white">
                                             <span className="text-[10px] font-black uppercase tracking-widest">{lang}</span>
                                             <svg className="w-2.5 h-2.5 opacity-40 group-hover:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7" /></svg>
                                         </button>
@@ -187,6 +188,7 @@ export default function Navbar() {
 
                                     {/* Currency Switcher */}
                                     <button
+                                        aria-label="Toggle currency"
                                         onClick={() => setCurrency(activeCurrency === 'USD' ? 'UZS' : 'USD')}
                                         className="hidden md:flex h-9 px-3 rounded-xl bg-white/5 border border-white/10 items-center gap-2 hover:bg-white/10 transition-all text-white group"
                                     >
@@ -197,6 +199,7 @@ export default function Navbar() {
                                     {mounted && (
                                         <div className="flex items-center gap-3">
                                             <button
+                                                aria-label="Toggle mobile search"
                                                 onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
                                                 className={`md:hidden w-9 h-9 rounded-xl border flex items-center justify-center transition-all group ${isMobileSearchOpen ? 'bg-primary border-primary text-white' : 'bg-white/5 border-white/10 text-white/60'}`}
                                             >
@@ -205,6 +208,7 @@ export default function Navbar() {
                                                 </svg>
                                             </button>
                                             <button
+                                                aria-label="Toggle dark mode"
                                                 onClick={toggleDarkMode}
                                                 className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 hidden md:flex items-center justify-center hover:bg-primary hover:text-white transition-all group"
                                             >
@@ -221,7 +225,7 @@ export default function Navbar() {
                                         animate={cartAnimation ? { scale: [1, 1.4, 1], rotate: [0, 10, -10, 0] } : {}}
                                         transition={{ duration: 0.5 }}
                                     >
-                                        <Link href="/cart" className="relative group hover:scale-110 transition-transform flex items-center justify-center">
+                                        <Link href="/cart" aria-label="Shopping Cart" className="relative group hover:scale-110 transition-transform flex items-center justify-center">
                                             <img src="/icons/cart.svg" className="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity" alt="Cart" />
                                             {cartCount > 0 && (
                                                 <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-primary text-white text-[8px] font-black flex items-center justify-center rounded-lg border border-black animate-pop-in">
@@ -235,6 +239,7 @@ export default function Navbar() {
                                         user ? (
                                             <div className="relative" ref={dropdownRef}>
                                                 <button
+                                                    aria-label="Toggle user profile menu"
                                                     onClick={() => setIsProfileOpen(!isProfileOpen)}
                                                     className="flex items-center gap-2 group outline-none"
                                                 >
@@ -302,6 +307,7 @@ export default function Navbar() {
 
                                     {/* Mobile Menu Toggle */}
                                     <button
+                                        aria-label="Open mobile menu"
                                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                                         className="lg:hidden w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-primary hover:text-white transition-all"
                                     >
@@ -354,7 +360,7 @@ export default function Navbar() {
                 <div className={`absolute right-0 top-0 bottom-0 w-full max-w-sm bg-surface dark:bg-[#050505] shadow-2xl transition-transform duration-500 z-[101] flex flex-col ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
                     <div className="flex items-center justify-between p-6 border-b border-black/100 dark:border-white/5 bg-white dark:bg-[#161B22]">
                         <img src="/images/Logo.png" alt="Logo" className="h-6 w-auto" />
-                        <button onClick={() => setIsMobileMenuOpen(false)} className="text-foreground dark:text-white opacity-60 hover:opacity-100 transition-opacity">
+                        <button aria-label="Close mobile menu" onClick={() => setIsMobileMenuOpen(false)} className="text-foreground dark:text-white opacity-60 hover:opacity-100 transition-opacity">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>

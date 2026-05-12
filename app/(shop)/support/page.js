@@ -1,45 +1,58 @@
 "use client";
 
 import { useState } from "react";
-
-const SUPPORT_DATA = {
-    warranty: {
-        title: "System Warranty",
-        icon: "🛡️",
-        content: [
-            { h: "Standard Deployment", p: "3-year limited warranty covering all mechanical and electronic failures." },
-            { h: "Enterprise Suite", p: "5-year onsite support with guaranteed 24-hour hardware replacement." },
-            { h: "Elite Coverage", p: "Lifetime support on labor and component consultation for custom liquid-cooled systems." }
-        ]
-    },
-    support: {
-        title: "Elite Support",
-        icon: "🎧",
-        content: [
-            { h: "Direct Line", p: "24/7 access to our hardware engineers for critical system diagnosis." },
-            { h: "Remote Tuning", p: "Expert optimization of BIOS and software configurations via secure tunnels." },
-            { h: "Hardware Refresh", p: "Priority access to new component drops and trade-in programs." }
-        ]
-    },
-    deployments: {
-        title: "Deployments",
-        icon: "🚀",
-        content: [
-            { h: "System Staging", p: "Every system undergoes 72 hours of stress testing before final deployment." },
-            { h: "White Glove Delivery", p: "Professional onsite installation and cable management for workstation setups." },
-            { h: "Global Logistics", p: "Secure, insured transit for all domestic and international shipments." }
-        ]
-    }
-};
+import { useTranslation } from "@/lib/LanguageContext";
 
 export default function SupportPage() {
+    const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState("warranty");
+
+    const SUPPORT_DATA = {
+        warranty: {
+            title: t('support_warranty_title'),
+            icon: "🛡️",
+            content: [
+                { h: t('support_warranty_h1'), p: t('support_warranty_p1') },
+                { h: t('support_warranty_h2'), p: t('support_warranty_p2') },
+                { h: t('support_warranty_h3'), p: t('support_warranty_p3') }
+            ]
+        },
+        support: {
+            title: t('support_elite_title'),
+            icon: "🎧",
+            content: [
+                { h: t('support_elite_h1'), p: t('support_elite_p1') },
+                { h: t('support_elite_h2'), p: t('support_elite_p2') },
+                { h: t('support_elite_h3'), p: t('support_elite_p3') }
+            ]
+        },
+        deployments: {
+            title: t('support_deployments_title'),
+            icon: "🚀",
+            content: [
+                { h: t('support_deployments_h1'), p: t('support_deployments_p1') },
+                { h: t('support_deployments_h2'), p: t('support_deployments_p2') },
+                { h: t('support_deployments_h3'), p: t('support_deployments_p3') }
+            ]
+        },
+        maintenance: {
+            title: t('support_maintenance_title'),
+            icon: "🔧",
+            content: [
+                { h: t('support_maintenance_h1'), p: t('support_maintenance_p1') },
+                { h: t('support_maintenance_h2'), p: t('support_maintenance_p2') },
+                { h: t('support_maintenance_h3'), p: t('support_maintenance_p3') }
+            ]
+        }
+    };
 
     return (
         <div className="py-20 space-y-24">
             <div className="text-center space-y-6">
-                <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter">Support <span className="text-primary">Ecosystem</span></h1>
-                <p className="text-surface-500 font-black uppercase text-[10px] tracking-[0.4em]">Comprehensive infrastructure for your hardware</p>
+                <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter">
+                    {t('support_title').split(' ')[0]} <span className="text-primary">{t('support_title').split(' ').slice(1).join(' ')}</span>
+                </h1>
+                <p className="text-surface-500 font-black uppercase text-[10px] tracking-[0.4em]">{t('support_subtitle')}</p>
             </div>
 
             {/* Tabs */}
@@ -66,7 +79,7 @@ export default function SupportPage() {
                             <div className="text-6xl">{SUPPORT_DATA[activeTab].icon}</div>
                             <h2 className="text-4xl font-black uppercase tracking-tighter">{SUPPORT_DATA[activeTab].title}</h2>
                             <p className="text-foreground/70 font-medium leading-loose">
-                                At OnePC, our commitment to your performance extends far beyond the point of sale. Our support infrastructure is engineered for maximum reliability and uptime.
+                                {t('support_commitment_text')}
                             </p>
                         </div>
                         
@@ -86,15 +99,15 @@ export default function SupportPage() {
             </div>
 
             {/* FAQ Preview */}
-            <section className="text-center space-y-12 py-20 bg-foreground text-background rounded-[4rem]">
-                <h3 className="text-3xl font-black uppercase tracking-tighter">Need Immediate Assistance?</h3>
+            <section className="text-center space-y-12 py-20 bg-foreground text-background rounded-[4rem] mx-6">
+                <h3 className="text-3xl font-black uppercase tracking-tighter">{t('support_immediate_help')}</h3>
                 <div className="flex flex-wrap justify-center gap-8">
                     <div className="bg-white/5 p-8 rounded-3xl border border-white/10 space-y-2 min-w-[280px]">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-primary">Technical HQ</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-primary">{t('support_tech_hq')}</p>
                         <p className="text-sm font-bold">+998 90 000 00 00</p>
                     </div>
                     <div className="bg-white/5 p-8 rounded-3xl border border-white/10 space-y-2 min-w-[280px]">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-primary">Email Matrix</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-primary">{t('support_email_matrix')}</p>
                         <p className="text-sm font-bold">support@onepc.uz</p>
                     </div>
                 </div>

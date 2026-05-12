@@ -9,6 +9,8 @@
         "lint": "next lint"
     },
     "dependencies": {
+        "@sentry/nextjs": "^10.52.0",
+        "@upstash/redis": "^1.38.0",
         "@vercel/speed-insights": "^2.0.0",
         "firebase": "^12.12.1",
         "firebase-admin": "^13.8.0",
@@ -19,6 +21,7 @@
         "react": "19.2.5",
         "react-dom": "19.2.5",
         "react-hot-toast": "^2.6.0",
+        "zod": "^4.4.3",
         "zustand": "^4.5.2"
     },
     "devDependencies": {

@@ -42,7 +42,39 @@ export default async function ProductPage({ params }) {
     const allProducts = await getProducts()
     const relatedProducts = allProducts.filter(p => p.category === product.category && p.id !== product.id)
 
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: product.name,
+        image: product.image,
+        description: product.description || `Buy ${product.name} from OnePC.`,
+        sku: product.id,
+        brand: {
+            '@type': 'Brand',
+            name: product.brand || 'OnePC',
+        },
+        offers: {
+            '@type': 'Offer',
+            url: `https://onepc.uz/products/${product.id}`,
+            priceCurrency: 'UZS',
+            price: product.price,
+            priceValidUntil: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+            itemCondition: 'https://schema.org/NewCondition',
+            availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            seller: {
+                '@type': 'Organization',
+                name: 'OnePC'
+            }
+        }
+    }
+
     return (
-        <ProductDetailClient product={product} relatedProducts={relatedProducts} />
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+            <ProductDetailClient product={product} relatedProducts={relatedProducts} />
+        </>
     )
 }
