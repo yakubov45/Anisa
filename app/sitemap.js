@@ -175,6 +175,38 @@ export default async function sitemap() {
 
   /*
    |--------------------------------------------------------------------------
+   | BUILDS / SETUPS
+   |--------------------------------------------------------------------------
+   */
+
+  let setupRoutes = [];
+
+  try {
+    const setupQuery = query(
+      collection(db, "builds"),
+      limit(500)
+    );
+
+    const snapshot = await getDocs(setupQuery);
+
+    setupRoutes = snapshot.docs.map((doc) => {
+      const data = doc.data();
+
+      return {
+        url: `${baseUrl}/builds/${data.slug || doc.id}`,
+        lastModified:
+          data.updatedAt?.toDate?.()?.toISOString() ||
+          currentDate,
+        changeFrequency: "weekly",
+        priority: 0.7,
+      };
+    });
+  } catch (error) {
+    console.error("SITEMAP BUILDS ERROR:", error);
+  }
+
+  /*
+   |--------------------------------------------------------------------------
    | PREBUILTS
    |--------------------------------------------------------------------------
    */
