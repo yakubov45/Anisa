@@ -7,8 +7,9 @@ import Newsletter from "@/components/home/Newsletter"
 import HeroSlider from "@/components/home/HeroSlider"
 import DiscountBanner from "@/components/home/DiscountBanner"
 import PromotionSlider from "@/components/home/PromotionSlider"
+import FeaturedPrebuilts from "@/components/home/FeaturedPrebuilts"
 import SectionHeading from "@/components/common/SectionHeading"
-import { getProductsAction, getBannersAction } from "@/lib/actions/product.actions"
+import { getProductsAction, getBannersAction, getPreBuiltSystemsAction } from "@/lib/actions/product.actions"
 import { getFlashDealsSettingsAction } from "@/lib/actions/flash-deals.actions"
 
 export default async function HomePage() {
@@ -18,13 +19,15 @@ export default async function HomePage() {
 
     try {
         // Parallel fetch — faqat 2 ta asosiy so'rov (kamroq so'rov = tezroq)
-        const [productsResult, bannersResult] = await Promise.allSettled([
+        const [productsResult, bannersResult, prebuiltsResult] = await Promise.allSettled([
             getProductsAction(1, 20),
             getBannersAction(),
+            getPreBuiltSystemsAction({ isFeatured: true, limit: 9 }),
         ]);
 
         allProducts = productsResult.status === 'fulfilled' ? productsResult.value ?? [] : [];
         banners = bannersResult.status === 'fulfilled' ? bannersResult.value ?? [] : [];
+        const featuredPrebuilts = prebuiltsResult.status === 'fulfilled' ? prebuiltsResult.value ?? [] : [];
 
         // Flash deals — faqat allProducts tayyor bo'lgandan keyin, alohida
         const flashSettings = await getFlashDealsSettingsAction().catch(() => null);
@@ -44,6 +47,9 @@ export default async function HomePage() {
     const heroSlides = banners.filter(b => b.type !== "promo");
     const promoSlides = banners.filter(b => b.type === "promo");
 
+    // Re-fetch since it's scoped in try-catch
+    const featuredPrebuilts = await getPreBuiltSystemsAction({ isFeatured: true, limit: 9 }).catch(() => []);
+
     return (
         <div className="space-y-12 md:space-y-20 animate-fade-in pb-20 md:pt-10 px-4 sm:px-0">
 
@@ -52,6 +58,11 @@ export default async function HomePage() {
 
             {/* 2. CATEGORIES */}
             <CategoryGrid />
+
+            {/* ZTT PREBUILTS HERO SECTION */}
+            {featuredPrebuilts && featuredPrebuilts.length > 0 && (
+                <FeaturedPrebuilts prebuilts={featuredPrebuilts} />
+            )}
 
             {/* 3. NEW ARRIVALS */}
             <section className="space-y-10">

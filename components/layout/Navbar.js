@@ -152,6 +152,7 @@ export default function Navbar() {
                                 <div className="flex items-center gap-4 lg:gap-6 border-r border-white/10 pr-4 lg:pr-6 hidden sm:flex">
                                     {[
                                         { name: t('nav_products'), href: "/products" },
+                                        { name: "Prebuilts", href: "/prebuilts" },
                                         { name: t('nav_pc_builder'), href: "/pc-builder" },
                                         { name: t('nav_faq'), href: "/faq" },
                                         { name: t('nav_about'), href: "/about" }
@@ -384,6 +385,18 @@ export default function Navbar() {
 
                     <div className="flex-1 overflow-y-auto no-scrollbar bg-surface-100 dark:bg-black">
                         <div className="flex flex-col">
+                            <Link href="/prebuilts" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between px-8 py-6 border-b border-black dark:border-white/10 bg-white dark:bg-white/5 hover:bg-primary/5 transition-all group shadow-sm">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary transition-colors">
+                                        <svg className="w-5 h-5 text-primary group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                    </div>
+                                    <span className="text-[11px] font-black text-foreground dark:text-white group-hover:text-primary uppercase tracking-[0.2em] transition-colors">Tayyor Kompyuterlar</span>
+                                </div>
+                                <svg className="w-4 h-4 text-foreground/30 dark:text-white/20 group-hover:text-primary transition-all group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                </svg>
+                            </Link>
+
                             <Link href="/pc-builder" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between px-8 py-6 border-b border-black dark:border-white/10 bg-white dark:bg-white/5 hover:bg-primary/5 transition-all group shadow-sm">
                                 <div className="flex items-center gap-4">
                                     <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary transition-colors">

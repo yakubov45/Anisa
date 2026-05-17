@@ -12,6 +12,11 @@ const securityHeaders = [
 
 const nextConfig = {
     poweredByHeader: false,
+    experimental: {
+        turbopack: {
+            root: '.',
+        },
+    },
     async headers() {
         return [
             {
@@ -38,6 +43,4 @@ export default withSentryConfig(nextConfig, {
     silent: !process.env.CI,
     widenClientFileUpload: true,
     hideSourceMaps: true,
-    disableLogger: true,
-    automaticVercelMonitors: true,
 });

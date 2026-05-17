@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+
 import Link from 'next/link';
 import { useTranslation } from "@/lib/LanguageContext";
 
@@ -18,30 +21,68 @@ const categories = [
 
 export default function CategoryGrid() {
     const { t } = useTranslation();
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    // The first row of categories
+    const visibleCategories = categories.slice(0, 5);
+    const hiddenCategories = categories.slice(5);
 
     return (
         <section className="space-y-8 md:space-y-12">
-            <div className="flex items-center gap-4">
-                <div className="w-12 h-1 bg-primary rounded-full" />
-                <h2 className="text-2xl md:text-3xl font-black text-foreground uppercase tracking-tighter">{t('nav_categories')}</h2>
+            <div className="flex items-center justify-between cursor-pointer group" onClick={() => setIsExpanded(!isExpanded)}>
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-1 bg-primary rounded-full transition-transform group-hover:scale-x-110" />
+                    <h2 className="text-2xl md:text-3xl font-black text-foreground uppercase tracking-tighter flex items-center gap-4">
+                        {t('nav_categories')}
+                    </h2>
+                </div>
+                <div className={`text-surface-400 group-hover:text-primary transition-all duration-500 ${isExpanded ? 'rotate-180' : ''}`}>
+                    <svg className="w-8 h-8 md:w-10 md:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" /></svg>
+                </div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-                {categories.map((cat) => (
-                    <Link 
-                        key={cat.id} 
-                        href={cat.href}
-                        className={`group relative overflow-hidden bg-[#0A0A0B] border border-white/5 p-6 md:p-8 rounded-3xl md:rounded-[2rem] transition-all hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10`}
-                    >
-                        <div className={`absolute inset-0 bg-gradient-to-br ${cat.color} opacity-0 group-hover:opacity-100 transition-opacity`} />
-                        <div className="relative z-10 flex flex-col items-center gap-6">
-                            <div className="text-white/40 group-hover:text-primary group-hover:scale-110 transition-all duration-500">
-                                {cat.icon}
+            
+            <div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+                    {visibleCategories.map((cat) => (
+                        <CategoryCard key={cat.id} cat={cat} />
+                    ))}
+                </div>
+
+                <AnimatePresence>
+                    {isExpanded && (
+                        <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.5, ease: "easeInOut" }}
+                            className="overflow-hidden"
+                        >
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 pt-4 md:pt-6">
+                                {hiddenCategories.map((cat) => (
+                                    <CategoryCard key={cat.id} cat={cat} />
+                                ))}
                             </div>
-                            <span className="font-black text-[10px] uppercase tracking-[0.2em] text-white/40 group-hover:text-primary transition-colors text-center">{cat.name}</span>
-                        </div>
-                    </Link>
-                ))}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
         </section>
+    );
+}
+
+function CategoryCard({ cat }) {
+    return (
+        <Link 
+            href={cat.href}
+            className={`group relative overflow-hidden bg-[#0A0A0B] border border-white/5 p-6 md:p-8 rounded-3xl md:rounded-[2rem] transition-all hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10`}
+        >
+            <div className={`absolute inset-0 bg-gradient-to-br ${cat.color} opacity-0 group-hover:opacity-100 transition-opacity`} />
+            <div className="relative z-10 flex flex-col items-center gap-6">
+                <div className="text-white/40 group-hover:text-primary group-hover:scale-110 transition-all duration-500">
+                    {cat.icon}
+                </div>
+                <span className="font-black text-[10px] uppercase tracking-[0.2em] text-white/40 group-hover:text-primary transition-colors text-center">{cat.name}</span>
+            </div>
+        </Link>
     );
 }

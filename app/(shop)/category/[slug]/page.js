@@ -1,29 +1,44 @@
-import ProductGrid from "@/features/product/ProductGrid";
+import CategoryClient from "./CategoryClient";
 import { getCategoryProductsAction } from "@/lib/actions/product.actions";
 
 
 
+export async function generateMetadata({ params }) {
+    const { slug } = await params;
+    const title = `${slug.charAt(0).toUpperCase() + slug.slice(1)} | OnePC`;
+    const description = `Discover the best selection of ${slug} at OnePC. High-performance gaming and professional hardware in Uzbekistan.`;
+
+    return {
+        title,
+        description,
+        openGraph: {
+            title,
+            description,
+            type: 'website',
+            url: `https://onepc.uz/category/${slug}`,
+        },
+    };
+}
+
 export default async function CategoryPage({ params }) {
-    const { slug } = params;
+    const { slug } = await params;
     const products = await getCategoryProductsAction(slug);
 
-    return (
-        <div className="space-y-12 animate-fade-in">
-            <div className="flex flex-col md:flex-row justify-between items-end gap-6">
-                <div className="space-y-2">
-                    <h1 className="text-4xl font-black text-surface-900 tracking-tighter capitalize">{slug}</h1>
-                    <p className="text-surface-500 font-medium italic">Showing the best {slug} in the market.</p>
-                </div>
-                <div className="flex gap-4">
-                    <select className="bg-surface border border-surface-100 rounded-xl px-4 py-2 text-xs font-bold focus:ring-2 focus:ring-primary">
-                        <option>Sort by: Newest</option>
-                        <option>Price: Low to High</option>
-                        <option>Price: High to Low</option>
-                    </select>
-                </div>
-            </div>
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        name: slug.charAt(0).toUpperCase() + slug.slice(1),
+        description: `Explore our range of ${slug} at OnePC.`,
+        url: `https://onepc.uz/category/${slug}`,
+    };
 
-            <ProductGrid products={products} />
-        </div>
+    return (
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+            <CategoryClient slug={slug} products={products} />
+        </>
     );
 }

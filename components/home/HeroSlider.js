@@ -47,6 +47,7 @@ export default function HeroSlider({ initialSlides }) {
     const [isAnimating, setIsAnimating] = useState(false);
     const [dragOffset, setDragOffset] = useState(0);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const [particles, setParticles] = useState([]);
     const sliderRef = useRef(null);
 
     const next = useCallback(() => {
@@ -109,10 +110,21 @@ export default function HeroSlider({ initialSlides }) {
         return () => clearInterval(timer);
     }, [next]);
 
+    useEffect(() => {
+        // Generate random particles only on the client to avoid SSR hydration mismatch
+        setParticles(Array.from({ length: 15 }).map(() => ({
+            width: `${Math.random() * 4 + 1}px`,
+            height: `${Math.random() * 4 + 1}px`,
+            left: `${Math.random() * 100}%`,
+            animationDuration: `${Math.random() * 10 + 10}s`,
+            animationDelay: `${Math.random() * 5}s`
+        })));
+    }, []);
+
     return (
         <section
             ref={sliderRef}
-            className="relative h-[500px] sm:h-[650px] md:h-[800px] w-full overflow-hidden rounded-[2rem] md:rounded-[4rem] bg-[#050505] border border-white/5 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] group"
+            className="relative h-[400px] sm:h-[500px] md:h-[650px] w-full overflow-hidden rounded-[2rem] md:rounded-[4rem] bg-[#050505] border border-white/5 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] group"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
@@ -140,17 +152,17 @@ export default function HeroSlider({ initialSlides }) {
 
             {/* Subtle Particles Background */}
             <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-30 mix-blend-screen">
-                {Array.from({ length: 15 }).map((_, i) => (
+                {particles.map((p, i) => (
                     <div 
                         key={i}
                         className="particle"
                         style={{
-                            width: `${Math.random() * 4 + 1}px`,
-                            height: `${Math.random() * 4 + 1}px`,
-                            left: `${Math.random() * 100}%`,
+                            width: p.width,
+                            height: p.height,
+                            left: p.left,
                             top: '100%',
-                            animationDuration: `${Math.random() * 10 + 10}s`,
-                            animationDelay: `${Math.random() * 5}s`
+                            animationDuration: p.animationDuration,
+                            animationDelay: p.animationDelay
                         }}
                     />
                 ))}
