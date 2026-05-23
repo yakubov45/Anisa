@@ -1,104 +1,207 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import {
+    Float,
+    Text,
+    Environment,
+    Sparkles
+} from "@react-three/drei";
+
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import * as THREE from "three";
+
+function RotatingCore() {
+    const meshRef = useRef(null);
+
+    useFrame((state, delta) => {
+        if (!meshRef.current) return;
+
+        meshRef.current.rotation.y += delta * 0.7;
+        meshRef.current.rotation.x += delta * 0.3;
+    });
+
+    return (
+        <Float speed={2} rotationIntensity={1.5} floatIntensity={2}>
+            <mesh ref={meshRef}>
+                <octahedronGeometry args={[1.4, 0]} />
+                <meshStandardMaterial
+                    color="#00ffff"
+                    emissive="#00ffff"
+                    emissiveIntensity={3}
+                    metalness={1}
+                    roughness={0.1}
+                />
+            </mesh>
+        </Float>
+    );
+}
+
+function NeonFloor() {
+    return (
+        <gridHelper
+            args={[50, 50, "#00ffff", "#001a1a"]}
+            rotation={[0, 0, 0]}
+            position={[0, -2, 0]}
+        />
+    );
+}
+
+function FlyingParticles() {
+    return (
+        <Sparkles
+            count={250}
+            speed={0.6}
+            opacity={1}
+            scale={20}
+            size={2}
+            color="#00ffff"
+        />
+    );
+}
+
+function Scene() {
+    const cameraRef = useRef(null);
+
+    useFrame((state) => {
+        const time = state.clock.getElapsedTime();
+
+        if (cameraRef.current) {
+            cameraRef.current.position.z =
+                8 + Math.sin(time * 0.5) * 1;
+
+            cameraRef.current.position.x =
+                Math.sin(time * 0.3) * 2;
+
+            cameraRef.current.lookAt(0, 0, 0);
+        }
+    });
+
+    return (
+        <>
+            <perspectiveCamera
+                ref={cameraRef}
+                makeDefault
+                position={[0, 0, 8]}
+            />
+
+            <color attach="background" args={["#02040a"]} />
+
+            <fog attach="fog" args={["#02040a", 8, 25]} />
+
+            <ambientLight intensity={0.3} />
+
+            <pointLight
+                position={[0, 4, 4]}
+                intensity={20}
+                color="#00ffff"
+            />
+
+            <pointLight
+                position={[0, -4, -4]}
+                intensity={10}
+                color="#0066ff"
+            />
+
+            <Environment preset="night" />
+
+            <NeonFloor />
+
+            <FlyingParticles />
+
+            <RotatingCore />
+
+            <Text
+                position={[0, -3.5, 0]}
+                fontSize={0.7}
+                color="#ffffff"
+                anchorX="center"
+                anchorY="middle"
+            >
+                ONEPC
+            </Text>
+        </>
+    );
+}
 
 export default function IntroOverlay() {
-    const [isVisible, setIsVisible] = useState(true);
+    const [visible, setVisible] = useState(true);
+    const [exit, setExit] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
-    const [loadingText, setLoadingText] = useState("SYSTEM BOOT SEQUENCE INITIATED...");
-
-    const texts = [
-        "SYSTEM BOOT SEQUENCE INITIATED...",
-        "VALIDATING HARDWARE COMPONENTS...",
-        "ESTABLISHING SECURE CONNECTION...",
-        "LOADING UI PROTOCOLS...",
-        "SYSTEM READY."
-    ];
 
     useEffect(() => {
         setIsMounted(true);
+        const shown = sessionStorage.getItem("onepc_intro_shown");
 
-        // Check if intro was already shown in this session
-        const introShown = sessionStorage.getItem("onepc_intro_shown");
-        if (introShown) {
-            setIsVisible(false);
+        if (shown) {
+            setVisible(false);
             return;
         }
-        
-        let index = 0;
-        const textInterval = setInterval(() => {
-            index++;
-            if (index < texts.length) {
-                setLoadingText(texts[index]);
-            }
-        }, 600);
 
-        // Automatically hide after 2.5 seconds
-        const timer = setTimeout(() => {
-            setIsVisible(false);
+        const exitTimer = setTimeout(() => {
+            setExit(true);
+        }, 4000);
+
+        const removeTimer = setTimeout(() => {
+            setVisible(false);
             sessionStorage.setItem("onepc_intro_shown", "true");
-        }, 2500);
+        }, 5200);
 
         return () => {
-            clearTimeout(timer);
-            clearInterval(textInterval);
+            clearTimeout(exitTimer);
+            clearTimeout(removeTimer);
         };
     }, []);
 
-    if (!isMounted) return null;
+    if (!isMounted || !visible) return null;
 
     return (
-        <div 
-            className={`fixed inset-0 z-[9999] bg-[#050A15] flex flex-col items-center justify-center transition-all duration-1000 ease-in-out ${
-                isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none scale-105 blur-md'
-            }`}
-        >
-            {/* Minimalist Tech Spinner */}
-            <div className="relative flex items-center justify-center w-40 h-40 mb-8">
-                {/* Background Ambient Glow */}
-                <div className="absolute inset-0 bg-primary/10 blur-[50px] rounded-full animate-pulse" />
+        <AnimatePresence>
+            <motion.div
+                initial={{ opacity: 1 }}
+                animate={{
+                    opacity: exit ? 0 : 1,
+                    scale: exit ? 1.3 : 1,
+                    filter: exit
+                        ? "blur(20px)"
+                        : "blur(0px)"
+                }}
+                transition={{
+                    duration: 1.4,
+                    ease: [0.16, 1, 0.3, 1]
+                }}
+                className="fixed inset-0 z-[9999]"
+            >
+                <Canvas>
+                    <Scene />
+                </Canvas>
 
-                {/* Outer Ring */}
-                <svg className="absolute inset-0 w-full h-full animate-[spin_8s_linear_infinite]" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="0.5" strokeDasharray="4 4" />
-                </svg>
+                {/* overlay glow */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.12),transparent_60%)] pointer-events-none" />
 
-                {/* Middle Rotating Dash */}
-                <svg className="absolute w-32 h-32 animate-[spin_3s_ease-in-out_infinite]" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" className="text-primary/50" strokeWidth="1" strokeDasharray="30 150" strokeLinecap="round" />
-                </svg>
+                {/* scanlines */}
+                <div
+                    className="absolute inset-0 opacity-[0.05] pointer-events-none"
+                    style={{
+                        backgroundImage:
+                            "linear-gradient(transparent 50%, rgba(255,255,255,0.08) 50%)",
+                        backgroundSize: "100% 4px"
+                    }}
+                />
 
-                {/* Inner Fast Ring */}
-                <svg className="absolute w-24 h-24 animate-[spin_2s_linear_infinite_reverse]" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" className="text-primary" strokeWidth="2" strokeDasharray="60 200" strokeLinecap="round" />
-                </svg>
-
-                {/* Core Logo */}
-                <div className="absolute flex flex-col items-center justify-center animate-pulse">
-                    <span className="text-2xl font-black tracking-tighter leading-none">
-                        <span className="text-primary">ONE</span>
-                        <span className="text-white">PC</span>
-                    </span>
-                    <span className="text-[6px] text-white/40 tracking-[0.4em] mt-1 font-mono">SYS.CORE</span>
-                </div>
-            </div>
-
-            {/* Technical Text Container */}
-            <div className="flex flex-col items-center gap-4">
-                {/* Progress Bar Line */}
-                <div className="w-48 h-[1px] bg-white/10 relative overflow-hidden">
-                    <div 
-                        className="absolute top-0 left-0 h-full bg-primary transition-all duration-300 ease-out" 
-                        style={{ width: `${(texts.indexOf(loadingText) + 1) * 20}%` }} 
-                    />
-                </div>
-                
-                {/* Dynamic Status Text */}
-                <span className="text-[9px] md:text-[10px] font-mono text-primary uppercase tracking-[0.3em] md:tracking-[0.5em] text-center px-4">
-                    {loadingText}
-                </span>
-            </div>
-            
-        </div>
+                {/* bottom text */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1 }}
+                    className="absolute bottom-16 left-1/2 -translate-x-1/2 pointer-events-none"
+                >
+                    <p className="text-cyan-300 text-xs tracking-[0.4em] font-mono">
+                        INITIALIZING SYSTEM
+                    </p>
+                </motion.div>
+            </motion.div>
+        </AnimatePresence>
     );
 }

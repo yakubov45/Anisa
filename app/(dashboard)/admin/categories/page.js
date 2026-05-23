@@ -5,12 +5,12 @@ import { categoryService } from "@/lib/services/category.service";
 import { useTranslation } from "@/lib/LanguageContext";
 
 export default function AdminCategoriesPage() {
-    const { t } = useTranslation();
+    const { t, lang } = useTranslation();
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editing, setEditing] = useState(null);
-    const [formData, setFormData] = useState({ name: "", slug: "", icon: "🏷️" });
+    const [formData, setFormData] = useState({ name: "", name_ru: "", name_en: "", slug: "", icon: "🏷️" });
 
     useEffect(() => {
         fetchCategories();
@@ -32,7 +32,7 @@ export default function AdminCategoriesPage() {
         }
         setShowModal(false);
         setEditing(null);
-        setFormData({ name: "", slug: "", icon: "🏷️" });
+        setFormData({ name: "", name_ru: "", name_en: "", slug: "", icon: "🏷️" });
         fetchCategories();
     };
 
@@ -45,7 +45,7 @@ export default function AdminCategoriesPage() {
 
     const openEdit = (cat) => {
         setEditing(cat);
-        setFormData({ name: cat.name, slug: cat.slug, icon: cat.icon || "🏷️" });
+        setFormData({ name: cat.name, name_ru: cat.name_ru || "", name_en: cat.name_en || "", slug: cat.slug, icon: cat.icon || "🏷️" });
         setShowModal(true);
     };
 
@@ -57,7 +57,7 @@ export default function AdminCategoriesPage() {
                     <p className="text-surface-500 font-bold italic">{t('cat_taxonomy_desc')}</p>
                 </div>
                 <button 
-                    onClick={() => { setEditing(null); setFormData({ name: "", slug: "", icon: "🏷️" }); setShowModal(true); }}
+                    onClick={() => { setEditing(null); setFormData({ name: "", name_ru: "", name_en: "", slug: "", icon: "🏷️" }); setShowModal(true); }}
                     className="bg-primary text-white font-black px-8 py-4 rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 transition-all uppercase tracking-widest text-xs"
                 >
                     {t('cat_new_category')}
@@ -81,7 +81,9 @@ export default function AdminCategoriesPage() {
                                     </button>
                                 </div>
                             </div>
-                            <h3 className="text-lg font-black text-surface-900 capitalize tracking-tight">{cat.name}</h3>
+                            <h3 className="text-lg font-black text-surface-900 capitalize tracking-tight">
+                                {lang === 'ru' && cat.name_ru ? cat.name_ru : lang === 'en' && cat.name_en ? cat.name_en : cat.name}
+                            </h3>
                             <p className="text-[10px] text-surface-400 font-bold uppercase tracking-[0.2em] mt-1">ID: {cat.slug}</p>
                         </div>
                     ))
@@ -97,14 +99,34 @@ export default function AdminCategoriesPage() {
                         </h2>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest pl-1">{t('cat_name_label')}</label>
+                                <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest pl-1">Kategoriya nomi (O'zbekcha)</label>
                                 <input 
                                     type="text" 
                                     value={formData.name}
                                     onChange={e => setFormData({...formData, name: e.target.value})}
                                     className="w-full bg-surface-50 border-none rounded-2xl px-6 py-4 text-sm font-bold focus:ring-2 focus:ring-primary transition-all"
-                                    placeholder="e.g. Graphics Cards"
+                                    placeholder="Masalan: Video kartalar"
                                     required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest pl-1">Категория (Русский)</label>
+                                <input 
+                                    type="text" 
+                                    value={formData.name_ru || ""}
+                                    onChange={e => setFormData({...formData, name_ru: e.target.value})}
+                                    className="w-full bg-surface-50 border-none rounded-2xl px-6 py-4 text-sm font-bold focus:ring-2 focus:ring-primary transition-all"
+                                    placeholder="Например: Видеокарты"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest pl-1">Category (English)</label>
+                                <input 
+                                    type="text" 
+                                    value={formData.name_en || ""}
+                                    onChange={e => setFormData({...formData, name_en: e.target.value})}
+                                    className="w-full bg-surface-50 border-none rounded-2xl px-6 py-4 text-sm font-bold focus:ring-2 focus:ring-primary transition-all"
+                                    placeholder="e.g. Graphics Cards"
                                 />
                             </div>
                             <div className="space-y-2">

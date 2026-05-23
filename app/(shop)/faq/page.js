@@ -74,7 +74,7 @@ export default function FAQPage() {
             {/* MAIN CONTENT */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-start">
                 {/* SIDEBAR: CATEGORIES */}
-                <div className="lg:col-span-4 space-y-4 sticky top-32">
+                <div className="lg:col-span-4 space-y-4 lg:sticky lg:top-32">
                     <p className="text-[10px] font-black text-surface-400 uppercase tracking-widest ml-4">{t('faq_categories') || 'Categories'}</p>
                     <div className="space-y-1">
                         {currentFaqData.map((cat) => (

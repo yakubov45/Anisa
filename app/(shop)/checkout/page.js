@@ -12,11 +12,11 @@ import { useTranslation } from "@/lib/LanguageContext";
 
 export default function CheckoutPage() {
     const { t } = useTranslation();
-    const { cart, clearCart } = useStore();
+    const { cart, clearCart, removeFromCart } = useStore();
     const { user, loading: userLoading } = useUser();
     const router = useRouter();
     const [step, setStep] = useState(1);
-    const [paymentMethod, setPaymentMethod] = useState("payme");
+    const [paymentMethod, setPaymentMethod] = useState("cash");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
 
@@ -59,8 +59,8 @@ export default function CheckoutPage() {
             return;
         }
 
-        if (formData.address.length < 10) {
-            setError(t('checkout_address_instruction'));
+        if (!formData.address.trim()) {
+            setError(t('checkout_address_required') || "Please enter your address");
             return;
         }
 
@@ -174,7 +174,7 @@ export default function CheckoutPage() {
                                             value={formData.fullName}
                                             onChange={(e) => setFormData({...formData, fullName: e.target.value})}
                                             className="w-full bg-surface-50 dark:bg-black border border-surface-200 dark:border-white/10 rounded-xl px-6 py-4 text-sm text-foreground focus:ring-1 focus:ring-primary outline-none transition-all" 
-                                            placeholder="ENTER NAME" 
+                                            placeholder={t('checkout_enter_name') || "ENTER NAME"} 
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -200,7 +200,9 @@ export default function CheckoutPage() {
                                                     <span className="text-sm font-black text-foreground uppercase tracking-tight">
                                                         {formData.region}
                                                     </span>
-                                                    <span className="text-[8px] bg-primary/10 text-primary px-2 py-0.5 rounded font-black uppercase tracking-widest ml-2">Auto-Detected</span>
+                                                    <span className="text-[8px] bg-primary/10 text-primary px-2 py-0.5 rounded font-black uppercase tracking-widest ml-2">
+                                                        {t('checkout_auto_detected') || "Auto-Detected"}
+                                                    </span>
                                                 </div>
                                             </div>
                                             <button 
@@ -208,7 +210,7 @@ export default function CheckoutPage() {
                                                 onClick={() => setIsChangingRegion(!isChangingRegion)}
                                                 className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline"
                                             >
-                                                {isChangingRegion ? "[ Close ]" : "[ Change ]"}
+                                                {isChangingRegion ? `[ ${t('btn_close') || 'Close'} ]` : `[ ${t('btn_change') || 'Change'} ]`}
                                             </button>
                                         </div>
 
@@ -232,11 +234,6 @@ export default function CheckoutPage() {
                                     </div>
 
                                     <div className="space-y-4 md:col-span-2">
-                                        <div className="bg-primary/5 border border-primary/20 p-4 rounded-xl">
-                                            <p className="text-[10px] font-bold text-primary leading-relaxed">
-                                                ⚠️ {t('checkout_address_instruction')}
-                                            </p>
-                                        </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-surface-500 uppercase tracking-widest ml-1">{t('checkout_street_name')}</label>
                                             <textarea 
@@ -253,12 +250,12 @@ export default function CheckoutPage() {
                             </div>
 
                             <div className="space-y-8">
-                                <div className="border-l-4 border-primary pl-6">
+                                <div className="hidden border-l-4 border-primary pl-6">
                                     <h2 className="text-xl md:text-2xl font-black text-foreground uppercase tracking-tighter">{t('det_payment_method')}</h2>
                                     <p className="text-surface-500 font-bold uppercase text-[9px] tracking-widest mt-1">{t('det_cargo_manifest')}</p>
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div className="hidden grid grid-cols-1 sm:grid-cols-3 gap-4">
                                     {[
                                         { id: 'payme', name: 'Payme', icon: '/icons/main-payme.webp' },
                                         { id: 'click', name: 'Click', icon: '/icons/main-click.webp' },
@@ -310,8 +307,18 @@ export default function CheckoutPage() {
                                         <p className="text-[11px] font-black text-foreground uppercase tracking-tight truncate">{item.name}</p>
                                         <p className="text-[10px] text-surface-500 font-bold uppercase tracking-widest">{t('det_qty')}: {item.quantity || 1}</p>
                                     </div>
-                                    <div className="text-right">
+                                    <div className="text-right flex flex-col items-end gap-2">
                                         <PriceDisplay price={item.price * (item.quantity || 1)} className="text-sm font-black text-foreground tracking-tight" />
+                                        <button 
+                                            type="button"
+                                            onClick={() => removeFromCart(item.id)} 
+                                            className="text-surface-400 hover:text-red-500 transition-colors p-1"
+                                            title="Remove item"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
                                     </div>
                                 </div>
                             ))}

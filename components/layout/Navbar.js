@@ -11,7 +11,7 @@ import SearchSuggestions from "./SearchSuggestions"
 
 import useStore from "@/store/useStore"
 import useUIStore from "@/store/useUIStore"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 
 export default function Navbar() {
     const { t, lang, setLang } = useTranslation();
@@ -19,7 +19,7 @@ export default function Navbar() {
     const router = useRouter();
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const dropdownRef = useRef(null);
-    const { cart, currency, setCurrency } = useStore()
+    const { cart, currency, setCurrency, setCartDrawerOpen, setNotificationsDrawerOpen, notifications } = useStore()
     const { cartAnimation } = useUIStore()
     const [mounted, setMounted] = useState(false)
     const [isScrolled, setIsScrolled] = useState(false)
@@ -63,6 +63,7 @@ export default function Navbar() {
 
     const cartCount = mounted ? cart.reduce((sum, item) => sum + (item.quantity || 1), 0) : 0
     const activeCurrency = mounted ? currency : 'USD'
+    const unreadNotificationsCount = mounted && notifications ? notifications.filter(n => !n.isRead).length : 0;
 
     const [isVisible, setIsVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
@@ -117,21 +118,29 @@ export default function Navbar() {
 
     return (
         <>
-            <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 transform ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'} ${isScrolled ? 'py-2 md:py-3' : 'py-3 md:py-5'}`}>
-                <div className="mx-auto max-w-7xl px-4 md:px-8">
-                    <div className="bg-[#161B22]/90 backdrop-blur-3xl rounded-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col transition-all duration-500">
-                        <div className="flex items-center justify-between px-6 md:px-8 py-2 md:py-3.5">
+            <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 transform ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'} ${isScrolled ? 'py-1 md:py-2' : 'py-2.5 md:py-4'}`}>
+                <div className="mx-auto max-w-[1400px] px-4 md:px-8">
+                    <div className="bg-[#161B22]/90 backdrop-blur-3xl rounded-2xl border border-white/10 shadow-[0_15px_35px_rgba(0,0,0,0.4)] flex flex-col transition-all duration-500">
+                        <div className="flex items-center justify-between px-5 md:px-7 py-2 md:py-3">
                             {/* LOGO */}
-                            <Link href="/" className="flex items-center group shrink-0">
-                                <div className="relative w-20 h-10 md:w-40 md:h-16 flex items-center justify-center transition-all">
-                                    <img src="/images/Logo.png" alt="OnePC" className="w-full h-full object-contain" />
+                            <Link href="/" className="flex items-center gap-1 md:gap-1.5 group shrink-0 select-none">
+                                <span className="text-lg md:text-xl font-black tracking-tighter uppercase font-outfit">
+                                    <span className="text-white drop-shadow-[0_2px_10px_rgba(255,255,255,0.1)]">ONE</span>
+                                    <span className="text-primary drop-shadow-[0_2px_10px_rgba(239,68,68,0.2)]">PC</span>
+                                </span>
+                                <div className="relative w-6 h-6 md:w-7 md:h-7 flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                                    <img 
+                                        src="/favicon.ico" 
+                                        alt="OnePC Logo" 
+                                        className="w-full h-full object-contain transform transition-transform duration-300 group-hover:rotate-12" 
+                                    />
                                 </div>
                             </Link>
-
+ 
                             {/* COMPACT SEARCH */}
-                            <div className="flex-1 max-w-xs mx-4 lg:mx-8 hidden md:block relative">
+                            <div className="flex-1 max-w-sm lg:max-w-md mx-3 lg:mx-6 hidden md:block relative">
                                 <div className="relative">
-                                    <img src="/icons/search.svg" className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 opacity-60" alt="" />
+                                    <img src="/icons/search.svg" className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 opacity-60" alt="" />
                                     <input
                                         type="text"
                                         aria-label="Search products"
@@ -141,47 +150,55 @@ export default function Navbar() {
                                         onFocus={() => setShowSuggestions(true)}
                                         onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                                         placeholder={t('nav_search_placeholder')}
-                                        className="w-full bg-black/20 border border-white/10 rounded-xl pl-11 pr-5 py-2.5 text-[11px] font-mono tracking-wider focus:ring-1 focus:ring-primary/50 focus:bg-black/40 transition-all placeholder:text-white/40 text-white outline-none"
+                                        className="w-full bg-black/20 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-xs font-mono tracking-wider focus:ring-1 focus:ring-primary/50 focus:bg-black/40 transition-all placeholder:text-white/40 text-white outline-none"
                                     />
                                     {showSuggestions && <SearchSuggestions query={searchQuery} onClose={() => setShowSuggestions(false)} />}
                                 </div>
                             </div>
-
+ 
                             {/* ACTIONS */}
-                            <div className="flex items-center gap-4 lg:gap-6">
-                                <div className="flex items-center gap-4 lg:gap-6 border-r border-white/10 pr-4 lg:pr-6 hidden sm:flex">
+                            <div className="flex items-center gap-3 lg:gap-5 shrink-0">
+                                <div className="flex items-center gap-3 lg:gap-4 border-r border-white/10 pr-3 lg:pr-5 hidden sm:flex">
                                     {[
                                         { name: t('nav_products'), href: "/products" },
-                                        { name: "Prebuilts", href: "/prebuilts" },
+                                        { name: t('nav_prebuilts') || "Prebuilts", href: "/prebuilts" },
                                         { name: t('nav_pc_builder'), href: "/pc-builder" },
                                         { name: t('nav_faq'), href: "/faq" },
                                         { name: t('nav_about'), href: "/about" }
                                     ].map((link) => (
-                                        <Link key={link.href} href={link.href} className={`text-[9px] font-black uppercase tracking-[0.25em] transition-colors ${pathname === link.href ? 'text-primary' : 'text-white/70 hover:text-white'}`}>
+                                        <Link 
+                                            key={link.href} 
+                                            href={link.href} 
+                                            className={`relative py-1 text-[10px] md:text-[11px] font-black uppercase tracking-[0.25em] transition-colors duration-300 ${pathname === link.href ? 'text-primary' : 'text-white/70 hover:text-white'} group`}
+                                        >
                                             {link.name}
+                                            <span className={`absolute bottom-0 left-0 w-full h-[2px] bg-primary transition-all duration-300 transform origin-left ${pathname === link.href ? 'scale-x-100 shadow-[0_0_8px_#ef4444]' : 'scale-x-0 group-hover:scale-x-100 group-hover:shadow-[0_0_8px_#ef4444]'}`} />
                                         </Link>
                                     ))}
                                 </div>
-
+ 
                                 <div className="flex items-center gap-3 lg:gap-5">
                                     {/* Language Switcher */}
                                     <div className="relative group hidden md:block">
-                                        <button aria-label="Toggle language menu" className="h-9 px-4 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2 hover:bg-white/10 transition-all text-white">
-                                            <span className="text-[10px] font-black uppercase tracking-widest">{lang}</span>
+                                        <button aria-label="Toggle language menu" className="h-10 px-4 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2 hover:bg-white/10 hover:border-primary/30 hover:scale-105 transition-all text-white duration-300">
+                                            <span className="text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5">
+                                                {lang === 'uz' ? '🇺🇿 UZ' : lang === 'ru' ? '🇷🇺 RU' : '🇬🇧 EN'}
+                                            </span>
                                             <svg className="w-2.5 h-2.5 opacity-40 group-hover:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7" /></svg>
                                         </button>
-                                        <div className="absolute top-full right-0 mt-2 w-32 bg-[#161B22] border border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all py-2 z-[60]">
+                                        <div className="absolute top-full right-0 mt-2 w-36 bg-[#161B22] border border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all py-2 z-[60]">
                                             {[
-                                                { id: 'uz', label: 'O\'zbekcha' },
-                                                { id: 'ru', label: 'Русский' },
-                                                { id: 'en', label: 'English' }
+                                                { id: 'uz', label: 'O\'zbekcha', flag: '🇺🇿' },
+                                                { id: 'ru', label: 'Русский', flag: '🇷🇺' },
+                                                { id: 'en', label: 'English', flag: '🇬🇧' }
                                             ].map(l => (
                                                 <button
                                                     key={l.id}
                                                     onClick={() => setLang(l.id)}
-                                                    className={`w-full px-4 py-2 text-left text-[10px] font-bold uppercase tracking-widest hover:bg-white/5 transition-colors ${lang === l.id ? 'text-primary' : 'text-white/60'}`}
+                                                    className={`w-full px-4 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider hover:bg-white/5 transition-colors flex items-center gap-2.5 ${lang === l.id ? 'text-primary' : 'text-white/60'}`}
                                                 >
-                                                    {l.label}
+                                                    <span className="text-sm leading-none">{l.flag}</span>
+                                                    <span>{l.label}</span>
                                                 </button>
                                             ))}
                                         </div>
@@ -191,14 +208,14 @@ export default function Navbar() {
                                     <button
                                         aria-label="Toggle currency"
                                         onClick={() => setCurrency(activeCurrency === 'USD' ? 'UZS' : 'USD')}
-                                        className="hidden md:flex h-9 px-3 rounded-xl bg-white/5 border border-white/10 items-center gap-2 hover:bg-white/10 transition-all text-white group"
+                                        className="hidden md:flex h-10 px-4 rounded-xl bg-white/5 border border-white/10 items-center gap-1.5 hover:bg-white/10 hover:border-primary/30 hover:scale-105 transition-all text-white group duration-300"
                                     >
-                                        <span className="text-[10px] font-black tracking-widest">{activeCurrency}</span>
+                                        <span className="text-[11px] font-black tracking-wider">{activeCurrency}</span>
                                     </button>
-
+ 
                                     {/* Theme Toggle */}
                                     {mounted && (
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-2">
                                             <button
                                                 aria-label="Toggle mobile search"
                                                 onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
@@ -211,7 +228,7 @@ export default function Navbar() {
                                             <button
                                                 aria-label="Toggle dark mode"
                                                 onClick={toggleDarkMode}
-                                                className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 hidden md:flex items-center justify-center hover:bg-primary hover:text-white transition-all group"
+                                                className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 hidden md:flex items-center justify-center hover:bg-primary hover:border-primary/45 hover:text-white hover:scale-105 transition-all group duration-300"
                                             >
                                                 {isDarkMode ? (
                                                     <svg className="w-4 h-4 text-yellow-500 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" /></svg>
@@ -222,18 +239,38 @@ export default function Navbar() {
                                         </div>
                                     )}
 
+                                    {/* Notifications */}
+                                    {mounted && (
+                                        <button
+                                            aria-label="Notifications"
+                                            onClick={() => setNotificationsDrawerOpen(true)}
+                                            className="relative group hover:scale-110 transition-transform flex items-center justify-center mr-1"
+                                        >
+                                            <svg className="w-[22px] h-[22px] text-white/70 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                            </svg>
+                                            {unreadNotificationsCount > 0 && (
+                                                <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#161B22] animate-pulse"></span>
+                                            )}
+                                        </button>
+                                    )}
+
                                     <motion.div
                                         animate={cartAnimation ? { scale: [1, 1.4, 1], rotate: [0, 10, -10, 0] } : {}}
                                         transition={{ duration: 0.5 }}
                                     >
-                                        <Link href="/cart" aria-label="Shopping Cart" className="relative group hover:scale-110 transition-transform flex items-center justify-center">
+                                        <button 
+                                            onClick={() => setCartDrawerOpen(true)} 
+                                            aria-label="Shopping Cart" 
+                                            className="relative group hover:scale-110 transition-transform flex items-center justify-center"
+                                        >
                                             <img src="/icons/cart.svg" className="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity" alt="Cart" />
                                             {cartCount > 0 && (
                                                 <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-primary text-white text-[8px] font-black flex items-center justify-center rounded-lg border border-black animate-pop-in">
                                                     {cartCount}
                                                 </span>
                                             )}
-                                        </Link>
+                                        </button>
                                     </motion.div>
 
                                     {!loading && (
@@ -244,7 +281,7 @@ export default function Navbar() {
                                                     onClick={() => setIsProfileOpen(!isProfileOpen)}
                                                     className="flex items-center gap-2 group outline-none"
                                                 >
-                                                    <div className="w-8 h-8 md:w-9 md:h-9 bg-primary rounded-lg md:rounded-xl overflow-hidden flex items-center justify-center font-black text-white shadow-lg shadow-primary/40 transition-transform group-hover:scale-105 active:scale-95 text-xs">
+                                                    <div className="w-7 h-7 md:w-8 md:h-8 bg-primary rounded-lg md:rounded-xl overflow-hidden flex items-center justify-center font-black text-white shadow-lg shadow-primary/40 transition-transform group-hover:scale-105 active:scale-95 text-[10px]">
                                                         {(user.photoURL || user.avatar) ? (
                                                             <img src={user.photoURL || user.avatar} alt={user.displayName} className="w-full h-full object-cover" />
                                                         ) : (
@@ -300,7 +337,7 @@ export default function Navbar() {
                                                 )}
                                             </div>
                                         ) : (
-                                            <Link href="/login" className="bg-white text-black font-black px-4 md:px-5 py-2 rounded-lg md:rounded-xl hover:bg-primary hover:text-white transition-all text-[9px] md:text-[10px] uppercase tracking-widest shadow-lg active:scale-95">
+                                            <Link href="/login" className="btn-premium btn-premium-white font-black px-4 md:px-5 py-2.5 rounded-lg md:rounded-xl text-[9px] md:text-[10px] uppercase tracking-widest shadow-lg">
                                                 {t('nav_sign_in')}
                                             </Link>
                                         )
@@ -352,117 +389,157 @@ export default function Navbar() {
             </nav>
 
             {/* Mobile Drawer */}
-            <div className={`fixed inset-0 z-[100] lg:hidden transition-all duration-500 ${isMobileMenuOpen ? 'visible opacity-100' : 'invisible opacity-0'}`}>
-                <div
-                    className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                />
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <div className="fixed inset-0 z-[100] lg:hidden flex justify-end">
+                        {/* Overlay backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="fixed inset-0 bg-black/80 backdrop-blur-sm"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        />
 
-                <div className={`absolute right-0 top-0 bottom-0 w-full max-w-sm bg-surface dark:bg-[#050505] shadow-2xl transition-transform duration-500 z-[101] flex flex-col ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-                    <div className="flex items-center justify-between p-6 border-b border-black/100 dark:border-white/5 bg-white dark:bg-[#161B22]">
-                        <img src="/images/Logo.png" alt="Logo" className="h-6 w-auto" />
-                        <button aria-label="Close mobile menu" onClick={() => setIsMobileMenuOpen(false)} className="text-foreground dark:text-white opacity-60 hover:opacity-100 transition-opacity">
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div className="flex border-b border-black/10 dark:border-white/5 bg-white dark:bg-[#050505]">
-                        <Link href="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="flex-1 flex items-center justify-center gap-3 py-4 text-foreground dark:text-white hover:bg-black/[0.02] dark:hover:bg-white/5 transition-all border-r border-black/10 dark:border-white/5">
-                            <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                            </svg>
-                            <span className="text-[10px] font-black uppercase tracking-widest">{t('nav_wishlist')}</span>
-                        </Link>
-                        <Link href="/cart" onClick={() => setIsMobileMenuOpen(false)} className="flex-1 flex items-center justify-center gap-3 py-4 text-foreground dark:text-white hover:bg-black/[0.02] dark:hover:bg-white/5 transition-all">
-                            <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                            <span className="text-[10px] font-black uppercase tracking-widest">{t('nav_cart')}</span>
-                        </Link>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto no-scrollbar bg-surface-100 dark:bg-black">
-                        <div className="flex flex-col">
-                            <Link href="/prebuilts" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between px-8 py-6 border-b border-black dark:border-white/10 bg-white dark:bg-white/5 hover:bg-primary/5 transition-all group shadow-sm">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary transition-colors">
-                                        <svg className="w-5 h-5 text-primary group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                        {/* Slide-out Drawer Panel */}
+                        <motion.div
+                            initial={{ x: "100%" }}
+                            animate={{ x: 0 }}
+                            exit={{ x: "100%" }}
+                            transition={{ type: "spring", damping: 25, stiffness: 220 }}
+                            className="relative w-full max-w-sm bg-gradient-to-b from-[#0a0c10] to-[#040507]/95 text-white shadow-[0_0_50px_rgba(239,68,68,0.15)] z-[101] flex flex-col h-full border-l border-white/5"
+                        >
+                            {/* Header */}
+                            <div className="flex items-center justify-between p-6 border-b border-white/5 bg-[#0f131a]/80 backdrop-blur-md">
+                                <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-1 group shrink-0 select-none">
+                                    <span className="text-lg font-outfit font-black tracking-tighter uppercase">
+                                        <span className="text-white">ONE</span>
+                                        <span className="text-primary">PC</span>
+                                    </span>
+                                    <div className="relative w-6 h-6 flex items-center justify-center transition-all group-hover:scale-110">
+                                        <img 
+                                            src="/favicon.ico" 
+                                            alt="OnePC Logo" 
+                                            className="w-full h-full object-contain transform transition-transform duration-300 group-hover:rotate-12" 
+                                        />
                                     </div>
-                                    <span className="text-[11px] font-black text-foreground dark:text-white group-hover:text-primary uppercase tracking-[0.2em] transition-colors">Tayyor Kompyuterlar</span>
-                                </div>
-                                <svg className="w-4 h-4 text-foreground/30 dark:text-white/20 group-hover:text-primary transition-all group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                </svg>
-                            </Link>
+                                </Link>
+                                <motion.button 
+                                    whileHover={{ rotate: 90, scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    aria-label="Close mobile menu" 
+                                    onClick={() => setIsMobileMenuOpen(false)} 
+                                    className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-primary/20 hover:border-primary/30 transition-all duration-300"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </motion.button>
+                            </div>
 
-                            <Link href="/pc-builder" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between px-8 py-6 border-b border-black dark:border-white/10 bg-white dark:bg-white/5 hover:bg-primary/5 transition-all group shadow-sm">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary transition-colors">
-                                        <svg className="w-5 h-5 text-primary group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>
-                                    </div>
-                                    <span className="text-[11px] font-black text-foreground dark:text-white group-hover:text-primary uppercase tracking-[0.2em] transition-colors">{t('nav_pc_builder')}</span>
-                                </div>
-                                <svg className="w-4 h-4 text-foreground/30 dark:text-white/20 group-hover:text-primary transition-all group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                </svg>
-                            </Link>
+                            {/* Floating Wishlist & Cart buttons */}
+                            <div className="grid grid-cols-2 gap-3 p-5 border-b border-white/5 bg-black/40">
+                                <Link href="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20 transition-all duration-300 group">
+                                    <svg className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                    </svg>
+                                    <span className="text-[10px] font-black uppercase tracking-widest">{t('nav_wishlist')}</span>
+                                </Link>
+                                <Link href="/cart" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-primary text-white hover:shadow-[0_0_20px_rgba(239,68,68,0.4)] transition-all duration-300 group">
+                                    <svg className="w-4 h-4 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    <span className="text-[10px] font-black uppercase tracking-widest">{t('nav_cart')}</span>
+                                </Link>
+                            </div>
 
-                            <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between px-8 py-6 border-b border-black dark:border-white/10 bg-white dark:bg-white/5 hover:bg-primary/5 transition-all group shadow-sm">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary transition-colors">
-                                        <svg className="w-5 h-5 text-primary group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                    </div>
-                                    <span className="text-[11px] font-black text-foreground dark:text-white group-hover:text-primary uppercase tracking-[0.2em] transition-colors">{t('nav_about')}</span>
-                                </div>
-                                <svg className="w-4 h-4 text-foreground/30 dark:text-white/20 group-hover:text-primary transition-all group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                </svg>
-                            </Link>
-
-                            {/* Settings Section (Language & Theme) */}
-                            <div className="px-8 py-8 space-y-6 border-b border-black dark:border-white/10 bg-surface-50 dark:bg-black/40">
-                                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-foreground/40 dark:text-white/30">{t('nav_settings') || "SETTINGS"}</p>
-                                
-                                <div className="flex bg-white dark:bg-white/5 rounded-xl p-1 border border-black/5 dark:border-white/10 flex-1">
+                            {/* Main scrollable body */}
+                            <div className="flex-1 overflow-y-auto no-scrollbar py-6 space-y-8 bg-black/20">
+                                {/* Navigation links list */}
+                                <div className="px-6 space-y-3">
                                     {[
-                                        { id: 'uz', label: 'UZ' },
-                                        { id: 'ru', label: 'RU' },
-                                        { id: 'en', label: 'EN' }
-                                    ].map(l => (
-                                        <button
-                                            key={l.id}
-                                            onClick={() => setLang(l.id)}
-                                            className={`flex-1 py-2 text-[10px] font-black rounded-lg transition-all ${lang === l.id ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-foreground/40 dark:text-white/40 hover:text-foreground dark:hover:text-white'}`}
+                                        { href: "/prebuilts", label: t('nav_prebuilts') || "Tayyor Kompyuterlar", icon: <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg> },
+                                        { href: "/pc-builder", label: t('nav_pc_builder'), icon: <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg> },
+                                        { href: "/about", label: t('nav_about'), icon: <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> }
+                                    ].map((link, idx) => (
+                                        <motion.div
+                                            key={link.href}
+                                            initial={{ opacity: 0, x: 30 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: idx * 0.05 + 0.1, duration: 0.4, type: "spring", stiffness: 150 }}
                                         >
-                                            {l.label}
-                                        </button>
+                                            <Link 
+                                                href={link.href} 
+                                                onClick={() => setIsMobileMenuOpen(false)} 
+                                                className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04] hover:bg-primary/5 hover:border-primary/20 transition-all duration-300 group"
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300">
+                                                        {link.icon}
+                                                    </div>
+                                                    <span className="text-[11px] font-black text-white/80 group-hover:text-primary uppercase tracking-[0.2em] transition-colors">{link.label}</span>
+                                                </div>
+                                                <svg className="w-4 h-4 text-white/20 group-hover:text-primary transition-all group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                                </svg>
+                                            </Link>
+                                        </motion.div>
                                     ))}
                                 </div>
-                            </div>
 
-                            {/* Categories Section */}
-                            <div className="px-8 py-8 space-y-6">
-                                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-foreground/40 dark:text-white/30">{t('nav_categories') || "CATEGORIES"}</p>
-                                <div className="grid grid-cols-1 gap-1">
-                                    {categories.map((cat) => (
-                                        <Link
-                                            key={cat.id}
-                                            href={`/products?category=${cat.id}`}
-                                            onClick={() => setIsMobileMenuOpen(false)}
-                                            className="flex items-center justify-between py-3 group transition-all"
-                                        >
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-foreground/70 dark:text-white/70 group-hover:text-primary transition-colors">{cat.name}</span>
-                                            <svg className="w-3 h-3 text-foreground/20 dark:text-white/10 group-hover:text-primary group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7" /></svg>
-                                        </Link>
-                                    ))}
+                                {/* Settings Section */}
+                                <div className="px-6 space-y-4">
+                                    <div className="h-px bg-white/5" />
+                                    <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30 ml-2">{t('nav_settings') || "SETTINGS"}</p>
+                                    
+                                    <div className="flex bg-black/40 border border-white/5 rounded-2xl p-1">
+                                        {[
+                                            { id: 'uz', label: '🇺🇿 UZ' },
+                                            { id: 'ru', label: '🇷🇺 RU' },
+                                            { id: 'en', label: '🇬🇧 EN' }
+                                        ].map(l => (
+                                            <button
+                                                key={l.id}
+                                                onClick={() => setLang(l.id)}
+                                                className={`flex-1 py-3 text-[10px] font-black rounded-xl transition-all duration-300 ${lang === l.id ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white'}`}
+                                            >
+                                                {l.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Categories Section */}
+                                <div className="px-6 space-y-4">
+                                    <div className="h-px bg-white/5" />
+                                    <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30 ml-2">{t('nav_categories') || "CATEGORIES"}</p>
+                                    
+                                    <div className="grid grid-cols-1 gap-1 pl-2">
+                                        {categories.map((cat, idx) => (
+                                            <motion.div
+                                                key={cat.id}
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                transition={{ delay: idx * 0.015 + 0.2 }}
+                                            >
+                                                <Link
+                                                    href={`/products?category=${cat.id}`}
+                                                    onClick={() => setIsMobileMenuOpen(false)}
+                                                    className="flex items-center justify-between py-3 border-b border-white/[0.02] group transition-all"
+                                                >
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-white/60 group-hover:text-primary transition-colors">{cat.name}</span>
+                                                    <svg className="w-3 h-3 text-white/10 group-hover:text-primary group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7" /></svg>
+                                                </Link>
+                                            </motion.div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
                     </div>
-                </div>
-            </div>
+                )}
+            </AnimatePresence>
         </>
     )
 }

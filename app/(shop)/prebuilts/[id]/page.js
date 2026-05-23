@@ -7,9 +7,33 @@ export async function generateMetadata({ params }) {
         const resolvedParams = await params;
         const pc = await getPreBuiltByIdAction(resolvedParams.id);
         if (!pc) return { title: "Topilmadi" };
+        
+        const title = `${pc.name} - OnePC Tayyor Kompyuter`;
+        const description = pc.quick_specs ? `Protsessor: ${pc.quick_specs.cpu} | Videokarta: ${pc.quick_specs.gpu} | RAM: ${pc.quick_specs.ram}. O'yin va ish uchun mukammal kompyuter!` : "OnePC tayyor kompyuterlari";
+        const imageUrl = pc.images && pc.images.length > 0 ? pc.images[0] : "https://onepc.uz/og-image.jpg"; // Yoki loyihaning rasmiy rasm manzili
+
         return {
-            title: `${pc.name} - OnePC Prebuilts`,
-            description: `${pc.name}: ${pc.quick_specs?.cpu}, ${pc.quick_specs?.gpu}, ${pc.quick_specs?.ram}`
+            title: title,
+            description: description,
+            openGraph: {
+                title: title,
+                description: description,
+                images: [
+                    {
+                        url: imageUrl,
+                        width: 1200,
+                        height: 630,
+                        alt: pc.name,
+                    },
+                ],
+                type: 'website',
+            },
+            twitter: {
+                card: "summary_large_image",
+                title: title,
+                description: description,
+                images: [imageUrl],
+            }
         };
     } catch {
         return { title: "Tayyor Kompyuter" };

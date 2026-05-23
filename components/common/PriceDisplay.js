@@ -12,32 +12,41 @@ export default function PriceDisplay({ price, className = "" }) {
     const activeCurrency = mounted ? currency : 'USD'
     const activeRate = mounted ? exchangeRate : 12800
 
-    const formatPrice = (p) => {
+    const formatPriceLocal = (p) => {
+        const val = Number(p)
+        if (isNaN(val)) {
+            return activeCurrency === 'UZS' ? <>0 <span className="opacity-60 text-[0.5em] ml-1 uppercase">UZS</span></> : <><span className="opacity-60 text-[0.8em] mr-0.5">$</span>0.00</>;
+        }
+
+        const isDbPriceInUZS = val > 100000;
+
         if (activeCurrency === 'USD') {
+            const usdValue = isDbPriceInUZS ? val / activeRate : val;
             return (
                 <>
                     <span className="opacity-60 text-[0.8em] mr-0.5">$</span>
-                    {Number(p).toLocaleString()}
+                    {usdValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </>
+            )
+        } else {
+            const uzsValue = isDbPriceInUZS ? val : val * activeRate;
+            const remainder = uzsValue % 100000
+            const roundedUZS = remainder >= 50000
+                ? Math.ceil(uzsValue / 100000) * 100000
+                : Math.floor(uzsValue / 100000) * 100000
+
+            return (
+                <>
+                    {roundedUZS.toLocaleString('en-US')}
+                    <span className="opacity-60 text-[0.5em] ml-1 uppercase">UZS</span>
                 </>
             )
         }
-        const rawUZS = p * activeRate
-        const remainder = rawUZS % 100000
-        const roundedUZS = remainder >= 50000
-            ? Math.ceil(rawUZS / 100000) * 100000
-            : Math.floor(rawUZS / 100000) * 100000
-
-        return (
-            <>
-                {roundedUZS.toLocaleString()}
-                <span className="opacity-60 text-[0.5em] ml-1 uppercase">UZS</span>
-            </>
-        )
     }
 
     return (
         <span className={className}>
-            {formatPrice(price)}
+            {formatPriceLocal(price)}
         </span>
     )
 }

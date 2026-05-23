@@ -11,6 +11,8 @@ import { useTranslation } from "@/lib/LanguageContext";
 export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
     const { t } = useTranslation();
     const [activeImage, setActiveImage] = useState(0);
+    const [ramUpgrade, setRamUpgrade] = useState(0);
+    const [storageUpgrade, setStorageUpgrade] = useState(0);
 
     useEffect(() => {
         if (!pc.images || pc.images.length <= 1) return;
@@ -21,18 +23,29 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
     }, [pc.images]);
     const [quantity, setQuantity] = useState(1);
     const { currency, exchangeRate, addToCart } = useStore();
-    const price = formatPrice(pc.price, currency || "UZS", exchangeRate);
+    
+    // Calculate total price including upgrades
+    const totalPrice = pc.price + ramUpgrade + storageUpgrade;
+    const price = formatPrice(totalPrice, currency || "UZS", exchangeRate);
 
     const handleAddToCart = () => {
+        let upgradeText = [];
+        if (ramUpgrade > 0) upgradeText.push("32GB RAM");
+        if (storageUpgrade > 0) upgradeText.push("1TB SSD");
+        
+        const finalName = upgradeText.length > 0 
+            ? `${pc.name} (+${upgradeText.join(", ")})` 
+            : pc.name;
+
         addToCart({
-            id: pc.id,
-            name: pc.name,
-            price: pc.price,
+            id: pc.id + (ramUpgrade > 0 ? "-ram" : "") + (storageUpgrade > 0 ? "-ssd" : ""), // Unique ID for cart
+            name: finalName,
+            price: totalPrice,
             image: pc.images?.[0] || 'https://via.placeholder.com/400x300',
             category: 'prebuilt',
             quantity: quantity
         });
-        toast.success(`${pc.name} savatchaga qo'shildi!`);
+        toast.success(`${finalName} savatchaga qo'shildi!`);
     };
 
     const specifications = pc.specifications || [];
@@ -115,6 +128,54 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
                                 ))}
                             </div>
                         )}
+                        {/* CONFIGURATOR (Small Upgrades) */}
+                        {pc.allow_upgrades !== false && (
+                            <div className="pt-6 border-t border-black/5 dark:border-white/5 space-y-4">
+                                <h3 className="font-black uppercase tracking-widest text-sm text-foreground">Kompyuterni kuchaytirish</h3>
+                                
+                                {/* RAM Upgrade */}
+                                <div>
+                                    <label className="block text-xs font-bold text-surface-500 mb-2">Operativ Xotira (RAM)</label>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <button 
+                                            onClick={() => setRamUpgrade(0)}
+                                            className={`p-3 rounded-xl border-2 text-left transition-all ${ramUpgrade === 0 ? 'border-primary bg-primary/5' : 'border-black/5 dark:border-white/5 hover:border-black/20'}`}
+                                        >
+                                            <div className="font-black text-sm text-foreground">Standart</div>
+                                            <div className="text-xs text-surface-500 font-bold">+ {formatPrice(0, currency || "UZS", exchangeRate)}</div>
+                                        </button>
+                                        <button 
+                                            onClick={() => setRamUpgrade(45)}
+                                            className={`p-3 rounded-xl border-2 text-left transition-all ${ramUpgrade === 45 ? 'border-primary bg-primary/5' : 'border-black/5 dark:border-white/5 hover:border-black/20'}`}
+                                        >
+                                            <div className="font-black text-sm text-foreground">32GB ga oshirish</div>
+                                            <div className="text-xs text-primary font-bold">+ {formatPrice(45, currency || "UZS", exchangeRate)}</div>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Storage Upgrade */}
+                                <div>
+                                    <label className="block text-xs font-bold text-surface-500 mb-2">Xotira (SSD)</label>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <button 
+                                            onClick={() => setStorageUpgrade(0)}
+                                            className={`p-3 rounded-xl border-2 text-left transition-all ${storageUpgrade === 0 ? 'border-primary bg-primary/5' : 'border-black/5 dark:border-white/5 hover:border-black/20'}`}
+                                        >
+                                            <div className="font-black text-sm text-foreground">Standart</div>
+                                            <div className="text-xs text-surface-500 font-bold">+ {formatPrice(0, currency || "UZS", exchangeRate)}</div>
+                                        </button>
+                                        <button 
+                                            onClick={() => setStorageUpgrade(35)}
+                                            className={`p-3 rounded-xl border-2 text-left transition-all ${storageUpgrade === 35 ? 'border-primary bg-primary/5' : 'border-black/5 dark:border-white/5 hover:border-black/20'}`}
+                                        >
+                                            <div className="font-black text-sm text-foreground">1TB ga oshirish</div>
+                                            <div className="text-xs text-primary font-bold">+ {formatPrice(35, currency || "UZS", exchangeRate)}</div>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* RIGHT: Details */}
@@ -171,6 +232,8 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
                             </div>
                         )}
 
+
+
                         {/* Add to Cart Area */}
                         <div className="pt-8 border-t border-black/5 dark:border-white/5 flex flex-col sm:flex-row gap-4 items-end">
                             <div>
@@ -195,48 +258,19 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
                 <div className="py-24 border-t border-black/5 dark:border-white/5">
                     <div className="text-center max-w-3xl mx-auto mb-16">
                         <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4 text-foreground">
-                            {t("prebuilt_game_fps_title")}
+                            {t("prebuilt_game_fps_title") || "O'YINLARDAGI KUCHI (FPS)"}
                         </h2>
                         <p className="text-xl text-surface-500 font-medium">
-                            {t("prebuilt_game_fps_desc")}
+                            {t("prebuilt_game_fps_desc") || "Ushbu kompyuter bilan siz yoqtirgan o'yinlarda qanday natija olishingizni ko'ring."}
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {gamePerformanceList.map((game, i) => (
-                            <div
-                                key={i}
-                                className="relative rounded-[2rem] overflow-hidden min-h-[380px] flex flex-col justify-end p-8 border border-black/10 dark:border-white/10 group hover:border-primary/50 transition-all duration-500 shadow-xl"
-                            >
-                                {/* Background Image */}
-                                <div className="absolute inset-0 z-0">
-                                    <img
-                                        src={game.bg}
-                                        alt={game.name}
-                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 brightness-75 group-hover:brightness-90"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
-                                </div>
-
-                                {/* Content */}
-                                <div className="relative z-10 text-left">
-                                    <h3 className="text-2xl font-black uppercase tracking-wide text-white mb-1 drop-shadow">
-                                        {game.name}
-                                    </h3>
-                                    <p className="text-primary text-xs font-black uppercase tracking-widest mb-4">
-                                        {game.resolution}
-                                    </p>
-                                    <div className="flex items-baseline gap-1">
-                                        <span className="text-5xl font-black text-white drop-shadow-lg">
-                                            {game.fps}
-                                        </span>
-                                        <span className="text-xl font-bold text-primary font-black uppercase tracking-wider">
-                                            FPS
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                    <div className="bg-surface-50 dark:bg-white/5 rounded-[2.5rem] border border-black/5 dark:border-white/10 p-8 md:p-12">
+                        {(() => {
+                            const usdPrice = pc.price > 1000000 ? pc.price / 12600 : pc.price;
+                            const fpsBaseScore = Math.max(60, usdPrice / 10);
+                            return <FPSCalculator baseScore={fpsBaseScore} />;
+                        })()}
                     </div>
                 </div>
 
@@ -301,6 +335,7 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
                                     pc={item}
                                     currency={currency}
                                     exchangeRate={exchangeRate}
+                                    layout="col"
                                 />
                             ))}
                         </div>
@@ -321,6 +356,113 @@ function SpecChip({ icon, value, label }) {
             </div>
             <span className="text-sm font-black text-foreground line-clamp-2 leading-tight">{value}</span>
             <span className="text-[10px] font-black uppercase tracking-widest text-surface-400 mt-auto">{label}</span>
+        </div>
+    );
+}
+
+function FPSCalculator({ baseScore }) {
+    const games = [
+        { name: "CS2", multiplier: 2.5, img: "https://preview.redd.it/today-marks-1-year-since-cs2-official-release-heres-to-10-v0-5227y6wa0frd1.png?auto=webp&s=a18f71a876dcf99bf418b3c191e8c267134aaa1b" },
+        { name: "Valorant", multiplier: 2.8, img: "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt7270e5b7fbca5eb8/623277908b982e0e5aee08e6/VALORANT_Episode4_Act2_Press_KeyArt.png" },
+        { name: "GTA V", multiplier: 1.8, img: "https://media-rockstargames-com.akamaized.net/rockstargames-newsite/global/23fbdd3d-f21d-4006-a83a-867df3c9c614.jpg" },
+        { name: "Cyberpunk", multiplier: 0.8, img: "https://mms.businesswire.com/media/20201209005953/en/845688/5/Cyberpunk_2077_Key_Art.jpg" },
+        { name: "PUBG", multiplier: 1.5, img: "https://wstatic-prod-boc.krafton.com/common/bg/pubg-bg.jpg" }
+    ];
+    const resolutions = ["1080p", "1440p", "4K"];
+    const [selectedGame, setSelectedGame] = useState(games[0]);
+    const [selectedRes, setSelectedRes] = useState("1440p");
+
+    const getResMultiplier = (res) => res === "1080p" ? 1.5 : res === "1440p" ? 1.0 : 0.6;
+    
+    // Very simple pseudo-calculation based on price
+    const calculatedFps = Math.round(baseScore * selectedGame.multiplier * getResMultiplier(selectedRes));
+    
+    // Animate numbers smoothly
+    const [displayFps, setDisplayFps] = useState(0);
+    useEffect(() => {
+        let start = displayFps;
+        const end = calculatedFps;
+        const duration = 500;
+        const startTime = performance.now();
+
+        const animate = (time) => {
+            const elapsed = time - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            // Ease out quad
+            const easeProgress = progress * (2 - progress);
+            setDisplayFps(Math.round(start + (end - start) * easeProgress));
+            if (progress < 1) requestAnimationFrame(animate);
+        };
+        requestAnimationFrame(animate);
+    }, [calculatedFps]);
+
+    return (
+        <div className="flex flex-col lg:flex-row gap-12 items-center">
+            {/* Controls */}
+            <div className="w-full lg:w-1/2 space-y-8">
+                <div>
+                    <label className="block text-sm font-black uppercase tracking-widest text-surface-400 mb-4">O'yinni tanlang</label>
+                    <div className="flex flex-wrap gap-3">
+                        {games.map((g, i) => (
+                            <button
+                                key={i}
+                                onClick={() => setSelectedGame(g)}
+                                className={`px-5 py-3 rounded-xl font-black uppercase tracking-widest text-xs transition-all ${selectedGame.name === g.name ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-105' : 'bg-white dark:bg-white/5 text-foreground hover:bg-surface-100 dark:hover:bg-white/10'}`}
+                            >
+                                {g.name}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-black uppercase tracking-widest text-surface-400 mb-4">Grafika (Rezolyutsiya)</label>
+                    <div className="flex gap-3 bg-white dark:bg-black/30 p-2 rounded-2xl border border-black/5 dark:border-white/5">
+                        {resolutions.map(res => (
+                            <button
+                                key={res}
+                                onClick={() => setSelectedRes(res)}
+                                className={`flex-1 py-3 rounded-xl font-black text-sm transition-all ${selectedRes === res ? 'bg-surface-100 dark:bg-white/10 text-primary shadow-sm' : 'text-surface-500 hover:text-foreground'}`}
+                            >
+                                {res}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Visualizer */}
+            <div className="w-full lg:w-1/2 relative">
+                <div className="relative rounded-[2rem] overflow-hidden aspect-[16/10] shadow-2xl border border-black/10 dark:border-white/10 group">
+                    <AnimatePresence mode="wait">
+                        <motion.img
+                            key={selectedGame.name}
+                            initial={{ opacity: 0, scale: 1.1 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            transition={{ duration: 0.4 }}
+                            src={selectedGame.img}
+                            alt={selectedGame.name}
+                            className="absolute inset-0 w-full h-full object-cover"
+                        />
+                    </AnimatePresence>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                    
+                    <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end">
+                        <div>
+                            <div className="text-white/80 font-black uppercase tracking-widest text-xs mb-1">{selectedRes} | Ultra Settings</div>
+                            <div className="text-3xl font-black text-white drop-shadow-md">{selectedGame.name}</div>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-primary font-black uppercase tracking-widest text-xs mb-1">Kutilayotgan</div>
+                            <div className="flex items-baseline gap-1">
+                                <span className="text-6xl font-black text-white drop-shadow-lg tabular-nums">{displayFps}</span>
+                                <span className="text-xl font-bold text-primary">FPS</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

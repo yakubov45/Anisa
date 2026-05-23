@@ -11,13 +11,13 @@ export default function FeaturedPrebuilts({ prebuilts }) {
     const [expandedCardId, setExpandedCardId] = useState(null);
     if (!prebuilts || prebuilts.length === 0) return null;
 
-    const visiblePrebuilts = prebuilts.slice(0, 3);
-    const hiddenPrebuilts = prebuilts.slice(3);
+    const visiblePrebuilts = prebuilts.slice(0, 4);
+    const hiddenPrebuilts = prebuilts.slice(4);
 
     return (
-        <section className="bg-surface dark:bg-[#0A0A0B] text-surface-900 dark:text-white rounded-[2.5rem] overflow-hidden my-12 shadow-2xl relative transition-all duration-500">
+        <section className="my-12 relative transition-all duration-500 text-surface-900 dark:text-white">
             {/* Hero / Header Part */}
-            <div className="relative py-16 px-6 md:px-12 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-8 bg-gradient-to-r from-surface-50 to-surface-100 dark:from-[#0A0A0B] dark:to-[#111111] border-b border-black/5 dark:border-white/5">
+            <div className="relative pb-10 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-8">
                 <div className="max-w-2xl z-10">
                     <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4 text-transparent bg-clip-text bg-gradient-to-r from-surface-900 to-surface-500 dark:from-white dark:to-surface-400">
                         OnePC Extreme Prebuilts
@@ -33,13 +33,14 @@ export default function FeaturedPrebuilts({ prebuilts }) {
             </div>
 
             {/* Grid Part */}
-            <div className="p-6 md:p-12 bg-surface dark:bg-[#0A0A0B]">
+            <div>
                 <div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
-                        {visiblePrebuilts.map((pc) => (
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+                        {visiblePrebuilts.map((pc, index) => (
                             <PrebuiltCard 
                                 key={pc.id} 
-                                pc={pc} 
+                                pc={pc}
+                                index={index}
                             />
                         ))}
                     </div>
@@ -53,11 +54,12 @@ export default function FeaturedPrebuilts({ prebuilts }) {
                                 transition={{ duration: 0.5, ease: "easeInOut" }}
                                 className="overflow-hidden"
                             >
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-6 items-start">
-                                    {hiddenPrebuilts.map((pc) => (
+                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 pt-6 items-start">
+                                    {hiddenPrebuilts.map((pc, index) => (
                                         <PrebuiltCard 
                                             key={pc.id} 
-                                            pc={pc} 
+                                            pc={pc}
+                                            index={index + 3}
                                         />
                                     ))}
                                 </div>
@@ -84,12 +86,11 @@ export default function FeaturedPrebuilts({ prebuilts }) {
     );
 }
 
-function PrebuiltCard({ pc }) {
-    const { addToCart, currency, exchangeRate } = useStore();
-    const [activeImg, setActiveImg] = useState(0);
-    const [isExpanded, setIsExpanded] = useState(false);
+function PrebuiltCard({ pc, index = 0 }) {
+    const { addToCart, currency, exchangeRate, compareList, toggleCompare } = useStore();
     const images = pc.images?.length > 0 ? pc.images : ['https://via.placeholder.com/400x300?text=No+Image'];
     const hasSecondImage = images.length > 1;
+    const inCompare = compareList?.some(item => item.id === pc.id);
 
     const handleAddToCart = () => {
         addToCart({
@@ -98,6 +99,7 @@ function PrebuiltCard({ pc }) {
             price: pc.price,
             image: images[0],
             category: 'prebuilt',
+            quantity: 1
         });
         toast.success(`${pc.name} savatchaga qo'shildi!`);
     };
@@ -107,172 +109,142 @@ function PrebuiltCard({ pc }) {
     // Get specifications (fallback to quick_specs if specifications array not present)
     const specifications = pc.specifications || [];
     
-    // Featured specs (rendered in the 4-grid SpecChips)
-    const featuredSpecs = specifications.length > 0
-        ? specifications.filter(s => s.isFeatured)
-        : [
-            { name: "CPU", value: pc.quick_specs?.cpu },
-            { name: "GPU", value: pc.quick_specs?.gpu },
-            { name: "RAM", value: pc.quick_specs?.ram },
-            { name: "SSD", value: pc.quick_specs?.storage || pc.quick_specs?.ssd }
-          ].filter(s => s.value);
+    const getSpecValue = (nameUpper) => {
+        const found = specifications.find(s => s.name.toUpperCase() === nameUpper);
+        if (found) return found.value;
+        if (nameUpper === "CPU") return pc.quick_specs?.cpu;
+        if (nameUpper === "GPU") return pc.quick_specs?.gpu;
+        if (nameUpper === "RAM") return pc.quick_specs?.ram;
+        if (nameUpper === "SSD") return pc.quick_specs?.storage || pc.quick_specs?.ssd;
+        return "";
+    };
 
-    // Non-featured specs (rendered inside expandable section)
-    const nonFeaturedSpecs = specifications.length > 0
-        ? specifications.filter(s => !s.isFeatured)
-        : [
-            { name: "Anakart", value: pc.quick_specs?.motherboard },
-            { name: "Quvvat bloki", value: pc.quick_specs?.psu },
-            { name: "Sovutish", value: pc.quick_specs?.cooling },
-            { name: "Korpus", value: pc.quick_specs?.case }
-          ].filter(s => s.value);
-
-    const hasExtraSpecs = nonFeaturedSpecs.length > 0;
+    const cpuVal = getSpecValue("CPU") || "N/A";
+    const gpuVal = getSpecValue("GPU") || "N/A";
+    const ramVal = getSpecValue("RAM") || "N/A";
+    const ssdVal = getSpecValue("SSD") || "N/A";
 
     return (
-        <div className="bg-white dark:bg-white/5 rounded-2xl border border-black/5 dark:border-white/5 overflow-hidden group hover:border-primary/50 dark:hover:border-primary/50 transition-all hover:shadow-2xl hover:shadow-primary/10 flex flex-col relative">
-            {/* Image with hover swap animation */}
-            <div
-                className="relative aspect-[4/3] bg-surface-50 dark:bg-black/50 overflow-hidden cursor-pointer"
-                onMouseEnter={() => hasSecondImage && setActiveImg(1)}
-                onMouseLeave={() => setActiveImg(0)}
-            >
-                {/* Badges */}
+        <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "100px" }}
+            whileHover={{ y: -5 }}
+            transition={{ duration: 0.4, delay: index * 0.05, ease: "easeOut" }}
+            className="bg-white dark:bg-[#0c0c0e] rounded-3xl border border-black/[0.06] dark:border-white/10 p-5 md:p-6 flex flex-col md:flex-row gap-5 md:gap-6 group hover:border-primary/50 dark:hover:border-primary/50 transition-colors duration-300 hover:shadow-2xl hover:shadow-primary/20 w-full items-stretch relative overflow-hidden"
+        >
+            {/* Background glowing gradient blob on hover */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 to-transparent blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-0"></div>
+            {/* Left Side: PC Image */}
+            <div className="relative w-full md:w-[45%] lg:w-[48%] bg-surface-50/50 dark:bg-black/30 rounded-2xl overflow-hidden flex items-center justify-center p-6 min-h-[200px] md:min-h-[260px] shrink-0">
                 {pc.badges && (
-                    <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+                    <div className="absolute top-4 left-4 z-20 flex flex-wrap gap-1.5 max-w-[70%]">
                         {(Array.isArray(pc.badges) ? pc.badges : [pc.badges]).map((b, i) => (
-                            <span key={i} className="bg-primary text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
+                            <span key={i} className="bg-primary text-white text-[8px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg shadow-md border border-white/5 shrink-0">
                                 {b}
                             </span>
                         ))}
                     </div>
                 )}
-
-                {/* Animated image swap */}
-                <AnimatePresence mode="wait">
-                    <motion.img
-                        key={activeImg}
-                        src={images[activeImg]}
-                        alt={pc.name}
-                        initial={{ opacity: 0, scale: 1.04 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.97 }}
-                        transition={{ duration: 0.35, ease: "easeInOut" }}
-                        className="w-full h-full object-contain p-4 drop-shadow-xl dark:drop-shadow-2xl"
-                    />
-                </AnimatePresence>
-
-                {/* Image dots indicator */}
+                
+                {/* Compare Button */}
+                <button
+                    onClick={(e) => {
+                        e.preventDefault();
+                        toggleCompare(pc);
+                        if (!inCompare) toast.success("Taqqoslashga qo'shildi!");
+                    }}
+                    className={`absolute top-4 right-4 z-20 w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-md ${inCompare ? 'bg-blue-500 text-white shadow-blue-500/20' : 'bg-white dark:bg-zinc-800 text-foreground hover:bg-blue-500 hover:text-white'}`}
+                    title="Taqqoslash"
+                >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                    </svg>
+                </button>
+                
+                <img
+                    src={images[0]}
+                    alt={pc.name}
+                    className={`max-h-[85%] max-w-full object-contain transition-all duration-700 ease-out z-10 relative ${hasSecondImage ? 'group-hover:opacity-0 group-hover:scale-95' : 'group-hover:scale-105'}`}
+                />
                 {hasSecondImage && (
-                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
-                        {images.slice(0, 2).map((_, i) => (
-                            <div
-                                key={i}
-                                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === activeImg ? 'bg-primary w-4' : 'bg-black/20 dark:bg-white/30'}`}
-                            />
-                        ))}
-                    </div>
+                    <img
+                        src={images[1]}
+                        alt={`${pc.name} alternate view`}
+                        className="absolute max-h-[85%] max-w-full object-contain transition-all duration-700 ease-out opacity-0 scale-105 group-hover:opacity-100 group-hover:scale-100 z-0"
+                    />
                 )}
             </div>
 
-            <div className="p-5 flex flex-col flex-grow">
-                <h3 className="text-lg font-black uppercase tracking-wide text-surface-900 dark:text-white mb-2 line-clamp-1" title={pc.name}>{pc.name}</h3>
-
-                {/* Featured Specs Chips */}
-                {featuredSpecs.length > 0 && (
-                    <div className="grid grid-cols-2 gap-2 mt-3 mb-3">
-                        {featuredSpecs.slice(0, 4).map((spec, i) => {
-                            // Match icons by spec name
-                            let icon = <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>;
-                            const name = spec.name.toUpperCase();
-                            if (name === "CPU" || name === "PROTSESSOR") {
-                                icon = <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>;
-                            } else if (name === "GPU" || name === "VIDEOKARTA") {
-                                icon = <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2zM7 7h10M7 11h10M7 15h7"/></svg>;
-                            } else if (name === "RAM" || name === "OPERATIV XOTIRA") {
-                                icon = <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7"/></svg>;
-                            } else if (["SSD", "STORAGE", "XOTIRA"].includes(name)) {
-                                icon = <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7v10c0 1.1.9 2 2 2h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2zm8 4h5m-5 4h5"/></svg>;
-                            }
-                            return (
-                                <SpecChip key={i} icon={icon} value={spec.value} label={spec.name} />
-                            );
-                        })}
-                    </div>
-                )}
-
-                {/* Expand button (Only show if there are extra specs to display) */}
-                {hasExtraSpecs && (
-                    <button
-                        onClick={() => setIsExpanded(!isExpanded)}
-                        className="flex items-center justify-center gap-2 mt-2 text-surface-400 hover:text-primary transition-colors text-[10px] font-black uppercase tracking-widest w-full py-1 border-t border-black/5 dark:border-white/5 pt-3 mb-2"
-                    >
-                        <span>{isExpanded ? "Yig'ish" : "Ko'proq ma'lumot"}</span>
-                        <svg
-                            className={`w-3.5 h-3.5 transition-transform duration-400 ${isExpanded ? 'rotate-180' : ''}`}
-                            fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-                )}
-
-                {/* Expandable Extra Details */}
-                <AnimatePresence>
-                    {isExpanded && hasExtraSpecs && (
-                        <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.35, ease: "easeInOut" }}
-                            className="overflow-hidden"
-                        >
-                            <div className="mt-2 pt-2 pb-4 border-t border-black/5 dark:border-white/5 space-y-2">
-                                {nonFeaturedSpecs.map((spec, i) => (
-                                    <div key={i} className="flex items-center gap-2 text-surface-500 dark:text-surface-400 text-xs font-bold">
-                                        <span className="text-primary shrink-0">⚙️</span>
-                                        <span>{spec.name}: {spec.value}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                {/* Price + Actions */}
-                <div className="mt-auto pt-4 border-t border-black/5 dark:border-white/5">
-                    <div className="flex items-center justify-between mb-3">
-                        <span className="text-xl font-black text-primary" suppressHydrationWarning>{price}</span>
-                    </div>
-                    <div className="flex gap-2">
-                        <Link
-                            href={`/prebuilts/${pc.id}`}
-                            className="flex-1 text-center bg-surface-100 dark:bg-white/10 hover:bg-surface-200 dark:hover:bg-white/20 text-foreground font-black py-2.5 rounded-xl text-[10px] uppercase tracking-widest transition-colors"
-                        >
-                            Batafsil
-                        </Link>
-                        <button
-                            onClick={handleAddToCart}
-                            className="flex-1 bg-primary hover:bg-primary-600 text-white font-black py-2.5 rounded-xl text-[10px] uppercase tracking-widest transition-all hover:shadow-lg hover:shadow-primary/20 active:scale-95"
-                        >
-                            Savatga
-                        </button>
+            {/* Right Side: PC Details */}
+            <div className="flex-1 flex flex-col justify-between py-2 min-w-0 gap-4">
+                
+                {/* Header & Title */}
+                <div>
+                    <h3 className="text-xl md:text-2xl font-bold uppercase tracking-tight text-foreground group-hover:text-primary transition-colors duration-300">
+                        {pc.name}
+                    </h3>
+                    <div className="flex items-baseline gap-2 mt-2">
+                        <span className="text-2xl font-black text-foreground tracking-tight">{price}</span>
                     </div>
                 </div>
-            </div>
-        </div>
-    );
-}
 
-function SpecChip({ icon, value, label }) {
-    if (!value) return null;
-    return (
-        <div className="bg-surface-50 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl p-2.5 flex flex-col items-start gap-1 hover:border-primary/30 transition-all">
-            <div className="flex items-center gap-1.5 w-full">
-                <span className="text-primary shrink-0">{icon}</span>
-                <span className="text-[11px] font-black text-surface-900 dark:text-white truncate leading-tight">{value}</span>
+                {/* Specs block (Chips) */}
+                <div className="space-y-3">
+                    <div className="flex flex-wrap gap-2">
+                        {gpuVal !== "N/A" && (
+                            <span className="max-w-full bg-surface-100 dark:bg-white/5 text-foreground pl-2 pr-4 py-2 rounded-2xl text-xs md:text-sm font-semibold tracking-tight border border-black/5 dark:border-white/10 flex items-center gap-3">
+                                <div className="w-8 h-8 shrink-0 flex items-center justify-center bg-white dark:bg-white/95 rounded-full p-1.5 shadow-sm border border-black/5">
+                                    <img src="/gpu-removebg-preview.png" alt="GPU" className="w-full h-full object-contain" />
+                                </div>
+                                <span className="truncate">{gpuVal}</span>
+                            </span>
+                        )}
+                        {cpuVal !== "N/A" && (
+                            <span className="max-w-full bg-surface-100 dark:bg-white/5 text-foreground pl-2 pr-4 py-2 rounded-2xl text-xs md:text-sm font-semibold tracking-tight border border-black/5 dark:border-white/10 flex items-center gap-3">
+                                <div className="w-8 h-8 shrink-0 flex items-center justify-center bg-white dark:bg-white/95 rounded-full p-1.5 shadow-sm border border-black/5">
+                                    <img src="/cpu-removebg-preview.png" alt="CPU" className="w-full h-full object-contain" />
+                                </div>
+                                <span className="truncate">{cpuVal}</span>
+                            </span>
+                        )}
+                        {ramVal !== "N/A" && (
+                            <span className="max-w-full bg-surface-100 dark:bg-white/5 text-foreground pl-2 pr-4 py-2 rounded-2xl text-xs md:text-sm font-semibold tracking-tight border border-black/5 dark:border-white/10 flex items-center gap-3">
+                                <div className="w-8 h-8 shrink-0 flex items-center justify-center bg-white dark:bg-white/95 rounded-full p-1.5 shadow-sm border border-black/5">
+                                    <img src="/ram-removebg-preview.png" alt="RAM" className="w-full h-full object-contain" />
+                                </div>
+                                <span className="truncate">{ramVal}</span>
+                            </span>
+                        )}
+                        {ssdVal !== "N/A" && (
+                            <span className="max-w-full bg-surface-100 dark:bg-white/5 text-foreground pl-2 pr-4 py-2 rounded-2xl text-xs md:text-sm font-semibold tracking-tight border border-black/5 dark:border-white/10 flex items-center gap-3">
+                                <div className="w-8 h-8 shrink-0 flex items-center justify-center bg-white dark:bg-white/95 rounded-full p-1.5 shadow-sm border border-black/5">
+                                    <img src="/ssd-removebg-preview.png" alt="SSD" className="w-full h-full object-contain" />
+                                </div>
+                                <span className="truncate">{ssdVal}</span>
+                            </span>
+                        )}
+                    </div>
+                </div>
+
+                {/* Actions Bottom Bar */}
+                <div className="flex items-center gap-3 mt-2">
+                    <Link
+                        href={`/prebuilts/${pc.id}`}
+                        className="flex-1 bg-transparent hover:bg-surface-100 dark:hover:bg-white/5 text-foreground text-center py-3.5 px-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center border border-surface-200 dark:border-white/10"
+                    >
+                        Batafsil
+                    </Link>
+                    <button
+                        onClick={handleAddToCart}
+                        className="flex-1 bg-primary hover:bg-primary/95 text-white shadow-lg shadow-primary/10 hover:shadow-primary/25 text-center py-3.5 px-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center border border-transparent"
+                    >
+                        Savatga
+                    </button>
+                </div>
+
             </div>
-            <span className="text-[9px] font-black uppercase tracking-widest text-surface-400">{label}</span>
-        </div>
+
+        </motion.div>
     );
 }

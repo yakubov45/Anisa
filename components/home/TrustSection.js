@@ -2,6 +2,8 @@
 
 import { useTranslation } from "@/lib/LanguageContext";
 
+import { motion } from "framer-motion";
+
 export default function TrustSection() {
     const { t } = useTranslation();
 
@@ -29,17 +31,32 @@ export default function TrustSection() {
     ];
 
     return (
-        <section className="bg-surface-50 border border-white/5 rounded-3xl md:rounded-[3rem] p-8 md:p-20">
-            <h2 className="text-xl md:text-4xl font-black text-center mb-10 md:mb-16 uppercase tracking-tight">{t('features_title')}</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+        <section className="bg-surface-50 border border-white/5 rounded-3xl md:rounded-[3rem] p-8 md:p-20 overflow-hidden">
+            <motion.h2 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                className="text-xl md:text-4xl font-black text-center mb-10 md:mb-16 uppercase tracking-tight"
+            >
+                {t('features_title')}
+            </motion.h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-12">
                 {features.map((f, idx) => (
-                    <div key={idx} className="flex flex-col items-center text-center gap-4 group">
-                        <div className="w-20 h-20 bg-surface-100 rounded-3xl flex items-center justify-center text-primary shadow-inner group-hover:bg-primary/10 group-hover:scale-110 transition-all">
+                    <motion.div 
+                        key={idx} 
+                        initial={{ opacity: 0, scale: 0.92, y: 15 }}
+                        whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-30px" }}
+                        whileHover={{ y: -5 }}
+                        transition={{ duration: 0.35, delay: idx * 0.05, ease: "easeOut" }}
+                        className="flex flex-col items-center text-center gap-3 md:gap-4 group hover:bg-surface-100 dark:hover:bg-white/5 p-4 md:p-6 rounded-2xl md:rounded-[2rem] transition-all hover:shadow-2xl hover:shadow-primary/10 border border-transparent hover:border-black/5 dark:hover:border-white/5"
+                    >
+                        <div className="w-14 h-14 md:w-20 md:h-20 bg-surface-100 dark:bg-white/5 rounded-2xl md:rounded-3xl flex items-center justify-center text-primary shadow-inner group-hover:bg-primary group-hover:text-white group-hover:scale-110 transition-all duration-300">
                             {f.icon}
                         </div>
-                        <h3 className="font-black text-foreground uppercase tracking-tight text-lg">{f.title}</h3>
-                        <p className="text-surface-600 text-xs font-bold leading-relaxed max-w-[150px]">{f.desc}</p>
-                    </div>
+                        <h3 className="font-black text-foreground uppercase tracking-tight text-sm md:text-lg group-hover:text-primary transition-colors">{f.title}</h3>
+                        <p className="text-surface-600 dark:text-surface-400 text-[10px] md:text-xs font-bold leading-relaxed max-w-[120px] md:max-w-[150px]">{f.desc}</p>
+                    </motion.div>
                 ))}
             </div>
         </section>

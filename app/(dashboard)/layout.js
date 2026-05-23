@@ -1,6 +1,6 @@
 "use client";
- 
-import { useState } from "react";
+
+import { useState, useEffect, useRef } from "react";
 
 import Link from "next/link";
 import { useUser } from "@/lib/UserContext";
@@ -9,7 +9,12 @@ import { AdminGuard } from "@/lib/guards/admin.guard";
 import { UserGuard } from "@/lib/guards/user.guard";
 import { DeliveryGuard } from "@/lib/guards/delivery.guard";
 import { useTranslation } from "@/lib/LanguageContext";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
+import { db } from "@/lib/firebase/client";
+import { COLLECTIONS } from "@/lib/constants";
+import { formatPrice } from "@/lib/utils";
+import useStore from "@/store/useStore";
 
 export default function DashboardLayout({ children }) {
     const { t } = useTranslation();
@@ -20,6 +25,95 @@ export default function DashboardLayout({ children }) {
     const isUserRoute = pathname.startsWith("/user");
     const isAdminRoute = pathname.startsWith("/admin");
     const isDeliveryRoute = pathname.startsWith("/delivery");
+
+    const [newOrderAlert, setNewOrderAlert] = useState(null);
+    const { currency, exchangeRate } = useStore();
+    const mountTimeRef = useRef(Date.now());
+
+    // Premium real-time synthesized alert chime note sequence
+    const playNotificationSound = () => {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const playTone = (freq, startTime, duration) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(freq, startTime);
+                gain.gain.setValueAtTime(0.12, startTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+                osc.start(startTime);
+                osc.stop(startTime + duration);
+            };
+            const now = audioCtx.currentTime;
+            playTone(523.25, now, 0.2);       // Chime 1 (C5)
+            playTone(659.25, now + 0.08, 0.2);  // Chime 2 (E5)
+            playTone(783.99, now + 0.16, 0.4);  // Chime 3 (G5)
+        } catch (e) {
+            console.error("Audio synthesis failed:", e);
+        }
+    };
+
+    useEffect(() => {
+        if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) return;
+
+        // Reset the mount timestamp so we only alert on items added AFTER this mount
+        mountTimeRef.current = Date.now();
+
+        const q = query(
+            collection(db, COLLECTIONS.ORDERS),
+            orderBy("createdAt", "desc"),
+            limit(1)
+        );
+
+        let initialLoad = true;
+        const unsubscribe = onSnapshot(
+            q, 
+            (snapshot) => {
+                try {
+                    if (snapshot.empty) {
+                        initialLoad = false;
+                        return;
+                    }
+
+                    const docData = snapshot.docs[0];
+                    const order = { id: docData.id, ...docData.data() };
+                    
+                    // Bulletproof date parser for Firestore Timestamps, Strings, or Numbers
+                    const getOrderTime = (createdAt) => {
+                        if (!createdAt) return Date.now();
+                        if (typeof createdAt.toDate === 'function') {
+                            return createdAt.toDate().getTime();
+                        }
+                        if (createdAt.seconds) {
+                            return createdAt.seconds * 1000;
+                        }
+                        const parsed = new Date(createdAt).getTime();
+                        return isNaN(parsed) ? Date.now() : parsed;
+                    };
+
+                    const orderTime = getOrderTime(order.createdAt);
+
+                    // Fire sound and pop-up toast if it's not the initial loaded doc and is newer than mount time
+                    if (!initialLoad && orderTime > mountTimeRef.current - 10000) {
+                        // Ensure we update our mount time limit to prevent double alerts
+                        mountTimeRef.current = orderTime + 1000;
+                        setNewOrderAlert(order);
+                        playNotificationSound();
+                    }
+                    initialLoad = false;
+                } catch (err) {
+                    console.error("Order snapshot processing error:", err);
+                }
+            },
+            (error) => {
+                console.error("Order real-time snapshot subscription failed:", error);
+            }
+        );
+
+        return () => unsubscribe();
+    }, [user]);
 
     const NavItem = ({ href, label, icon }) => {
         const active = pathname === href;
@@ -146,6 +240,78 @@ export default function DashboardLayout({ children }) {
                 <main className="flex-1 min-h-[calc(100vh-120px)] animate-fade-in p-4 lg:p-0">
                     {children}
                 </main>
+
+                {/* Floating Real-Time Order Toast */}
+                <AnimatePresence>
+                    {newOrderAlert && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -50, scale: 0.9, x: 50 }}
+                            animate={{ opacity: 1, y: 0, scale: 1, x: 0 }}
+                            exit={{ opacity: 0, y: 20, scale: 0.95, x: 20 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                            className="fixed top-24 right-6 z-[9999] w-[400px] max-w-[calc(100vw-3rem)] rounded-[2rem] bg-zinc-950/90 dark:bg-black/90 backdrop-blur-2xl border border-primary/30 p-8 text-white shadow-[0_25px_60px_rgba(239,68,68,0.25)] space-y-6"
+                        >
+                            <div className="flex justify-between items-start gap-4">
+                                <div className="flex gap-4 items-center">
+                                    <div className="relative flex h-3 w-3">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                    </div>
+                                    <h4 className="text-sm font-black uppercase tracking-wider text-primary-400">🚨 Yangi Buyurtma!</h4>
+                                </div>
+                                <button 
+                                    onClick={() => setNewOrderAlert(null)}
+                                    className="text-white/40 hover:text-white transition-colors"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Buyurtma ID</p>
+                                    <p className="text-xs font-mono text-white/90">#{newOrderAlert.id.toUpperCase()}</p>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Mijoz</p>
+                                        <p className="text-xs font-bold text-white truncate">{newOrderAlert.customer?.fullName || newOrderAlert.fullName || "Mehmon"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Telefon</p>
+                                        <p className="text-xs font-bold text-white truncate">{newOrderAlert.customer?.phone || newOrderAlert.phone || "N/A"}</p>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white/5 dark:bg-black/50 p-4 rounded-xl border border-white/5 flex justify-between items-center">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-white/50">Jami Summa</span>
+                                    <span className="text-lg font-black text-primary tracking-tight">
+                                        {formatPrice(newOrderAlert.totalAmount || newOrderAlert.total || 0, currency, exchangeRate)}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <Link
+                                    href={`/admin/orders/${newOrderAlert.id}`}
+                                    onClick={() => setNewOrderAlert(null)}
+                                    className="flex-1 bg-primary text-center text-white text-[10px] font-black py-4 rounded-xl uppercase tracking-widest hover:bg-white hover:text-black transition-all active:scale-95 shadow-lg shadow-primary/20"
+                                >
+                                    Ko'rish →
+                                </Link>
+                                <button
+                                    onClick={() => setNewOrderAlert(null)}
+                                    className="px-6 bg-white/10 text-white text-[10px] font-black rounded-xl uppercase tracking-widest hover:bg-white/20 transition-all active:scale-95"
+                                >
+                                    Yopish
+                                </button>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
         </Guard>
     );

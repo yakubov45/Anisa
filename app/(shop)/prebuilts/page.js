@@ -8,7 +8,13 @@ export const metadata = {
 
 export const revalidate = 60;
 
+import { Suspense } from "react";
+
 export default async function PrebuiltsPage() {
     const allPrebuilts = await getPreBuiltSystemsAction();
-    return <PrebuiltsClient initialData={allPrebuilts} />;
+    return (
+        <Suspense fallback={<div className="h-screen flex items-center justify-center font-bold text-surface-500 uppercase tracking-widest animate-pulse">Yuklanmoqda...</div>}>
+            <PrebuiltsClient initialData={allPrebuilts} />
+        </Suspense>
+    );
 }

@@ -79,10 +79,6 @@ export default function OrderDetailsPage() {
         }
     };
 
-    const getDisplayPrice = (usdPrice) => {
-        const price = Number(usdPrice) || 0;
-        return currency === 'UZS' ? price * exchangeRate : price;
-    };
 
     if (loading) return (
         <div className="h-screen flex items-center justify-center">
@@ -161,7 +157,7 @@ export default function OrderDetailsPage() {
                                             <p className="text-xs font-bold text-surface-400 mt-1">QTY: {item.quantity || 1}</p>
                                         </div>
                                     </div>
-                                    <p className="text-sm font-black text-primary">{formatPrice(getDisplayPrice(item.price), currency)}</p>
+                                    <p className="text-sm font-black text-primary">{formatPrice(item.price, currency, exchangeRate)}</p>
                                 </div>
                             ))}
                         </div>
@@ -203,21 +199,21 @@ export default function OrderDetailsPage() {
                         <div className="space-y-4 border-b border-white/10 pb-6">
                             <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs font-bold">
                                 <span className="text-white/50 uppercase tracking-widest">Subtotal</span>
-                                <span className="text-white">{formatPrice(getDisplayPrice(order.totalAmount || order.itemsPrice || order.subtotal || order.total), currency)}</span>
+                                <span className="text-white">{formatPrice(order.totalAmount || order.itemsPrice || order.subtotal || order.total, currency, exchangeRate)}</span>
                             </div>
                             <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs font-bold">
                                 <span className="text-white/50 uppercase tracking-widest">Logistics</span>
-                                <span className="text-white">{formatPrice(getDisplayPrice(order.shippingPrice || 0), currency)}</span>
+                                <span className="text-white">{formatPrice(order.shippingPrice || 0, currency, exchangeRate)}</span>
                             </div>
                             <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs font-bold">
                                 <span className="text-white/50 uppercase tracking-widest">Tax</span>
-                                <span className="text-white">{formatPrice(getDisplayPrice(order.taxPrice || 0), currency)}</span>
+                                <span className="text-white">{formatPrice(order.taxPrice || 0, currency, exchangeRate)}</span>
                             </div>
                         </div>
                         <div className="flex flex-col gap-2">
                             <span className="text-[10px] font-black uppercase tracking-widest text-white/50">Total_Amount</span>
                             <span className="text-2xl sm:text-3xl font-black tracking-tighter text-white break-words">
-                                {formatPrice(getDisplayPrice(order.totalAmount || order.total), currency)}
+                                {formatPrice(order.totalAmount || order.total, currency, exchangeRate)}
                             </span>
                         </div>
                     </div>

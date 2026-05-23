@@ -7,10 +7,12 @@ import { getUserOrdersAction } from "@/lib/actions/order.actions";
 import SkeletonLoading from "@/components/common/SkeletonLoading";
 import Link from 'next/link';
 import { formatPrice, formatDate } from "@/lib/utils";
+import useStore from "@/store/useStore";
 
 export default function UserOrdersPage() {
     const { user } = useUser();
     const { t } = useTranslation();
+    const { currency, exchangeRate } = useStore();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -55,7 +57,7 @@ export default function UserOrdersPage() {
                                 </div>
                                 <div>
                                     <p className="text-xs font-black text-surface-400 uppercase tracking-widest mb-1">{t('ord_number')}{o.id.slice(-6).toUpperCase()}</p>
-                                    <h4 className="text-lg font-black text-surface-900">{formatPrice(o.totalAmount || o.total)}</h4>
+                                    <h4 className="text-lg font-black text-surface-900">{formatPrice(o.totalAmount || o.total, currency, exchangeRate)}</h4>
                                     <p className="text-xs text-surface-400 font-bold">{formatDate(o.createdAt)}</p>
                                 </div>
                             </div>

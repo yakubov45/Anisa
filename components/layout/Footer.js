@@ -112,13 +112,12 @@ export default function Footer() {
                     </div>
 
                     <div className="col-span-1 space-y-4">
-                        <h4 className="text-[10px] md:text-[11px] font-black text-white uppercase tracking-[0.4em]">{t('footer_deployments')}</h4>
+                        <h4 className="text-[10px] md:text-[11px] font-black text-white uppercase tracking-[0.4em]">{t('nav_about')}</h4>
                         <ul className="space-y-3 md:space-y-2">
                             {[
-                                { name: t('footer_registry'), url: '/legal' },
-                                { name: t('footer_privacy'), url: '/legal' },
-                                { name: t('footer_terms'), url: '/legal' },
-                                { name: t('footer_security'), url: '/legal' },
+                                { name: t('nav_products'), url: '/products' },
+                                { name: t('nav_prebuilts'), url: '/prebuilts' },
+                                { name: t('nav_faq'), url: '/faq' },
                                 { name: t('nav_about'), url: '/about' }
                             ].map(item => (
                                 <li key={item.name}>

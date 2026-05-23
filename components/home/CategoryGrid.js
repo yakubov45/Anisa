@@ -23,9 +23,9 @@ export default function CategoryGrid() {
     const { t } = useTranslation();
     const [isExpanded, setIsExpanded] = useState(false);
 
-    // The first row of categories
-    const visibleCategories = categories.slice(0, 5);
-    const hiddenCategories = categories.slice(5);
+    // Show 6 initially (2 rows of 3 on mobile)
+    const visibleCategories = categories.slice(0, 6);
+    const hiddenCategories = categories.slice(6);
 
     return (
         <section className="space-y-8 md:space-y-12">
@@ -42,9 +42,9 @@ export default function CategoryGrid() {
             </div>
             
             <div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-                    {visibleCategories.map((cat) => (
-                        <CategoryCard key={cat.id} cat={cat} />
+                <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-6">
+                    {visibleCategories.map((cat, index) => (
+                        <CategoryCard key={cat.id} cat={cat} index={index} />
                     ))}
                 </div>
 
@@ -57,9 +57,9 @@ export default function CategoryGrid() {
                             transition={{ duration: 0.5, ease: "easeInOut" }}
                             className="overflow-hidden"
                         >
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 pt-4 md:pt-6">
-                                {hiddenCategories.map((cat) => (
-                                    <CategoryCard key={cat.id} cat={cat} />
+                            <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-6 pt-3 md:pt-6">
+                                {hiddenCategories.map((cat, index) => (
+                                    <CategoryCard key={cat.id} cat={cat} index={index} />
                                 ))}
                             </div>
                         </motion.div>
@@ -70,19 +70,26 @@ export default function CategoryGrid() {
     );
 }
 
-function CategoryCard({ cat }) {
+const MotionLink = motion.create(Link);
+
+function CategoryCard({ cat, index }) {
     return (
-        <Link 
+        <MotionLink 
             href={cat.href}
-            className={`group relative overflow-hidden bg-[#0A0A0B] border border-white/5 p-6 md:p-8 rounded-3xl md:rounded-[2rem] transition-all hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10`}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.35, delay: index * 0.04, ease: "easeOut" }}
+            className={`group relative overflow-hidden bg-[#0A0A0B] border border-white/5 p-4 md:p-6 rounded-2xl md:rounded-[2rem] transition-all hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/15`}
         >
-            <div className={`absolute inset-0 bg-gradient-to-br ${cat.color} opacity-0 group-hover:opacity-100 transition-opacity`} />
-            <div className="relative z-10 flex flex-col items-center gap-6">
-                <div className="text-white/40 group-hover:text-primary group-hover:scale-110 transition-all duration-500">
+            <div className={`absolute inset-0 bg-gradient-to-br ${cat.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 to-transparent blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-0"></div>
+            <div className="relative z-10 flex flex-col items-center gap-3 md:gap-5">
+                <div className="text-white/40 group-hover:text-primary group-hover:scale-110 transition-all duration-500 drop-shadow-md [&>svg]:w-7 [&>svg]:h-7 md:[&>svg]:w-10 md:[&>svg]:h-10">
                     {cat.icon}
                 </div>
-                <span className="font-black text-[10px] uppercase tracking-[0.2em] text-white/40 group-hover:text-primary transition-colors text-center">{cat.name}</span>
+                <span className="font-black text-[8px] md:text-[10px] uppercase tracking-[0.15em] text-white/40 group-hover:text-primary transition-colors text-center leading-tight">{cat.name}</span>
             </div>
-        </Link>
+        </MotionLink>
     );
 }

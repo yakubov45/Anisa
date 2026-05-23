@@ -12,11 +12,7 @@ const securityHeaders = [
 
 const nextConfig = {
     poweredByHeader: false,
-    experimental: {
-        turbopack: {
-            root: '.',
-        },
-    },
+    outputFileTracingRoot: process.cwd(),
     async headers() {
         return [
             {

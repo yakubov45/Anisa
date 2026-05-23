@@ -1,24 +1,41 @@
 import ProductListing from "@/features/product/ProductListing";
-import { getProductsAction, getCategoriesAction, getProductsCountAction } from "@/lib/actions/product.actions";
-
-
+import { 
+    getProductsAction, 
+    getCategoriesAction, 
+    getProductsCountAction,
+    getSearchProductsAction
+} from "@/lib/actions/product.actions";
 
 export default async function ProductsPage({ searchParams }) {
-    const { category, page = "1" } = await searchParams;
+    const { category, page = "1", search } = await searchParams;
     const currentPage = parseInt(page);
 
+    let productsPromise;
+    let countPromise;
+
+    if (search) {
+        productsPromise = getSearchProductsAction(search);
+        countPromise = Promise.resolve(0);
+    } else if (category) {
+        productsPromise = getSearchProductsAction();
+        countPromise = getProductsCountAction(category);
+    } else {
+        productsPromise = getProductsAction(currentPage, 12);
+        countPromise = getProductsCountAction();
+    }
+
     const [products, allCategories, totalCount] = await Promise.all([
-        getProductsAction(currentPage, 12),
+        productsPromise,
         getCategoriesAction(),
-        getProductsCountAction(category)
+        countPromise
     ]);
 
     return (
-        <div className="space-y-12 animate-fade-in pb-20 md:pt-15 px-4 md:px-8">
+        <div className="space-y-12 animate-fade-in pb-20 px-4 md:px-8">
             <ProductListing 
                 initialProducts={products} 
                 allCategories={allCategories} 
-                totalProducts={totalCount}
+                totalProducts={search ? products.length : totalCount}
                 currentPage={currentPage}
             />
         </div>

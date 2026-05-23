@@ -9,19 +9,72 @@ const useStore = create(
             currency: 'USD',
             exchangeRate: 12800,
 
+            cartDrawerOpen: false,
+            notificationsDrawerOpen: false,
+            notifications: [
+                {
+                    id: 'welcome_bot',
+                    type: 'info',
+                    isRead: false,
+                    date: new Date().toISOString(),
+                    title: {
+                        uz: "Telegram bot qo'shildi!",
+                        ru: "Добавлен Telegram бот!",
+                        en: "Telegram bot added!"
+                    },
+                    message: {
+                        uz: "Endilikda OnePC.uz buyurtmalaringizni Telegram bot orqali osongina kuzatishingiz mumkin. Botga kiring va xaridlaringiz holatini tekshiring.",
+                        ru: "Теперь вы можете легко отслеживать ваши заказы через Telegram бот.",
+                        en: "You can now easily track your orders via Telegram bot."
+                    }
+                }
+            ],
+            setCartDrawerOpen: (isOpen) => set({ cartDrawerOpen: isOpen }),
+            setNotificationsDrawerOpen: (isOpen) => set((state) => {
+                // If opening the drawer, we don't auto-read. User must click "Mark all as read". 
+                // But wait, user requested: "qizil o'chsin user kirib chiqgandan kegin" (red dot disappears after user goes in and out). 
+                // So if isOpen is false (closing), we can mark all as read. Or we can just let them click the button. 
+                // Let's implement markAll as a separate function.
+                if (!isOpen) {
+                    return { 
+                        notificationsDrawerOpen: isOpen,
+                        notifications: state.notifications.map(n => ({ ...n, isRead: true }))
+                    }
+                }
+                return { notificationsDrawerOpen: isOpen }
+            }),
+            addNotification: (notification) => set((state) => {
+                // Check if identical notification already exists to prevent duplicates on strict mode
+                if (notification.id && state.notifications.some(n => n.id === notification.id)) return state;
+                return {
+                    notifications: [{
+                        id: notification.id || Date.now().toString(),
+                        isRead: false,
+                        date: new Date().toISOString(),
+                        ...notification
+                    }, ...state.notifications]
+                }
+            }),
+            markAllNotificationsAsRead: () => set((state) => ({
+                notifications: state.notifications.map(n => ({ ...n, isRead: true }))
+            })),
+            markNotificationAsRead: (id) => set((state) => ({
+                notifications: state.notifications.map(n => n.id === id ? { ...n, isRead: true } : n)
+            })),
             setCurrency: (currency) => set({ currency }),
             setExchangeRate: (rate) => set({ exchangeRate: rate }),
 
             addToCart: (product) => set((state) => {
                 const existing = state.cart.find(item => item.id === product.id);
-                if (existing) {
-                    return {
-                        cart: state.cart.map(item =>
-                            item.id === product.id ? { ...item, quantity: (item.quantity || 1) + 1 } : item
-                        )
-                    };
-                }
-                return { cart: [...state.cart, { ...product, quantity: 1 }] };
+                const nextCart = existing
+                    ? state.cart.map(item =>
+                        item.id === product.id ? { ...item, quantity: (item.quantity || 1) + 1 } : item
+                      )
+                    : [...state.cart, { ...product, quantity: 1 }];
+                return { 
+                    cart: nextCart,
+                    cartDrawerOpen: true
+                };
             }),
 
             removeFromCart: (productId) => set((state) => ({
@@ -43,7 +96,25 @@ const useStore = create(
                     return { wishlist: state.wishlist.filter(item => item.id !== product.id) };
                 }
                 return { wishlist: [...state.wishlist, product] };
-            })
+            }),
+
+            compareList: [],
+            toggleCompare: (product) => set((state) => {
+                const inCompare = state.compareList.some(item => item.id === product.id);
+                if (inCompare) {
+                    return { compareList: state.compareList.filter(item => item.id !== product.id) };
+                }
+                // Optionally limit compare list to e.g. 4 items max
+                if (state.compareList.length >= 4) {
+                    // Remove first item and add new
+                    return { compareList: [...state.compareList.slice(1), product] };
+                }
+                return { compareList: [...state.compareList, product] };
+            }),
+            removeFromCompare: (productId) => set((state) => ({
+                compareList: state.compareList.filter(item => item.id !== productId)
+            })),
+            clearCompare: () => set({ compareList: [] })
         }),
         {
             name: 'onepc-storage',

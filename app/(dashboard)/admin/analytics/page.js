@@ -43,6 +43,26 @@ export default function AdminAnalyticsPage() {
         );
     }
 
+    if (!data) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] text-center space-y-4 animate-fade-in">
+                <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center mb-2">
+                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h3 className="text-xl font-black uppercase tracking-widest text-foreground">Ma'lumot topilmadi</h3>
+                <p className="text-sm font-bold text-surface-500">Analitika ma'lumotlarini yuklashda xatolik yuz berdi yoki ma'lumot yo'q.</p>
+                <button 
+                    onClick={() => fetchAnalytics(range)}
+                    className="mt-4 px-6 py-3 bg-surface-100 hover:bg-surface-200 dark:bg-white/5 dark:hover:bg-white/10 rounded-xl text-xs font-black uppercase tracking-widest transition-colors"
+                >
+                    Qayta urinish
+                </button>
+            </div>
+        );
+    }
+
     // SVG Chart Logic with Cumulative Support
     const chartWidth = 1000;
     const chartHeight = 300;

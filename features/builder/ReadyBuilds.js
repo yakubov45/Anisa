@@ -4,9 +4,12 @@ import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { getPreBuiltSystemsAction } from "@/lib/actions/product.actions"
 import { useTranslation } from "@/lib/LanguageContext"
+import useStore from "@/store/useStore"
+import { formatPrice } from "@/lib/utils"
 
 export default function ReadyBuilds() {
     const { t } = useTranslation()
+    const { currency, exchangeRate } = useStore()
     const [currentIndex, setCurrentIndex] = useState(0);
     const [builds, setBuilds] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -18,8 +21,8 @@ export default function ReadyBuilds() {
 
     useEffect(() => {
         const fetchBuilds = async () => {
-            const data = await getPreBuiltSystemsAction();
-            setBuilds(data || []);
+            const data = await getPreBuiltSystemsAction({ limit: 10 });
+            setBuilds(data?.slice(0, 10) || []);
             setLoading(false);
         };
         fetchBuilds();
@@ -125,10 +128,10 @@ export default function ReadyBuilds() {
                             <div className="flex items-center gap-8">
                                 <div className="flex flex-col">
                                     <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">{t('pc_builder_investment')}</span>
-                                    <span className="text-2xl md:text-4xl font-black text-white tracking-tighter">$ {activePC.price}</span>
+                                    <span className="text-2xl md:text-4xl font-black text-white tracking-tighter">{formatPrice(activePC.price, currency || 'UZS', exchangeRate)}</span>
                                 </div>
                                 <Link
-                                    href={`/pc-builder/${activePC.id}`}
+                                    href={`/prebuilts/${activePC.id}`}
                                     className="lg:flex-none bg-primary text-white font-black text-[10px] md:text-xs text-center uppercase tracking-[0.2em] px-10 md:px-12 py-3.5 md:py-5 rounded-2xl hover:bg-white hover:text-black transition-all shadow-xl shadow-primary/20"
                                 >
                                     {t('pc_builder_view_details')}

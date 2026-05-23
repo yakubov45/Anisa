@@ -5,6 +5,7 @@ import { useTranslation } from "@/lib/LanguageContext";
 import useStore from "@/store/useStore";
 import useUIStore from "@/store/useUIStore";
 import Link from "next/link";
+import PriceDisplay from "@/components/common/PriceDisplay";
 
 export default function CartPage() {
     const { cart, removeFromCart, updateQuantity, clearCart } = useStore();
@@ -99,7 +100,7 @@ export default function CartPage() {
                             </div>
 
                             <div className="text-right w-full md:w-auto relative z-10">
-                                <p className="text-xl font-black text-foreground tracking-tighter">${calculateItemTotal(item).toLocaleString()}</p>
+                                <PriceDisplay price={calculateItemTotal(item)} className="text-xl font-black text-foreground tracking-tighter" />
                             </div>
                         </div>
                     ))}
@@ -111,7 +112,7 @@ export default function CartPage() {
                     <div className="space-y-6 relative z-10">
                         <h3 className="text-xl font-black tracking-tighter text-foreground uppercase">{t('cart_summary')}</h3>
                         <div className="space-y-4 text-[9px] font-black text-surface-500 uppercase tracking-[0.2em]">
-                            <div className="flex justify-between"><span>{t('cart_subtotal')}</span><span className="text-foreground">${subtotal.toLocaleString()}</span></div>
+                            <div className="flex justify-between"><span>{t('cart_subtotal')}</span><PriceDisplay price={subtotal} className="text-foreground" /></div>
                             <div className="flex justify-between"><span>{t('cart_shipping')}</span><span className="text-green-500">{t('cart_shipping_free')}</span></div>
                             <div className="flex justify-between"><span>{t('cart_tax')}</span><span className="text-foreground">{t('cart_tax_included')}</span></div>
                         </div>
@@ -120,7 +121,7 @@ export default function CartPage() {
                     <div className="pt-8 border-t border-surface-200 dark:border-white/5 space-y-6 relative z-10">
                         <div className="flex justify-between items-end">
                             <span className="text-surface-500 font-black uppercase text-[8px] tracking-[0.3em]">{t('cart_total')}</span>
-                            <span className="text-3xl font-black text-foreground tracking-tighter">${subtotal.toLocaleString()}</span>
+                            <PriceDisplay price={subtotal} className="text-3xl font-black text-foreground tracking-tighter" />
                         </div>
                         <Link href="/checkout" className="block w-full bg-foreground dark:bg-white text-background dark:text-black font-black py-5 rounded-xl text-center shadow-lg hover:bg-primary hover:text-white transition-all uppercase text-[10px] tracking-widest active:scale-95">
                             {t('cart_checkout_btn')}

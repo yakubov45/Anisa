@@ -23,7 +23,7 @@ function ProductCard({ product, badge = null, rating = null }) {
     }
 
     return (
-        <div className="product-card rounded-2xl p-2 md:p-5 flex flex-col h-full group relative overflow-hidden animate-slide-up bg-surface/50 border border-border-alpha hover:border-primary/50 transition-colors will-change-transform">
+        <div className="product-card rounded-2xl p-2 md:p-5 flex flex-col h-full group relative overflow-hidden animate-slide-up bg-surface/50 border border-border-alpha hover:border-primary/50 transition-all duration-500 group-hover:shadow-[0_0_30px_rgba(239,68,68,0.15)] will-change-transform">
             {/* Precision Badge */}
             <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
                 {badge ? (
@@ -49,13 +49,14 @@ function ProductCard({ product, badge = null, rating = null }) {
                 <div className="absolute inset-0 bg-surface/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px] gap-4">
                     <button
                         onClick={() => setIsQuickViewOpen(true)}
-                        className="bg-surface text-foreground font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] px-4 md:px-8 py-3 md:py-4 rounded-xl shadow-2xl hover:bg-primary hover:text-white transition-all active:scale-95 border border-border-alpha"
+                        className="btn-premium btn-premium-white text-foreground font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] px-4 md:px-8 py-3 md:py-4 rounded-xl shadow-2xl border border-border-alpha"
                     >
                         {t('quick_view')}
                     </button>
                     <button
                         onClick={(e) => { e.preventDefault(); toggleWishlist(product); }}
                         className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center transition-all active:scale-95 shadow-2xl border border-border-alpha ${isFavorite ? 'bg-primary text-white border-primary' : 'bg-surface text-foreground hover:bg-primary hover:text-white'}`}
+                        title="Sevimlilarga qo'shish"
                     >
                         <svg className="w-4 h-4 md:w-5 md:h-5" fill={isFavorite ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -106,7 +107,7 @@ function ProductCard({ product, badge = null, rating = null }) {
 
                 {/* Buttons */}
                 <div className="flex gap-2 pt-1 md:pt-2">
-                    <Link href={`/products/${product.id}`} className="flex-1 h-9 md:h-11 border border-border-alpha hover:border-primary/50 text-surface-500 hover:text-primary font-black text-[9px] md:text-[10px] uppercase tracking-widest rounded-lg md:rounded-xl bg-surface-50 flex items-center justify-center transition-all active:scale-95">
+                    <Link href={`/products/${product.id}`} className="btn-premium btn-premium-dark flex-1 h-9 md:h-11 font-black text-[9px] md:text-[10px] uppercase tracking-widest rounded-lg md:rounded-xl flex items-center justify-center">
                         {t('details')}
                     </Link>
                     <button
@@ -116,7 +117,7 @@ function ProductCard({ product, badge = null, rating = null }) {
                             triggerCartAnimation();
                             addToast(t('cart_added_msg').replace('{name}', product.name));
                         }}
-                        className="flex-[2] h-9 md:h-11 bg-foreground text-background font-black text-[8px] md:text-[10px] uppercase tracking-widest rounded-lg md:rounded-xl hover:bg-primary hover:text-white transition-all active:scale-95 shadow-lg"
+                        className="btn-premium btn-premium-red flex-[2] h-9 md:h-11 font-black text-[8px] md:text-[10px] uppercase tracking-widest rounded-lg md:rounded-xl shadow-lg"
                     >
                         {t('buy_now')}
                     </button>

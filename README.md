@@ -16,7 +16,7 @@ OnePc is a high-performance, modern e-commerce platform built with Next.js 16 an
 - **Framework**: Next.js 16 (App Router)
 - **Styling**: Tailwind CSS
 - **Backend**: Firebase (Auth, Firestore, Storage)
-- **Database**: MongoDB (for Partner Brands)
+- **Database**: Firebase Firestore (for all data including Partner Brands)
 - **State Management**: Zustand
 - **Deployment**: Vercel (Edge Network & CDN)
 

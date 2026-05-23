@@ -107,7 +107,7 @@ export default function PCBuilderPage() {
     }
 
     return (
-        <div className="space-y-12 md:space-y-20 animate-fade-in pb-20 md:pt-8 px-4 sm:px-0">
+        <div className="space-y-12 md:space-y-20 animate-fade-in pb-20 px-4 sm:px-0">
             {/* Split Hero Section with 3D Phone Mockup */}
             <section ref={sectionRef} className="relative flex flex-col-reverse lg:flex-row gap-16 lg:gap-8 items-center justify-between p-8 md:p-16 bg-[#050A15] rounded-3xl md:rounded-[3rem] border border-white/5 shadow-premium overflow-hidden mt-4 md:mt-0">
                 

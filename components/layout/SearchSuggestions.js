@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { getProductsAction } from "@/lib/actions/product.actions";
+import { getProductsAction, getSearchProductsAction } from "@/lib/actions/product.actions";
 import Link from "next/link";
 import { useTranslation } from "@/lib/LanguageContext";
 
@@ -32,13 +32,8 @@ export default function SearchSuggestions({ query, onClose }) {
         if (query.length > 0) {
             setLoading(true);
             const timer = setTimeout(async () => {
-                const products = await getProductsAction(1, 100);
-                const filtered = (products || []).filter(p =>
-                    p.name?.toLowerCase().includes(query.toLowerCase()) ||
-                    p.category?.toLowerCase().includes(query.toLowerCase()) ||
-                    p.brand?.toLowerCase().includes(query.toLowerCase())
-                ).slice(0, 5);
-                setSuggestions(filtered);
+                const results = await getSearchProductsAction(query);
+                setSuggestions((results || []).slice(0, 5));
                 setLoading(false);
             }, 200);
             return () => clearTimeout(timer);

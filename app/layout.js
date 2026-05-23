@@ -9,6 +9,10 @@ import IntroOverlay from "@/components/layout/IntroOverlay";
 import ToastContainer from "@/components/common/ToastContainer";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import CurrencyInitializer from "@/components/common/CurrencyInitializer";
+import CartDrawer from "@/components/layout/CartDrawer";
+import NotificationsDrawer from "@/components/layout/NotificationsDrawer";
+import CompareWidget from "@/components/common/CompareWidget";
+import SmoothScrollProvider from "@/components/common/SmoothScroll";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
@@ -50,17 +54,22 @@ export default function RootLayout({ children }) {
                 <LanguageProvider>
                     <UserProvider>
                         <CartSyncProvider>
-                            <IntroOverlay />
-                            <ToastContainer />
-                            <ConfirmModal />
-                            <CurrencyInitializer />
-                            <div className="min-h-screen flex flex-col">
-                                <Navbar />
-                                <main className="flex-1 max-w-[1600px] mx-auto w-full px-6 md:px-12 pt-20 md:pt-32 pb-12">
-                                    {children}
-                                </main>
-                                <Footer />
-                            </div>
+                            <SmoothScrollProvider>
+                                <IntroOverlay />
+                                <ToastContainer />
+                                <ConfirmModal />
+                                <CurrencyInitializer />
+                                <CartDrawer />
+                                <NotificationsDrawer />
+                                <CompareWidget />
+                                <div className="min-h-screen flex flex-col">
+                                    <Navbar />
+                                    <main className="flex-1 max-w-[1600px] mx-auto w-full px-6 md:px-12 pt-16 md:pt-24 pb-12">
+                                        {children}
+                                    </main>
+                                    <Footer />
+                                </div>
+                            </SmoothScrollProvider>
                         </CartSyncProvider>
                     </UserProvider>
                 </LanguageProvider>

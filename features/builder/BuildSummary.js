@@ -8,7 +8,7 @@ import useUIStore from "@/store/useUIStore"
 import PriceDisplay from "@/components/common/PriceDisplay"
 
 export default function BuildSummary() {
-    const { t } = useTranslation()
+    const { t, lang } = useTranslation()
     const { selectedParts, getTotalPrice, getProgress, getCompatibilityIssues, resetBuild } = useBuildStore()
     const addToCart = useStore(state => state.addToCart)
     const { addToast, triggerCartAnimation } = useUIStore()
@@ -18,6 +18,102 @@ export default function BuildSummary() {
     const hasErrors = issues.some(i => i.type === 'error')
     const [buildId, setBuildId] = useState("")
     const [isMounted, setIsMounted] = useState(false)
+
+    // Helper to estimate TDP of selected parts
+    const getEstimatedTDP = () => {
+        let tdp = 0;
+        let psuCapacity = 0;
+
+        if (selectedParts.cpu) {
+            const name = selectedParts.cpu.name.toUpperCase();
+            if (name.includes("I9") || name.includes("R9") || name.includes("9900") || name.includes("7900") || name.includes("7950") || name.includes("13900") || name.includes("14900")) tdp += 170;
+            else if (name.includes("I7") || name.includes("R7") || name.includes("7700") || name.includes("7800") || name.includes("13700") || name.includes("14700") || name.includes("5800")) tdp += 125;
+            else tdp += 65;
+        }
+        if (selectedParts.gpu) {
+            const name = selectedParts.gpu.name.toUpperCase();
+            if (name.includes("4090") || name.includes("3090")) tdp += 450;
+            else if (name.includes("4080") || name.includes("3080")) tdp += 320;
+            else if (name.includes("4070") || name.includes("3070")) tdp += 220;
+            else if (name.includes("4060") || name.includes("3060")) tdp += 160;
+            else if (name.includes("1660") || name.includes("1650") || name.includes("6600")) tdp += 100;
+            else tdp += 75;
+        }
+        if (selectedParts.motherboard) tdp += 50;
+        if (selectedParts.ram) tdp += 10;
+        if (selectedParts.ssd || selectedParts.hdd) tdp += 10;
+        if (selectedParts.cooler) tdp += 15;
+        if (selectedParts.case) tdp += 15;
+
+        if (selectedParts.psu) {
+            const name = selectedParts.psu.name.toUpperCase();
+            const match = name.match(/(\d+)W/);
+            if (match) psuCapacity = parseInt(match[1]);
+            else {
+                if (name.includes("1000")) psuCapacity = 1000;
+                else if (name.includes("850")) psuCapacity = 850;
+                else if (name.includes("750")) psuCapacity = 750;
+                else if (name.includes("650")) psuCapacity = 650;
+                else if (name.includes("550")) psuCapacity = 550;
+                else psuCapacity = 600;
+            }
+        }
+
+        return { tdp, psuCapacity };
+    };
+
+    // Helper to calculate Bottleneck percentage
+    const getBottleneckInfo = () => {
+        if (!selectedParts.cpu || !selectedParts.gpu) return null;
+
+        const cpuName = selectedParts.cpu.name.toUpperCase();
+        const gpuName = selectedParts.gpu.name.toUpperCase();
+
+        let cpuTier = 2; // Default mid
+        if (cpuName.includes("I9") || cpuName.includes("R9") || cpuName.includes("13900") || cpuName.includes("14900") || cpuName.includes("7950")) cpuTier = 5;
+        else if (cpuName.includes("I7") || cpuName.includes("R7") || cpuName.includes("13700") || cpuName.includes("14700") || cpuName.includes("7800")) cpuTier = 4;
+        else if (cpuName.includes("I5") || cpuName.includes("R5") || cpuName.includes("13400") || cpuName.includes("12400") || cpuName.includes("5600")) cpuTier = 3;
+        else cpuTier = 2;
+
+        let gpuTier = 2;
+        if (gpuName.includes("4090") || gpuName.includes("3090") || gpuName.includes("7900XTX")) gpuTier = 5;
+        else if (gpuName.includes("4080") || gpuName.includes("3080") || gpuName.includes("4070TI") || gpuName.includes("7900XT")) gpuTier = 4;
+        else if (gpuName.includes("4070") || gpuName.includes("3070") || gpuName.includes("4060TI") || gpuName.includes("7700XT")) gpuTier = 3;
+        else if (gpuName.includes("4060") || gpuName.includes("3060") || gpuName.includes("7600")) gpuTier = 2;
+        else gpuTier = 1;
+
+        const diff = Math.abs(cpuTier - gpuTier);
+        let bottleneckPct = 5 + diff * 12;
+        if (bottleneckPct > 50) bottleneckPct = 48; // cap it nicely
+
+        let type = "minimal";
+        let color = "text-green-500 bg-green-500/10 border-green-500/20 dark:bg-green-500/5";
+        let label = "Mukammal moslik";
+        if (lang === 'ru') label = "Отличный баланс";
+        if (lang === 'en') label = "Perfect balance";
+
+        if (diff >= 2) {
+            type = "high";
+            color = "text-red-500 bg-red-500/10 border-red-500/20 dark:bg-red-500/5";
+            if (cpuTier < gpuTier) {
+                label = "CPU Bottleneck (Kuchli)";
+                if (lang === 'ru') label = "Бутылочное горлышко CPU";
+                if (lang === 'en') label = "High CPU Bottleneck";
+            } else {
+                label = "GPU Bottleneck (Kuchli)";
+                if (lang === 'ru') label = "Бутылочное горлышко GPU";
+                if (lang === 'en') label = "High GPU Bottleneck";
+            }
+        } else if (diff === 1) {
+            type = "moderate";
+            color = "text-yellow-500 bg-yellow-500/10 border-yellow-500/20 dark:bg-yellow-500/5";
+            label = "O'rtacha Bottleneck";
+            if (lang === 'ru') label = "Умеренный дисбаланс";
+            if (lang === 'en') label = "Moderate Bottleneck";
+        }
+
+        return { percentage: bottleneckPct, type, color, label };
+    };
 
     useEffect(() => {
         setBuildId(`PC-${Math.random().toString(36).substr(2, 6).toUpperCase()}`)
@@ -83,6 +179,67 @@ export default function BuildSummary() {
                     </div>
                 </div>
             </div>
+
+            {/* TDP and Bottleneck Visualizers */}
+            {progress.count > 0 && (
+                <div className="space-y-4 pt-4 border-t border-border-alpha">
+                    {/* TDP Meter */}
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
+                            <span className="text-foreground/60">
+                                {lang === 'uz' ? "Quvvat sarfi (TDP)" : lang === 'ru' ? "Энергопотребление (TDP)" : "Power Draw (TDP)"}
+                            </span>
+                            <span className="text-white font-mono">
+                                {getEstimatedTDP().tdp} W
+                                {getEstimatedTDP().psuCapacity > 0 ? ` / ${getEstimatedTDP().psuCapacity} W` : ""}
+                            </span>
+                        </div>
+                        <div className="h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5 p-0.5">
+                            <div 
+                                className={`h-full rounded-full transition-all duration-700 ${
+                                    getEstimatedTDP().psuCapacity > 0 && getEstimatedTDP().tdp > getEstimatedTDP().psuCapacity
+                                        ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]'
+                                        : 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]'
+                                }`}
+                                style={{
+                                    width: `${Math.min(100, getEstimatedTDP().psuCapacity > 0 ? (getEstimatedTDP().tdp / getEstimatedTDP().psuCapacity) * 100 : (getEstimatedTDP().tdp / 800) * 100)}%`
+                                }}
+                            />
+                        </div>
+                        {getEstimatedTDP().psuCapacity > 0 && getEstimatedTDP().tdp > getEstimatedTDP().psuCapacity && (
+                            <p className="text-[9px] font-black text-red-500 uppercase tracking-wider">
+                                {lang === 'uz' ? "⚠️ PSU quvvati yetarli emas! Kattaroq blok tanlang." : lang === 'ru' ? "⚠️ Мощности БП недостаточно! Выберите больше." : "⚠️ Insufficient PSU wattage!"}
+                            </p>
+                        )}
+                        {getEstimatedTDP().psuCapacity === 0 && getEstimatedTDP().tdp > 0 && (
+                            <p className="text-[8px] font-bold text-surface-400 uppercase tracking-wider">
+                                {lang === 'uz' ? "Tavsiya etilgan blok" : lang === 'ru' ? "Рекомендуемый БП" : "Recommended PSU"}: min {Math.round(getEstimatedTDP().tdp * 1.3 / 50) * 50}W
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Bottleneck Gauge */}
+                    {getBottleneckInfo() && (
+                        <div className={`p-3 rounded-xl border ${getBottleneckInfo().color} space-y-1.5 transition-all duration-500`}>
+                            <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider">
+                                <span>
+                                    {lang === 'uz' ? "Muvozanat (Bottleneck)" : lang === 'ru' ? "Баланс компонентов" : "Bottleneck Index"}
+                                </span>
+                                <span className="font-mono">{getBottleneckInfo().percentage}%</span>
+                            </div>
+                            <p className="text-[9px] font-bold uppercase tracking-widest">{getBottleneckInfo().label}</p>
+                            <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                                <div 
+                                    className={`h-full rounded-full transition-all duration-700 ${
+                                        getBottleneckInfo().type === 'high' ? 'bg-red-500' : getBottleneckInfo().type === 'moderate' ? 'bg-yellow-500' : 'bg-green-500'
+                                    }`}
+                                    style={{ width: `${getBottleneckInfo().percentage}%` }}
+                                />
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Compatibility Warnings */}
             {issues.length > 0 && (

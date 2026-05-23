@@ -26,6 +26,26 @@ const SLIDE_DATA = [
         image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=1600&q=90",
         link: "/pc-builder",
         linkKey: 'hero_cta_builder'
+    },
+    {
+        id: 3,
+        titleKey: 'hero_3_title',
+        subtitleKey: 'hero_3_subtitle',
+        badgeKey: 'hero_3_badge',
+        descKey: 'hero_3_desc',
+        image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1600&q=90",
+        link: "/prebuilts",
+        linkKey: 'hero_cta_prebuilts'
+    },
+    {
+        id: 4,
+        titleKey: 'hero_4_title',
+        subtitleKey: 'hero_4_subtitle',
+        badgeKey: 'hero_4_badge',
+        descKey: 'hero_4_desc',
+        image: "https://images.unsplash.com/photo-1591488320449-011701bb6704?w=1600&q=90",
+        link: "/products",
+        linkKey: 'hero_cta_deals'
     }
 ];
 
@@ -47,7 +67,6 @@ export default function HeroSlider({ initialSlides }) {
     const [isAnimating, setIsAnimating] = useState(false);
     const [dragOffset, setDragOffset] = useState(0);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-    const [particles, setParticles] = useState([]);
     const sliderRef = useRef(null);
 
     const next = useCallback(() => {
@@ -55,7 +74,7 @@ export default function HeroSlider({ initialSlides }) {
         setIsAnimating(true);
         setDragOffset(0);
         setCurrent((prev) => (prev + 1) % slides.length);
-        setTimeout(() => setIsAnimating(false), 800);
+        setTimeout(() => setIsAnimating(false), 700);
     }, [isAnimating, slides.length]);
 
     const prev = useCallback(() => {
@@ -63,7 +82,7 @@ export default function HeroSlider({ initialSlides }) {
         setIsAnimating(true);
         setDragOffset(0);
         setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
-        setTimeout(() => setIsAnimating(false), 800);
+        setTimeout(() => setIsAnimating(false), 700);
     }, [isAnimating, slides.length]);
 
     const [touchStart, setTouchStart] = useState(null);
@@ -110,193 +129,247 @@ export default function HeroSlider({ initialSlides }) {
         return () => clearInterval(timer);
     }, [next]);
 
-    useEffect(() => {
-        // Generate random particles only on the client to avoid SSR hydration mismatch
-        setParticles(Array.from({ length: 15 }).map(() => ({
-            width: `${Math.random() * 4 + 1}px`,
-            height: `${Math.random() * 4 + 1}px`,
-            left: `${Math.random() * 100}%`,
-            animationDuration: `${Math.random() * 10 + 10}s`,
-            animationDelay: `${Math.random() * 5}s`
-        })));
-    }, []);
+    const slide = slides[current];
+
+    let imgSrc = slide?.image || "";
+    if (imgSrc && imgSrc.includes('google.com/imgres')) {
+        try {
+            const urlParams = new URLSearchParams(imgSrc.split('?')[1]);
+            const directUrl = urlParams.get('imgurl');
+            if (directUrl) imgSrc = directUrl;
+        } catch (e) {}
+    }
 
     return (
         <section
             ref={sliderRef}
-            className="relative h-[400px] sm:h-[500px] md:h-[650px] w-full overflow-hidden rounded-[2rem] md:rounded-[4rem] bg-[#050505] border border-white/5 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] group"
+            className="relative w-full max-w-[1400px] mx-auto overflow-hidden rounded-[1.5rem] md:rounded-[3rem] bg-[#050505] border border-white/5 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] group"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
         >
-            {/* Custom Styles for Subtle Particles & Motion Blur */}
-            <style dangerouslySetInnerHTML={{ __html: `
-                @keyframes float-particles {
-                    0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-                    50% { opacity: 0.5; }
-                    100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
-                }
-                .particle {
-                    position: absolute;
-                    background: radial-gradient(circle, rgba(var(--primary), 0.8) 0%, transparent 70%);
-                    border-radius: 50%;
-                    pointer-events: none;
-                    animation: float-particles linear infinite;
-                }
-                .motion-blur-active {
-                    filter: blur(8px) brightness(1.2);
-                }
-            `}} />
-
-            {/* Subtle Particles Background */}
-            <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-30 mix-blend-screen">
-                {particles.map((p, i) => (
-                    <div 
-                        key={i}
-                        className="particle"
+            {/* ─── MOBILE LAYOUT (< md) ─────────────────────────────── */}
+            <div className="flex flex-col md:hidden">
+                {/* Image area — fixed aspect ratio so it's never too short/tall */}
+                <div className="relative w-full aspect-[21/9] overflow-hidden">
+                    <div
+                        className="absolute inset-0 flex h-full transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"
                         style={{
-                            width: p.width,
-                            height: p.height,
-                            left: p.left,
-                            top: '100%',
-                            animationDuration: p.animationDuration,
-                            animationDelay: p.animationDelay
+                            transform: `translateX(calc(-${current * 100}% + ${dragOffset}px))`,
+                            width: `${slides.length * 100}%`,
                         }}
-                    />
-                ))}
-            </div>
-
-            {/* Glowing Orb following mouse */}
-            <div 
-                className="absolute w-[400px] h-[400px] bg-primary/20 rounded-full blur-[120px] pointer-events-none z-10 transition-transform duration-700 ease-out mix-blend-screen hidden md:block"
-                style={{
-                    transform: `translate(calc(${mousePos.x * 400}px - 50%), calc(${mousePos.y * 400}px - 50%))`,
-                    left: '50%',
-                    top: '50%'
-                }}
-            />
-
-            <div
-                className="absolute inset-0 flex h-full transition-transform duration-[800ms] ease-[cubic-bezier(0.25,1,0.5,1)]"
-                style={{
-                    transform: `translateX(calc(-${current * 100}% + ${dragOffset}px))`,
-                    width: `${slides.length * 100}%`
-                }}
-            >
-                {slides.map((slide, idx) => (
-                    <div key={slide.id} className="relative min-w-full h-full flex-shrink-0 flex items-center">
-                        <div className={`absolute inset-0 z-0 transition-all duration-500 ${isAnimating ? 'motion-blur-active' : ''}`}>
-                            {(() => {
-                                let imgSrc = slide.image;
-                                if (imgSrc && imgSrc.includes('google.com/imgres')) {
-                                    try {
-                                        const urlParams = new URLSearchParams(imgSrc.split('?')[1]);
-                                        const directUrl = urlParams.get('imgurl');
-                                        if (directUrl) imgSrc = directUrl;
-                                    } catch (e) { }
-                                }
-                                return (
+                    >
+                        {slides.map((s, idx) => {
+                            let src = s.image || "";
+                            if (src.includes('google.com/imgres')) {
+                                try {
+                                    const p = new URLSearchParams(src.split('?')[1]);
+                                    src = p.get('imgurl') || src;
+                                } catch (e) {}
+                            }
+                            return (
+                                <div key={s.id} className="relative min-w-full h-full flex-shrink-0">
                                     <Image
-                                        src={imgSrc || "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=1600&auto=format&fit=crop&q=90"}
-                                        alt={slide.title}
+                                        src={src || "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=800&q=80"}
+                                        alt={s.title || "Slide"}
                                         fill
                                         priority={idx < 2}
-                                        className="object-cover opacity-50 transition-transform duration-[10000ms] ease-out"
-                                        style={{ 
-                                            transform: idx === current 
-                                                ? `scale(1.05) translate(${mousePos.x * -20}px, ${mousePos.y * -20}px)` 
-                                                : 'scale(1.15)' 
-                                        }}
+                                        className="object-cover object-[center_30%]"
                                     />
-                                );
-                            })()}
-                            
-                            {/* Stronger, Premium Gradient */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/80 to-transparent z-10" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent z-10 opacity-80" />
-                        </div>
-
-                        <div className={`relative z-20 px-6 sm:px-10 md:px-24 max-w-[1400px] w-full space-y-6 md:space-y-12 transition-all duration-[800ms] delay-200 ${idx === current ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-16 md:-translate-x-32'}`}>
-                            <div className="space-y-6 md:space-y-8 max-w-2xl text-left">
-                                
-                                <div className="inline-flex items-center gap-3 bg-white/5 border border-white/10 px-5 py-2.5 rounded-full text-white font-bold text-[10px] md:text-xs uppercase tracking-[0.3em] md:tracking-[0.4em] backdrop-blur-xl shadow-2xl">
-                                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                                    {slide.badge}
+                                    {/* bottom fade */}
+                                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#050505]/90" />
                                 </div>
+                            );
+                        })}
+                    </div>
 
-                                <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-black text-white leading-[1.05] tracking-tight">
-                                    {slide.title.split(' ').map((word, i) => (
-                                        <span key={i} className="block">{word}</span>
-                                    ))}
-                                    <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary via-red-400 to-orange-500 pb-2">
-                                        {slide.subtitle}
-                                    </span>
-                                </h1>
-
-                                <p className="text-surface-300 text-sm sm:text-base md:text-xl font-medium max-w-[280px] sm:max-w-md md:max-w-xl leading-relaxed">
-                                    {slide.description}
-                                </p>
-
-                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6 pt-6">
-                                    <Link 
-                                        href={slide.link} 
-                                        className="group relative bg-white text-black font-extrabold px-10 sm:px-14 py-4 md:py-5 rounded-full hover:bg-transparent hover:text-white border-2 border-white transition-all duration-300 shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] active:scale-95 text-[11px] md:text-sm uppercase tracking-widest w-auto flex items-center justify-center overflow-hidden"
-                                    >
-                                        <span className="relative z-10 flex items-center gap-3">
-                                            {slide.linkText || t('hero_cta_shop')}
-                                            <svg className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                                        </span>
-                                        <div className="absolute inset-0 bg-primary translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                                    </Link>
-                                    
-                                    <Link 
-                                        href="/products?sort=popular" 
-                                        className="text-white/60 font-bold hover:text-white transition-all duration-300 flex items-center gap-3 group/link text-[11px] md:text-sm uppercase tracking-[0.2em] relative"
-                                    >
-                                        <span>TOP PRODUCTS</span>
-                                        <div className="h-[2px] w-0 bg-primary absolute -bottom-1 left-0 group-hover/link:w-full transition-all duration-300" />
-                                    </Link>
-                                </div>
-                            </div>
+                    {/* Badge over image */}
+                    <div className="absolute top-4 left-4 z-20">
+                        <div className="inline-flex items-center gap-1.5 bg-black/50 border border-white/10 px-3 py-1.5 rounded-full text-white font-bold text-[9px] uppercase tracking-[0.25em] backdrop-blur-md">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                            {slide?.badge}
                         </div>
                     </div>
-                ))}
+                </div>
+
+                {/* Text area — sits below the image */}
+                <div className="bg-[#080a0d] px-5 py-6 space-y-4">
+                    <h2 className="text-xl md:text-2xl font-black text-white leading-tight tracking-tight">
+                        {slide?.title?.split(' ').map((word, i) => (
+                            <span key={i} className="block">{word}</span>
+                        ))}
+                        <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary via-red-400 to-orange-400 mt-0.5">
+                            {slide?.subtitle}
+                        </span>
+                    </h2>
+
+                    <p className="text-white/55 text-xs leading-relaxed line-clamp-2">
+                        {slide?.description}
+                    </p>
+
+                    <div className="flex items-center gap-3 pt-1">
+                        <Link
+                            href={slide?.link || "/products"}
+                            className="flex-1 flex items-center justify-center gap-2 bg-primary text-white font-extrabold py-3 rounded-xl text-[10px] uppercase tracking-widest shadow-lg shadow-primary/30 active:scale-95 transition-all"
+                        >
+                            {slide?.linkText || t('hero_cta_shop')}
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </Link>
+                    </div>
+
+                    {/* Mobile dots */}
+                    <div className="flex items-center justify-center gap-2 pt-2">
+                        {slides.map((_, idx) => (
+                            <button
+                                key={idx}
+                                onClick={() => {
+                                    if (isAnimating) return;
+                                    setIsAnimating(true);
+                                    setCurrent(idx);
+                                    setTimeout(() => setIsAnimating(false), 700);
+                                }}
+                                className="group relative h-2 flex items-center justify-center"
+                            >
+                                <div className={`h-[3px] rounded-full transition-all duration-500 ${current === idx ? 'w-8 bg-primary shadow-[0_0_8px_rgba(239,68,68,0.8)]' : 'w-4 bg-white/20'}`} />
+                            </button>
+                        ))}
+                    </div>
+                </div>
             </div>
 
-            {/* Premium Navigation Controls */}
-            <div className="absolute inset-0 z-30 pointer-events-none hidden md:flex items-center justify-between px-8 lg:px-12">
-                <button onClick={prev} className="pointer-events-auto w-14 h-14 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:border-white/30 hover:bg-white/10 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 active:scale-90">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
-                </button>
-                <button onClick={next} className="pointer-events-auto w-14 h-14 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:border-white/30 hover:bg-white/10 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 active:scale-90">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-                </button>
-            </div>
+            {/* ─── DESKTOP LAYOUT (≥ md) ───────────────────────────── */}
+            <div className="hidden md:block relative h-[400px] lg:h-[460px]">
+                {/* Glowing orb following mouse */}
+                <div
+                    className="absolute w-[400px] h-[400px] bg-primary/20 rounded-full blur-[120px] pointer-events-none z-10 transition-transform duration-700 ease-out mix-blend-screen"
+                    style={{
+                        transform: `translate(calc(${mousePos.x * 400}px - 50%), calc(${mousePos.y * 400}px - 50%))`,
+                        left: '50%',
+                        top: '50%',
+                    }}
+                />
 
-            {/* Premium Pagination Indicators */}
-            <div className="absolute bottom-8 md:bottom-12 left-6 md:left-24 flex items-center gap-3 z-40">
-                {slides.map((_, idx) => (
-                    <button
-                        key={idx}
-                        onClick={() => {
-                            if (isAnimating) return;
-                            setIsAnimating(true);
-                            setCurrent(idx);
-                            setTimeout(() => setIsAnimating(false), 800);
-                        }}
-                        className="group relative h-2 flex items-center justify-center"
-                    >
-                        <div className={`h-[2px] md:h-1 rounded-full transition-all duration-700 ease-out ${current === idx ? 'w-12 md:w-20 bg-primary shadow-[0_0_10px_rgba(var(--primary),0.8)]' : 'w-4 md:w-8 bg-white/20 group-hover:bg-white/50'}`} />
+                {/* Slide strip */}
+                <div
+                    className="absolute inset-0 flex h-full transition-transform duration-[800ms] ease-[cubic-bezier(0.25,1,0.5,1)]"
+                    style={{
+                        transform: `translateX(calc(-${current * 100}% + ${dragOffset}px))`,
+                        width: `${slides.length * 100}%`,
+                    }}
+                >
+                    {slides.map((s, idx) => {
+                        let src = s.image || "";
+                        if (src.includes('google.com/imgres')) {
+                            try {
+                                const p = new URLSearchParams(src.split('?')[1]);
+                                src = p.get('imgurl') || src;
+                            } catch (e) {}
+                        }
+                        return (
+                            <div key={s.id} className="relative min-w-full h-full flex-shrink-0 flex items-center">
+                                <div className="absolute inset-0 z-0">
+                                    <Image
+                                        src={src || "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=1600&q=90"}
+                                        alt={s.title || "Slide"}
+                                        fill
+                                        priority={idx < 2}
+                                        className="object-cover object-[center_30%] opacity-50"
+                                        style={{
+                                            transform: idx === current
+                                                ? `scale(1.02) translate(${mousePos.x * -10}px, ${mousePos.y * -10}px)`
+                                                : 'scale(1.08)'
+                                        }}
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/80 to-transparent z-10" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent z-10 opacity-80" />
+                                </div>
+
+                                <div className={`relative z-20 px-10 md:px-24 max-w-[1400px] w-full space-y-6 transition-all duration-[800ms] delay-200 ${idx === current ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-32'}`}>
+                                    <div className="space-y-5 max-w-2xl text-left">
+                                        <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full text-white font-bold text-[10px] uppercase tracking-[0.4em] backdrop-blur-xl shadow-2xl">
+                                            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                                            {s.badge}
+                                        </div>
+
+                                        <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-[1.1] tracking-tight">
+                                            {s.title?.split(' ').map((word, i) => (
+                                                <span key={i} className="block">{word}</span>
+                                            ))}
+                                            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary via-red-400 to-orange-500 pb-2">
+                                                {s.subtitle}
+                                            </span>
+                                        </h1>
+
+                                        <p className="text-surface-300 text-sm md:text-base font-medium max-w-xl leading-relaxed">
+                                            {s.description}
+                                        </p>
+
+                                        <div className="flex items-center gap-5 pt-3">
+                                            <Link
+                                                href={s.link}
+                                                className="group relative bg-white text-black font-extrabold px-10 py-3.5 rounded-full hover:bg-transparent hover:text-white border-2 border-white transition-all duration-300 shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] active:scale-95 text-xs uppercase tracking-widest flex items-center justify-center overflow-hidden"
+                                            >
+                                                <span className="relative z-10 flex items-center gap-3">
+                                                    {s.linkText || t('hero_cta_shop')}
+                                                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                                    </svg>
+                                                </span>
+                                                <div className="absolute inset-0 bg-primary translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                                            </Link>
+
+                                            <Link
+                                                href="/products?sort=popular"
+                                                className="text-white/60 font-bold hover:text-white transition-all duration-300 flex items-center gap-3 group/link text-xs uppercase tracking-[0.2em] relative"
+                                            >
+                                                <span>TOP PRODUCTS</span>
+                                                <div className="h-[2px] w-0 bg-primary absolute -bottom-1 left-0 group-hover/link:w-full transition-all duration-300" />
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Desktop nav arrows */}
+                <div className="absolute inset-0 z-30 pointer-events-none flex items-center justify-between px-8 lg:px-12">
+                    <button onClick={prev} className="pointer-events-auto w-14 h-14 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:border-white/30 hover:bg-white/10 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 active:scale-90">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
                     </button>
-                ))}
-            </div>
-            
-            {/* Scroll Indicator */}
-            <div className="absolute bottom-8 right-6 md:right-24 z-40 hidden md:flex flex-col items-center gap-2 opacity-50">
-                <span className="text-[9px] font-bold text-white uppercase tracking-[0.4em] rotate-90 origin-right translate-x-3 mb-8">SCROLL</span>
-                <div className="w-[1px] h-12 bg-gradient-to-b from-white to-transparent" />
+                    <button onClick={next} className="pointer-events-auto w-14 h-14 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:border-white/30 hover:bg-white/10 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 active:scale-90">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+                    </button>
+                </div>
+
+                {/* Desktop pagination dots */}
+                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-3 z-40">
+                    {slides.map((_, idx) => (
+                        <button
+                            key={idx}
+                            onClick={() => {
+                                if (isAnimating) return;
+                                setIsAnimating(true);
+                                setCurrent(idx);
+                                setTimeout(() => setIsAnimating(false), 700);
+                            }}
+                            className="group relative h-2 flex items-center justify-center"
+                        >
+                            <div className={`h-1 rounded-full transition-all duration-700 ease-out ${current === idx ? 'w-20 bg-primary shadow-[0_0_10px_rgba(239,68,68,0.8)]' : 'w-8 bg-white/20 group-hover:bg-white/50'}`} />
+                        </button>
+                    ))}
+                </div>
+
+                {/* Scroll indicator */}
+                <div className="absolute bottom-8 right-24 z-40 flex flex-col items-center gap-2 opacity-50">
+                    <span className="text-[9px] font-bold text-white uppercase tracking-[0.4em] rotate-90 origin-right translate-x-3 mb-8">SCROLL</span>
+                    <div className="w-[1px] h-12 bg-gradient-to-b from-white to-transparent" />
+                </div>
             </div>
         </section>
     );

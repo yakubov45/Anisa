@@ -134,4 +134,74 @@
 
 .animate-progress-loading {
   animation: progress-loading 2s ease-in-out infinite;
+}
+
+/* Premium interactive button hover sweep & scale effect */
+.btn-premium {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+  isolation: isolate;
+}
+
+.btn-premium::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  transform: skewX(-25deg);
+  z-index: 10;
+  transition: none;
+}
+
+.btn-premium:hover::after {
+  left: 150%;
+  transition: left 0.85s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.btn-premium:hover {
+  transform: translateY(-2px) scale(1.03);
+}
+
+.btn-premium:active {
+  transform: translateY(1px) scale(0.97);
+}
+
+/* Specific glows for different button variants */
+.btn-premium-red {
+  background-color: #E31E24 !important;
+  color: #ffffff !important;
+}
+
+.btn-premium-red:hover {
+  box-shadow: 0 0 25px rgba(227, 30, 36, 0.55), 0 0 10px rgba(227, 30, 36, 0.35);
+}
+
+.btn-premium-white {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.btn-premium-white:hover {
+  box-shadow: 0 10px 25px rgba(255, 255, 255, 0.2), 0 0 15px rgba(255, 255, 255, 0.15);
+}
+
+.btn-premium-dark {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.btn-premium-dark:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(227, 30, 36, 0.5) !important;
+  box-shadow: 0 0 20px rgba(227, 30, 36, 0.25);
 }
