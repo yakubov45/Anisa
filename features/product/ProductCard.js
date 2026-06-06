@@ -16,11 +16,49 @@ function ProductCard({ product, badge = null, rating = null }) {
     const isFavorite = wishlist.some(item => item.id === product.id);
     const [isQuickViewOpen, setIsQuickViewOpen] = useState(false)
 
+    // Variant Logic
+    const hasVariants = product.variants && product.variants.length > 0;
+    const validVariants = hasVariants ? product.variants : [];
+    
+    // Auto-select first variant if available
+    const [selectedVariant, setSelectedVariant] = useState(validVariants.length > 0 ? validVariants[0] : null);
+    const [hoverVariant, setHoverVariant] = useState(null);
+    const [hoverImageIndex, setHoverImageIndex] = useState(0);
+
+    const activeVariant = hoverVariant || selectedVariant;
+    
+    // Determine displays
+    const activeImages = activeVariant?.images || (product.image ? [product.image] : []);
+    const displayImage = activeImages[hoverImageIndex] || activeImages[0];
+    const displayPrice = activeVariant?.price || product.basePrice || product.price || 0;
+    const displayStock = activeVariant?.stock ?? product.countInStock ?? product.stock ?? 0;
+
     const badgeKeys = {
         'Bestseller': t('home_bestsellers'),
         'FLASH': t('home_flash_deals'),
         'Hot': t('new_arrivals')
     }
+
+    const handleAddToCart = (e) => {
+        e.preventDefault();
+        if (displayStock <= 0) return;
+        
+        const cartItem = {
+            ...product,
+            id: selectedVariant ? `${product.id}-${selectedVariant.id}` : product.id,
+            baseProductId: product.id,
+            name: selectedVariant && selectedVariant.colorName !== 'Standard' 
+                ? `${product.name} (${selectedVariant.colorName})` 
+                : product.name,
+            price: displayPrice,
+            image: displayImage,
+            variant: selectedVariant
+        };
+        
+        addToCart(cartItem);
+        triggerCartAnimation();
+        addToast(t('cart_added_msg').replace('{name}', product.name));
+    };
 
     return (
         <div className="product-card rounded-2xl p-2 md:p-5 flex flex-col h-full group relative overflow-hidden animate-slide-up bg-surface/50 border border-border-alpha hover:border-primary/50 transition-all duration-500 group-hover:shadow-[0_0_30px_rgba(239,68,68,0.15)] will-change-transform">
@@ -40,13 +78,29 @@ function ProductCard({ product, badge = null, rating = null }) {
             {/* IMAGE */}
             <div className="block relative overflow-hidden rounded-xl bg-surface-50 flex-1 min-h-[160px] md:min-h-[220px]">
                 <ImageWithFallback
-                    src={product.image}
+                    src={displayImage}
                     fallbackSrc="https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=500&auto=format&fit=crop&q=80"
                     alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 grayscale-[0.5] group-hover:grayscale-0"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700 grayscale-[0.2] group-hover:grayscale-0"
                 />
 
-                <div className="absolute inset-0 bg-surface/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px] gap-4">
+                {/* Thumbnail Gallery Preview on Hover (if multiple images exist for active variant) */}
+                {activeImages.length > 1 && (
+                    <div className="absolute bottom-2 left-0 w-full flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                        {activeImages.slice(0, 4).map((img, idx) => (
+                            <div 
+                                key={idx} 
+                                onMouseEnter={() => setHoverImageIndex(idx)}
+                                onMouseLeave={() => setHoverImageIndex(0)}
+                                className={`w-8 h-8 rounded-md overflow-hidden border-2 transition-all ${hoverImageIndex === idx ? 'border-primary' : 'border-transparent opacity-70'}`}
+                            >
+                                <img src={img} className="w-full h-full object-cover" alt="" />
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                <div className="absolute inset-0 bg-surface/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px] gap-4 z-10">
                     <button
                         onClick={() => setIsQuickViewOpen(true)}
                         className="btn-premium btn-premium-white text-foreground font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] px-4 md:px-8 py-3 md:py-4 rounded-xl shadow-2xl border border-border-alpha"
@@ -66,41 +120,76 @@ function ProductCard({ product, badge = null, rating = null }) {
             </div>
 
             <div className="mt-3 md:mt-6 flex flex-col gap-2 md:gap-4">
-                {/* Brand & Rating */}
-                <div className="flex items-center justify-between">
-                    <span className="text-[7px] md:text-[9px] font-black text-surface-500 uppercase tracking-[0.3em] font-mono">{product.brand || 'Brand'}</span>
-                    {(rating || product.rating) && (
-                        <div className="flex text-yellow-500 text-[8px] gap-0.5">
-                            {[...Array(5)].map((_, i) => (
-                                <span key={i}>{i < (rating || product.rating) ? '★' : '☆'}</span>
-                            ))}
+                {/* Brand & Rating & Swatches */}
+                <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                        <span className="text-[7px] md:text-[9px] font-black text-surface-500 uppercase tracking-[0.3em] font-mono">{product.brand || 'Brand'}</span>
+                        {(rating || product.rating) && (
+                            <div className="flex text-yellow-500 text-[8px] gap-0.5">
+                                {[...Array(5)].map((_, i) => (
+                                    <span key={i}>{i < (rating || product.rating) ? '★' : '☆'}</span>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    
+                    {/* Color Swatches */}
+                    {validVariants.length > 1 && (
+                        <div className="flex flex-wrap gap-1.5 h-5 items-center">
+                            {validVariants.map((v) => {
+                                const isOutOfStock = v.stock <= 0;
+                                const isSelected = selectedVariant?.id === v.id;
+                                return (
+                                    <button
+                                        key={v.id}
+                                        onMouseEnter={() => setHoverVariant(v)}
+                                        onMouseLeave={() => setHoverVariant(null)}
+                                        onClick={(e) => { e.preventDefault(); setSelectedVariant(v); }}
+                                        className={`w-4 h-4 rounded-full border border-surface-300 relative transition-all duration-300 group/swatch
+                                            ${isSelected ? 'ring-2 ring-primary ring-offset-2 ring-offset-surface' : 'hover:scale-110'} 
+                                            ${isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
+                                        `}
+                                        style={{ backgroundColor: v.colorHex || '#000000' }}
+                                    >
+                                        {/* Cross line for out of stock */}
+                                        {isOutOfStock && (
+                                            <span className="absolute inset-0 m-auto w-[120%] h-[1.5px] bg-red-500 rotate-45 transform origin-center shadow-sm" />
+                                        )}
+                                        {/* Tooltip */}
+                                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-[8px] whitespace-nowrap rounded opacity-0 group-hover/swatch:opacity-100 pointer-events-none transition-opacity z-30">
+                                            {isOutOfStock ? "Tez orada yangi mahsulotlar keladi" : v.colorName}
+                                        </span>
+                                    </button>
+                                );
+                            })}
                         </div>
                     )}
                 </div>
 
                 {/* Stock Status */}
                 <div className="flex items-center gap-1.5">
-                    <span className={`w-1 h-1 md:w-1.5 md:h-1.5 rounded-full ${product.stock > 0 ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-                    <span className={`text-[8px] md:text-[9px] font-black uppercase tracking-widest ${product.stock > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                        {product.stock > 0 ? `${product.stock} ${t('stock')}` : t('out_of_stock')}
+                    <span className={`w-1 h-1 md:w-1.5 md:h-1.5 rounded-full ${displayStock > 0 ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                    <span className={`text-[8px] md:text-[9px] font-black uppercase tracking-widest ${displayStock > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                        {displayStock > 0 ? `${displayStock} ${t('stock')}` : t('out_of_stock')}
                     </span>
                 </div>
 
-                {/* Product Name */}
-                <Link href={`/products/${product.id}`}>
-                    <h3 className="font-extrabold text-foreground text-[10px] md:text-lg tracking-tight group-hover:text-primary transition-colors line-clamp-2 uppercase leading-tight">{product.name}</h3>
+                <Link href={`/products/${product.id}`} className="py-1">
+                    <h3 className="font-extrabold text-foreground text-[11px] md:text-lg tracking-wider md:tracking-widest group-hover:text-primary transition-colors line-clamp-2 uppercase leading-relaxed md:leading-relaxed">
+                        {product.name}
+                    </h3>
                 </Link>
 
                 {/* Price Section */}
                 <div className="flex flex-col gap-0.5">
-                    {product.discount && (
+                    {product.discount > 0 && (
                         <PriceDisplay
-                            price={product.price / (1 - product.discount / 100)}
+                            price={displayPrice}
                             className="text-[9px] md:text-[10px] text-surface-400 line-through font-bold opacity-60"
                         />
                     )}
                     <PriceDisplay
-                        price={product.price}
+                        price={product.discount > 0 ? displayPrice * (1 - product.discount / 100) : displayPrice}
                         className="font-black text-xs md:text-xl text-foreground tracking-tight"
                     />
                 </div>
@@ -111,15 +200,13 @@ function ProductCard({ product, badge = null, rating = null }) {
                         {t('details')}
                     </Link>
                     <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            addToCart(product);
-                            triggerCartAnimation();
-                            addToast(t('cart_added_msg').replace('{name}', product.name));
-                        }}
-                        className="btn-premium btn-premium-red flex-[2] h-9 md:h-11 font-black text-[8px] md:text-[10px] uppercase tracking-widest rounded-lg md:rounded-xl shadow-lg"
+                        onClick={handleAddToCart}
+                        disabled={displayStock <= 0}
+                        className={`btn-premium flex-[2] h-9 md:h-11 font-black text-[8px] md:text-[10px] uppercase tracking-widest rounded-lg md:rounded-xl shadow-lg transition-all
+                            ${displayStock > 0 ? 'btn-premium-red' : 'bg-surface-300 text-surface-500 cursor-not-allowed border-none'}
+                        `}
                     >
-                        {t('buy_now')}
+                        {displayStock > 0 ? t('buy_now') : t('out_of_stock')}
                     </button>
                 </div>
             </div>

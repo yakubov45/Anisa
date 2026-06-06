@@ -7,22 +7,39 @@ import useStore from "@/store/useStore";
 import { useTranslation } from "@/lib/LanguageContext";
 import ProductCard from "@/features/product/ProductCard";
 import { reviewService } from "@/lib/services/review.service";
+import PriceDisplay from "@/components/common/PriceDisplay";
 
 export default function ProductDetailClient({ product, relatedProducts }) {
     const { addToCart, wishlist, toggleWishlist } = useStore();
     const isFavorite = wishlist.some(item => item.id === product.id);
     const { t, lang } = useTranslation();
     const [isNotified, setIsNotified] = useState(false);
-    const [activeImage, setActiveImage] = useState(product.image);
-    const images = product.images || [product.image];
+    
+    // Variant Logic
+    const hasVariants = product.variants && product.variants.length > 0;
+    const validVariants = hasVariants ? product.variants : [];
+    const [selectedVariant, setSelectedVariant] = useState(validVariants.length > 0 ? validVariants[0] : null);
+
+    const displayImages = selectedVariant?.images?.length > 0 
+        ? selectedVariant.images 
+        : (product.image ? [product.image] : []);
+    
+    const [activeImage, setActiveImage] = useState(displayImages[0]);
+
+    useEffect(() => {
+        setActiveImage(displayImages[0]);
+    }, [selectedVariant]);
+
+    const displayPrice = selectedVariant?.price || product.basePrice || product.price || 0;
+    const finalPrice = product.discount > 0 ? displayPrice * (1 - product.discount / 100) : displayPrice;
+    const displayStock = selectedVariant?.stock ?? product.countInStock ?? product.stock ?? 0;
+    const isOutOfStock = displayStock <= 0;
 
     // Image Zoom State
     const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
     const [isZooming, setIsZooming] = useState(false);
 
-    // Sticky Cart State
-    const [showStickyCart, setShowStickyCart] = useState(false);
-    const mainCartBtnRef = useRef(null);
+
 
     // Review States
     const [reviews, setReviews] = useState([]);
@@ -35,20 +52,6 @@ export default function ProductDetailClient({ product, relatedProducts }) {
             setReviews(data);
         };
         fetchReviews();
-        
-        // Intersection Observer for Sticky Cart
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                setShowStickyCart(!entry.isIntersecting);
-            },
-            { threshold: 0 }
-        );
-
-        if (mainCartBtnRef.current) {
-            observer.observe(mainCartBtnRef.current);
-        }
-
-        return () => observer.disconnect();
     }, [product.id]);
 
     const handleReviewSubmit = async (e) => {
@@ -73,8 +76,25 @@ export default function ProductDetailClient({ product, relatedProducts }) {
         setZoomPos({ x, y });
     };
 
+    const handleAddToCart = () => {
+        if (isOutOfStock) return;
+        
+        const cartItem = {
+            ...product,
+            id: selectedVariant ? `${product.id}-${selectedVariant.id}` : product.id,
+            baseProductId: product.id,
+            name: selectedVariant && selectedVariant.colorName !== 'Standard' 
+                ? `${product.name} (${selectedVariant.colorName})` 
+                : product.name,
+            price: finalPrice,
+            image: displayImages[0],
+            variant: selectedVariant
+        };
+        addToCart(cartItem);
+    };
+
     const productName = lang === 'ru' ? (product.nameRu || product.name) : lang === 'en' ? (product.nameEn || product.name) : product.name;
-    const productDesc = lang === 'ru' ? (product.descriptionRu || product.specs || product.description) : lang === 'en' ? (product.descriptionEn || product.specs || product.description) : (product.description || product.specs || "Professional hardware specifications and technical parameters.");
+    const productDesc = lang === 'ru' ? (product.descriptionRu || product.description) : lang === 'en' ? (product.descriptionEn || product.description) : (product.description || "Professional hardware specifications and technical parameters.");
 
     return (
         <div className="space-y-12 md:space-y-20 animate-fade-in pb-32 pt-6 md:pt-10">
@@ -102,7 +122,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
 
                         <div className="absolute inset-0 z-10 p-8 md:p-12 overflow-hidden">
                             <Image
-                                src={activeImage || product.image}
+                                src={activeImage}
                                 alt={productName}
                                 fill
                                 priority
@@ -115,7 +135,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                             />
                         </div>
 
-                        {product.countInStock <= 0 && (
+                        {isOutOfStock && (
                             <div className="absolute inset-0 bg-surface-900/60 backdrop-blur-md flex items-center justify-center z-20">
                                 <span className="bg-red-500 text-white font-black px-6 py-3 rounded-xl uppercase tracking-[0.3em] text-[10px] shadow-[0_0_20px_rgba(239,68,68,0.5)]">
                                     {t('out_of_stock') || "OUT OF STOCK"}
@@ -125,17 +145,19 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                     </div>
                     
                     {/* Thumbnail Gallery */}
-                    <div className="grid grid-cols-4 gap-3 md:gap-4">
-                        {images.map((img, i) => (
-                            <div
-                                key={i}
-                                onClick={() => setActiveImage(img)}
-                                className={`aspect-square bg-surface-100 rounded-xl cursor-pointer border transition-all overflow-hidden p-2 md:p-3 relative group ${activeImage === img ? 'border-primary shadow-[0_0_15px_rgba(var(--primary),0.3)]' : 'border-surface-200 dark:border-white/5 hover:border-primary/50'}`}
-                            >
-                                <img src={img} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" />
-                            </div>
-                        ))}
-                    </div>
+                    {displayImages.length > 1 && (
+                        <div className="grid grid-cols-4 gap-3 md:gap-4">
+                            {displayImages.map((img, i) => (
+                                <div
+                                    key={i}
+                                    onClick={() => setActiveImage(img)}
+                                    className={`aspect-square bg-surface-100 rounded-xl cursor-pointer border transition-all overflow-hidden p-2 md:p-3 relative group ${activeImage === img ? 'border-primary shadow-[0_0_15px_rgba(var(--primary),0.3)]' : 'border-surface-200 dark:border-white/5 hover:border-primary/50'}`}
+                                >
+                                    <img src={img} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" />
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* DETAILS */}
@@ -143,10 +165,12 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                     <div className="space-y-4 md:space-y-6">
                         <div className="flex items-center gap-4">
                             <span className="text-[10px] font-black text-primary bg-primary/10 border border-primary/20 px-4 py-2 rounded-lg uppercase tracking-[0.4em]">{product.brand || 'Brand'}</span>
-                            <span className="text-[10px] text-surface-500 font-bold uppercase tracking-[0.3em] font-mono">Status: {(product.countInStock > 0 ? (t('stock') || "In Stock") : (t('out_of_stock') || "On Request"))}</span>
+                            <span className={`text-[10px] font-bold uppercase tracking-[0.3em] font-mono ${displayStock > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                Status: {(displayStock > 0 ? (t('stock') || "In Stock") : (t('out_of_stock') || "Out of Stock"))}
+                            </span>
                         </div>
                         
-                        <h1 className="text-4xl md:text-6xl font-black text-foreground tracking-tighter leading-[1.1] uppercase drop-shadow-sm">
+                        <h1 className="text-4xl md:text-6xl font-black text-foreground tracking-normal leading-[1.1] uppercase drop-shadow-sm">
                             {productName}
                         </h1>
                         
@@ -157,48 +181,79 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                         </div>
                     </div>
 
+                    {/* Color Swatches */}
+                    {validVariants.length > 1 && (
+                        <div className="space-y-3">
+                            <p className="text-[10px] font-black text-surface-500 uppercase tracking-widest">
+                                {t('color') || 'Color'}: <span className="text-foreground">{selectedVariant?.colorName}</span>
+                            </p>
+                            <div className="flex flex-wrap gap-4">
+                                {validVariants.map((v) => {
+                                    const isVOutOfStock = v.stock <= 0;
+                                    const isSelected = selectedVariant?.id === v.id;
+                                    return (
+                                        <button
+                                            key={v.id}
+                                            onClick={() => setSelectedVariant(v)}
+                                            className={`w-10 h-10 rounded-full border border-surface-300 relative transition-all duration-300 group/swatch
+                                                ${isSelected ? 'ring-2 ring-primary ring-offset-4 ring-offset-background scale-110' : 'hover:scale-110'} 
+                                                ${isVOutOfStock ? 'opacity-40' : 'cursor-pointer'}
+                                            `}
+                                            style={{ backgroundColor: v.colorHex || '#000000' }}
+                                        >
+                                            {/* Cross line for out of stock */}
+                                            {isVOutOfStock && (
+                                                <span className="absolute inset-0 m-auto w-[130%] h-[2px] bg-red-500 rotate-45 transform origin-center shadow-md" />
+                                            )}
+                                            {/* Tooltip */}
+                                            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-1.5 bg-black text-white text-[10px] font-bold whitespace-nowrap rounded-lg opacity-0 group-hover/swatch:opacity-100 pointer-events-none transition-opacity z-30 shadow-xl">
+                                                {isVOutOfStock ? "Tez orada yangi mahsulotlar keladi" : v.colorName}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Price and Installments */}
                     <div className="space-y-6">
                         <div className="flex items-end gap-6 md:gap-8">
                             <div className="flex flex-col">
-                                <span className="text-surface-400 dark:text-surface-500 line-through font-bold text-lg md:text-xl opacity-60 decoration-2">
-                                    $ {(product.price * 1.15).toFixed(0)}
-                                </span>
-                                <span className="text-5xl md:text-7xl font-black text-primary tracking-tighter drop-shadow-md">
-                                    ${product.price}
-                                </span>
+                                {product.discount > 0 && (
+                                    <PriceDisplay price={displayPrice} className="text-surface-400 dark:text-surface-500 line-through font-bold text-lg md:text-xl opacity-60 decoration-2" />
+                                )}
+                                <PriceDisplay price={finalPrice} className="text-5xl md:text-7xl font-black text-primary tracking-tighter drop-shadow-md" />
                             </div>
                             <div className="h-12 md:h-16 w-px bg-surface-200 dark:bg-white/10 hidden md:block" />
                             <div className="hidden md:block space-y-1.5 pb-2">
-                                <p className="text-green-500 font-black text-[10px] md:text-xs uppercase tracking-[0.3em] flex items-center gap-2">
-                                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                    SAVE 15%
-                                </p>
+                                {product.discount > 0 ? (
+                                    <p className="text-primary font-black text-[10px] md:text-xs uppercase tracking-[0.3em] flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                                        SALE {product.discount}%
+                                    </p>
+                                ) : (
+                                    <p className="text-green-500 font-black text-[10px] md:text-xs uppercase tracking-[0.3em] flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                                        IN STOCK
+                                    </p>
+                                )}
                                 <p className="text-surface-500 text-[9px] font-bold uppercase tracking-widest">Global shipping included</p>
-                            </div>
-                        </div>
-
-                        {/* Installment Calculator Widget */}
-                        <div className="flex items-center gap-4 bg-white dark:bg-zinc-900 border border-surface-200 dark:border-white/10 p-4 rounded-2xl">
-                            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                            </div>
-                            <div>
-                                <p className="text-xs text-surface-500 font-bold uppercase tracking-widest">Installment Plan</p>
-                                <p className="text-foreground font-black text-sm uppercase">From ${(product.price / 12).toFixed(0)} / month <span className="text-surface-400 font-medium text-xs">(12 months)</span></p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4 md:gap-6 pt-4" ref={mainCartBtnRef}>
+                    <div className="flex flex-col sm:flex-row gap-4 md:gap-6 pt-4">
                         <button
-                            onClick={() => addToCart(product)}
-                            className={`group relative flex-[2] font-black py-5 md:py-6 rounded-2xl shadow-xl transition-all active:scale-95 uppercase text-[11px] md:text-xs tracking-widest overflow-hidden ${product.countInStock > 0 ? 'bg-foreground text-background dark:bg-white dark:text-black hover:shadow-[0_0_30px_rgba(255,255,255,0.3)]' : 'bg-primary text-white hover:bg-foreground hover:text-background'}`}
+                            onClick={handleAddToCart}
+                            disabled={isOutOfStock}
+                            className={`group relative flex-[2] font-black py-5 md:py-6 rounded-2xl shadow-xl transition-all active:scale-95 uppercase text-[11px] md:text-xs tracking-widest overflow-hidden 
+                                ${!isOutOfStock ? 'bg-primary text-white hover:bg-foreground hover:text-background' : 'bg-surface-200 text-surface-400 cursor-not-allowed shadow-none border-none'}`}
                         >
-                            <div className="absolute inset-0 bg-primary translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                            {!isOutOfStock && <div className="absolute inset-0 bg-foreground translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />}
                             <span className="relative z-10 flex items-center justify-center gap-3">
-                                {product.countInStock > 0 ? (t('buy_now') || 'Buy Now') : (t('pre_order') || 'Pre-order')}
-                                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                {!isOutOfStock ? (t('buy_now') || 'Buy Now') : (t('out_of_stock') || 'Out of Stock')}
+                                {!isOutOfStock && <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>}
                             </span>
                         </button>
                         <button
@@ -215,39 +270,34 @@ export default function ProductDetailClient({ product, relatedProducts }) {
             </div>
 
             {/* TECHNICAL SPECIFICATIONS TABLE */}
-            <section className="space-y-10 md:space-y-12 pt-12 md:pt-20 border-t border-surface-200 dark:border-white/5 px-4 md:px-0 max-w-5xl mx-auto">
-                <div className="flex flex-col items-center justify-center text-center space-y-4">
-                    <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tighter uppercase">{t('technical_specs') || "Technical Specifications"}</h2>
-                    <p className="text-surface-500 font-bold uppercase text-[9px] md:text-[11px] tracking-[0.3em]">{t('detailed_specs') || "Detailed hardware specifications"}</p>
-                    <div className="w-16 h-1 bg-primary rounded-full mt-4" />
-                </div>
-
-                <div className="bg-white dark:bg-zinc-900/80 border border-surface-200 dark:border-white/10 rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl backdrop-blur-xl">
-                    <div className="divide-y divide-surface-100 dark:divide-white/5">
-                        {[
-                            { label: "Memory (RAM)", value: product.ram || "16 GB DDR5 6000MHz" },
-                            { label: "Storage (SSD)", value: product.storage || "1TB NVMe M.2 Gen4" },
-                            { label: "Processor (CPU)", value: product.cpu || "Intel Core i7-13700K" },
-                            { label: "Graphics (GPU)", value: product.gpu || "NVIDIA RTX 4080 16GB" },
-                            { label: "Refresh Rate", value: product.refreshRate || "240 Hz" },
-                            { label: "Display", value: product.display || "27\" 4K OLED HDR" }
-                        ].map((spec, idx) => (
-                            <div
-                                key={idx}
-                                className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-0 px-6 py-5 md:px-12 md:py-6 hover:bg-surface-50 dark:hover:bg-white/[0.02] transition-colors group"
-                            >
-                                <span className="text-surface-500 dark:text-surface-400 font-bold uppercase text-[11px] md:text-sm tracking-widest flex items-center gap-3">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-primary/50 group-hover:bg-primary transition-colors hidden md:block" />
-                                    {spec.label}
-                                </span>
-                                <span className="text-foreground font-black text-sm md:text-lg md:text-right uppercase tracking-tight">
-                                    {spec.value}
-                                </span>
-                            </div>
-                        ))}
+            {product.specs && Object.keys(product.specs).length > 0 && (
+                <section className="space-y-10 md:space-y-12 pt-12 md:pt-20 border-t border-surface-200 dark:border-white/5 px-4 md:px-0 max-w-5xl mx-auto">
+                    <div className="flex flex-col items-center justify-center text-center space-y-4">
+                        <h2 className="text-3xl md:text-5xl font-black text-foreground tracking-tighter uppercase">{t('technical_specs') || "Technical Specifications"}</h2>
+                        <p className="text-surface-500 font-bold uppercase text-[9px] md:text-[11px] tracking-[0.3em]">{t('detailed_specs') || "Detailed hardware specifications"}</p>
+                        <div className="w-16 h-1 bg-primary rounded-full mt-4" />
                     </div>
-                </div>
-            </section>
+
+                    <div className="bg-white dark:bg-zinc-900/80 border border-surface-200 dark:border-white/10 rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl backdrop-blur-xl">
+                        <div className="divide-y divide-surface-100 dark:divide-white/5">
+                            {Object.entries(product.specs).map(([key, val], idx) => (
+                                <div
+                                    key={idx}
+                                    className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-0 px-6 py-5 md:px-12 md:py-6 hover:bg-surface-50 dark:hover:bg-white/[0.02] transition-colors group"
+                                >
+                                    <span className="text-surface-500 dark:text-surface-400 font-bold uppercase text-[11px] md:text-sm tracking-widest flex items-center gap-3">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-primary/50 group-hover:bg-primary transition-colors hidden md:block" />
+                                        {key}
+                                    </span>
+                                    <span className="text-foreground font-black text-sm md:text-lg md:text-right uppercase tracking-tight">
+                                        {val}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
 
             {/* REVIEWS SECTION */}
             <section className="space-y-10 md:space-y-12 pt-12 md:pt-20 border-t border-surface-200 dark:border-white/5 px-4 md:px-0 max-w-6xl mx-auto">
@@ -360,35 +410,6 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                     ))}
                 </div>
             </section>
-
-            {/* STICKY ADD TO CART BAR */}
-            <div 
-                className={`fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-black/90 backdrop-blur-2xl border-t border-surface-200 dark:border-white/10 p-4 md:p-6 z-50 transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] flex items-center justify-between gap-4 shadow-[0_-20px_50px_rgba(0,0,0,0.1)] ${showStickyCart ? 'translate-y-0' : 'translate-y-full'}`}
-            >
-                <div className="flex items-center gap-4 max-w-7xl mx-auto w-full">
-                    <div className="hidden sm:block relative w-12 h-12 rounded-xl bg-surface-100 overflow-hidden border border-surface-200 dark:border-white/10">
-                        <Image src={product.image} alt={productName} fill className="object-contain p-2" />
-                    </div>
-                    <div className="flex-1 hidden md:block">
-                        <p className="text-xs font-black uppercase text-foreground truncate">{productName}</p>
-                        <p className="text-[10px] font-bold text-surface-500 uppercase tracking-widest">${product.price}</p>
-                    </div>
-                    
-                    <div className="flex items-center gap-4 w-full md:w-auto">
-                        <div className="flex flex-col text-right hidden sm:flex">
-                            <span className="text-[10px] font-bold text-surface-500 uppercase tracking-widest">Total Price</span>
-                            <span className="text-lg font-black text-primary">${product.price}</span>
-                        </div>
-                        <button
-                            onClick={() => addToCart(product)}
-                            className="w-full md:w-auto bg-primary text-white font-black px-8 py-3.5 md:py-4 rounded-xl uppercase tracking-widest text-[10px] md:text-xs hover:bg-white hover:text-black transition-all shadow-xl active:scale-95 text-center flex items-center justify-center gap-2"
-                        >
-                            {product.countInStock > 0 ? (t('buy_now') || 'Buy Now') : (t('pre_order') || 'Pre-order')}
-                            <svg className="w-4 h-4 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
 
         </div>
     );

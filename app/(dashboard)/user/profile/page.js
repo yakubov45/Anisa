@@ -24,22 +24,9 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [status, setStatus] = useState({ type: null, message: "" });
-    const [verificationSentEmail, setVerificationSentEmail] = useState(() => {
-        if (typeof window !== 'undefined') {
-            return localStorage.getItem('pending_email_update') || "";
-        }
-        return "";
-    });
-
     // Sync user data to form
     useEffect(() => {
         if (user && !isEditing) {
-            // Clear pending if user email is now updated in Firebase
-            if (user.email === verificationSentEmail) {
-                setVerificationSentEmail("");
-                localStorage.removeItem('pending_email_update');
-            }
-
             const nameParts = (user.fullName || user.displayName || "").split(" ");
             const first = nameParts[0] || "";
             const last = nameParts.slice(1).join(" ") || "";
@@ -49,14 +36,21 @@ export default function ProfilePage() {
                 firstName: first,
                 lastName: last,
                 phone: user.phone || user.phoneNumber || "",
-                email: verificationSentEmail || user.email || "",
+                email: user.email || "",
                 dob: user.dob || ""
             }));
         }
-    }, [user, isEditing, verificationSentEmail]);
+    }, [user, isEditing]);
 
-    // Check for missing critical info
-    const isMissingInfo = !user?.fullName || !user?.email;
+    // Check for missing critical info dynamically
+    const missingFieldsArr = [];
+    if (!user?.fullName) missingFieldsArr.push(t('profile_first_name') + " / " + t('profile_last_name'));
+    if (!user?.phone) missingFieldsArr.push(t('profile_phone'));
+    if (!user?.dob) missingFieldsArr.push(t('profile_dob'));
+    if (!user?.email) missingFieldsArr.push(t('profile_email'));
+
+    const isMissingInfo = missingFieldsArr.length > 0;
+    const missingFieldsText = missingFieldsArr.join(", ");
 
     const handleUpdate = async (e) => {
         e.preventDefault();
@@ -84,17 +78,6 @@ export default function ProfilePage() {
                 if (!updateResult.success) {
                     throw new Error(updateResult.error || "Failed to update security email.");
                 }
-
-                setVerificationSentEmail(formData.email);
-                localStorage.setItem('pending_email_update', formData.email);
-                setStatus({ type: "success", message: "Email updated successfully in security records. Please verify to finalize." });
-                
-                // Still try to send verification if possible, but don't crash if it fails
-                try {
-                    await authService.updateEmailWithVerification(formData.email);
-                } catch (vErr) {
-                    console.log("Verification trigger skipped, handled via Admin.");
-                }
             }
 
             const updateData = { 
@@ -102,9 +85,7 @@ export default function ProfilePage() {
                 displayName: fullName,
                 phone: formData.phone,
                 dob: formData.dob,
-                // We don't update email in Firestore yet, it's safer to wait for Auth verification
-                // but if they are adding it for the first time, we can save it
-                ...(user.email ? {} : { email: formData.email })
+                email: formData.email
             };
 
             await userService.updateProfile(user.uid, updateData);
@@ -182,7 +163,7 @@ export default function ProfilePage() {
 
             {/* NOTIFICATION BANNER */}
             <AnimatePresence>
-                {(isMissingInfo || (user?.email && !user?.emailVerified && user?.role === 'user')) && (
+                {isMissingInfo && (
                     <motion.div 
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -193,12 +174,10 @@ export default function ProfilePage() {
                         </div>
                         <div className="space-y-1">
                             <h3 className="text-sm font-black text-primary uppercase tracking-tighter">
-                                {user?.email && !user?.emailVerified ? t('profile_email_pending_title') : t('profile_incomplete_title')}
+                                {t('profile_incomplete_title')}
                             </h3>
                             <p className="text-[10px] font-bold text-surface-500 uppercase tracking-widest">
-                                {user?.email && !user?.emailVerified && user?.role === 'user'
-                                    ? t('profile_email_pending_desc')
-                                    : t('profile_incomplete_desc')}
+                                {t('profile_incomplete_desc')?.replace('{fields}', missingFieldsText) || `Tizimga to'liq kirish uchun quyidagi ma'lumotlarni to'ldiring: ${missingFieldsText}`}
                             </p>
                         </div>
                     </motion.div>
@@ -254,11 +233,6 @@ export default function ProfilePage() {
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between ml-1">
                                         <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest">{t('profile_email')}</label>
-                                        {user?.email && (
-                                            <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full ${user.emailVerified ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}`}>
-                                                {user.emailVerified ? t('profile_verified') : t('profile_pending')}
-                                            </span>
-                                        )}
                                     </div>
                                     <input
                                         type="email"
@@ -273,7 +247,7 @@ export default function ProfilePage() {
 
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">{t('profile_dob')}</label>
-                                    <div className="grid grid-cols-1 sm:flex gap-2 w-full">
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full">
                                         <select
                                             value={formData.dob ? formData.dob.split('-')[1] : ""}
                                             onChange={(e) => {
@@ -281,7 +255,7 @@ export default function ProfilePage() {
                                                 parts[1] = e.target.value;
                                                 setFormData({...formData, dob: parts.join('-')});
                                             }}
-                                            className={`sm:flex-[2] ${!isEditing ? 'bg-surface-100 dark:bg-white/5 cursor-not-allowed opacity-60' : 'bg-surface-50 dark:bg-black focus:ring-2 focus:ring-primary'} border border-surface-200 dark:border-white/10 rounded-xl px-3 py-4 text-sm text-foreground outline-none transition-all appearance-none text-center font-bold`}
+                                            className={`w-full ${!isEditing ? 'bg-surface-100 dark:bg-white/5 cursor-not-allowed opacity-60' : 'bg-surface-50 dark:bg-black focus:ring-2 focus:ring-primary'} border border-surface-200 dark:border-white/10 rounded-xl px-3 py-4 text-sm text-foreground outline-none transition-all appearance-none text-center font-bold`}
                                             disabled={!isEditing}
                                         >
                                             <option value="" disabled>{t('profile_month')}</option>
@@ -289,38 +263,36 @@ export default function ProfilePage() {
                                                 <option key={m} value={m}>{new Date(2000, i).toLocaleString(language || 'en', {month: 'long'})}</option>
                                             ))}
                                         </select>
-                                        <div className="grid grid-cols-2 sm:flex sm:flex-1 gap-2">
-                                            <select
-                                                value={formData.dob ? formData.dob.split('-')[2] : ""}
-                                                onChange={(e) => {
-                                                    const parts = formData.dob ? formData.dob.split('-') : ['2000', '01', '01'];
-                                                    parts[2] = e.target.value;
-                                                    setFormData({...formData, dob: parts.join('-')});
-                                                }}
-                                                className={`w-full ${!isEditing ? 'bg-surface-100 dark:bg-white/5 cursor-not-allowed opacity-60' : 'bg-surface-50 dark:bg-black focus:ring-2 focus:ring-primary'} border border-surface-200 dark:border-white/10 rounded-xl px-3 py-4 text-sm text-foreground outline-none transition-all appearance-none text-center font-bold`}
-                                                disabled={!isEditing}
-                                            >
-                                                <option value="" disabled>{t('profile_day')}</option>
-                                                {Array.from({length: 31}, (_, i) => String(i + 1).padStart(2, '0')).map(d => (
-                                                    <option key={d} value={d}>{d}</option>
-                                                ))}
-                                            </select>
-                                            <select
-                                                value={formData.dob ? formData.dob.split('-')[0] : ""}
-                                                onChange={(e) => {
-                                                    const parts = formData.dob ? formData.dob.split('-') : ['2000', '01', '01'];
-                                                    parts[0] = e.target.value;
-                                                    setFormData({...formData, dob: parts.join('-')});
-                                                }}
-                                                className={`w-full sm:flex-[1.5] ${!isEditing ? 'bg-surface-100 dark:bg-white/5 cursor-not-allowed opacity-60' : 'bg-surface-50 dark:bg-black focus:ring-2 focus:ring-primary'} border border-surface-200 dark:border-white/10 rounded-xl px-3 py-4 text-sm text-foreground outline-none transition-all appearance-none text-center font-bold`}
-                                                disabled={!isEditing}
-                                            >
-                                                <option value="" disabled>{t('profile_year')}</option>
-                                                {Array.from({length: 100}, (_, i) => String(new Date().getFullYear() - i)).map(y => (
-                                                    <option key={y} value={y}>{y}</option>
-                                                ))}
-                                            </select>
-                                        </div>
+                                        <select
+                                            value={formData.dob ? formData.dob.split('-')[2] : ""}
+                                            onChange={(e) => {
+                                                const parts = formData.dob ? formData.dob.split('-') : ['2000', '01', '01'];
+                                                parts[2] = e.target.value;
+                                                setFormData({...formData, dob: parts.join('-')});
+                                            }}
+                                            className={`w-full ${!isEditing ? 'bg-surface-100 dark:bg-white/5 cursor-not-allowed opacity-60' : 'bg-surface-50 dark:bg-black focus:ring-2 focus:ring-primary'} border border-surface-200 dark:border-white/10 rounded-xl px-3 py-4 text-sm text-foreground outline-none transition-all appearance-none text-center font-bold`}
+                                            disabled={!isEditing}
+                                        >
+                                            <option value="" disabled>{t('profile_day')}</option>
+                                            {Array.from({length: 31}, (_, i) => String(i + 1).padStart(2, '0')).map(d => (
+                                                <option key={d} value={d}>{d}</option>
+                                            ))}
+                                        </select>
+                                        <select
+                                            value={formData.dob ? formData.dob.split('-')[0] : ""}
+                                            onChange={(e) => {
+                                                const parts = formData.dob ? formData.dob.split('-') : ['2000', '01', '01'];
+                                                parts[0] = e.target.value;
+                                                setFormData({...formData, dob: parts.join('-')});
+                                            }}
+                                            className={`w-full ${!isEditing ? 'bg-surface-100 dark:bg-white/5 cursor-not-allowed opacity-60' : 'bg-surface-50 dark:bg-black focus:ring-2 focus:ring-primary'} border border-surface-200 dark:border-white/10 rounded-xl px-3 py-4 text-sm text-foreground outline-none transition-all appearance-none text-center font-bold`}
+                                            disabled={!isEditing}
+                                        >
+                                            <option value="" disabled>{t('profile_year')}</option>
+                                            {Array.from({length: 100}, (_, i) => String(new Date().getFullYear() - i)).map(y => (
+                                                <option key={y} value={y}>{y}</option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
 

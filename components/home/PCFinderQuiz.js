@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "@/lib/LanguageContext";
 
 const icons = {
     gaming: <svg className="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a1 1 0 11-2 0 1 1 0 012 0zM9 11a1 1 0 11-2 0 1 1 0 012 0zM12 7a1 1 0 110-2 1 1 0 010 2zM12 15a1 1 0 110-2 1 1 0 010 2z" /><rect x="2" y="6" width="20" height="12" rx="3" strokeWidth="2" /></svg>,
@@ -18,6 +19,7 @@ const icons = {
 };
 
 export default function PCFinderQuiz() {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const [step, setStep] = useState(0);
     const [answers, setAnswers] = useState({});
@@ -26,50 +28,50 @@ export default function PCFinderQuiz() {
     const getQuestion = (stepIndex) => {
         if (stepIndex === 0) {
             return {
-                title: "Kompyuterni nima maqsadda xarid qilyapsiz?",
+                title: t("quiz_question_1"),
                 options: [
-                    { id: "gaming", label: "Faqat o'yinlar uchun", icon: icons.gaming },
-                    { id: "work", label: "Dasturlash / Ofis ishlari", icon: icons.work },
-                    { id: "rendering", label: "3D Dizayn / Video Montaj", icon: icons.rendering }
+                    { id: "gaming", label: t("quiz_q1_opt1"), icon: icons.gaming },
+                    { id: "work", label: t("quiz_q1_opt2"), icon: icons.work },
+                    { id: "rendering", label: t("quiz_q1_opt3"), icon: icons.rendering }
                 ]
             };
         }
         if (stepIndex === 1) {
             if (answers[0] === 'work') {
                 return {
-                    title: "Asosan qanday dasturlardan foydalanasiz?",
+                    title: t("quiz_question_2_work"),
                     options: [
-                        { id: "office", label: "Word, Excel, Brauzer (Yengil)", icon: icons.office },
-                        { id: "coding", label: "VS Code, Docker, Web dasturlash", icon: icons.coding },
-                        { id: "heavy", label: "1C, Katta bazalar (Og'ir)", icon: icons.heavy }
+                        { id: "office", label: t("quiz_q2_work_opt1"), icon: icons.office },
+                        { id: "coding", label: t("quiz_q2_work_opt2"), icon: icons.coding },
+                        { id: "heavy", label: t("quiz_q2_work_opt3"), icon: icons.heavy }
                     ]
                 };
             }
             if (answers[0] === 'rendering') {
                 return {
-                    title: "Qaysi dasturlarda ishlaysiz?",
+                    title: t("quiz_question_2_render"),
                     options: [
-                        { id: "adobe", label: "Premiere Pro, After Effects", icon: icons.adobe },
-                        { id: "3d", label: "Blender, 3ds Max, Maya", icon: icons.design3d },
-                        { id: "cad", label: "AutoCAD, Revit, CorelDraw", icon: icons.cad }
+                        { id: "adobe", label: t("quiz_q2_render_opt1"), icon: icons.adobe },
+                        { id: "3d", label: t("quiz_q2_render_opt2"), icon: icons.design3d },
+                        { id: "cad", label: t("quiz_q2_render_opt3"), icon: icons.cad }
                     ]
                 };
             }
             return {
-                title: "Qanday darajadagi o'yinlarni o'ynaysiz?",
+                title: t("quiz_question_2_game"),
                 options: [
-                    { id: "esports", label: "CS2, Valorant, Dota 2 (Yengil)", icon: icons.esports },
-                    { id: "aaa", label: "Cyberpunk, GTA V, RDR2 (Og'ir)", icon: icons.aaa }
+                    { id: "esports", label: t("quiz_q2_game_opt1"), icon: icons.esports },
+                    { id: "aaa", label: t("quiz_q2_game_opt2"), icon: icons.aaa }
                 ]
             };
         }
         if (stepIndex === 2) {
             return {
-                title: "Kompyuter uchun qancha pul ajratmoqchisiz?",
+                title: t("quiz_question_3"),
                 options: [
-                    { id: "6000000", label: "~ $500 (Boshlang'ich daraja)", icon: icons.money },
-                    { id: "12000000", label: "~ $1000 (O'rta daraja)", icon: icons.money },
-                    { id: "24000000", label: "~ $2000+ (Professional)", icon: icons.money }
+                    { id: "6000000", label: t("quiz_q3_opt1"), icon: icons.money },
+                    { id: "12000000", label: t("quiz_q3_opt2"), icon: icons.money },
+                    { id: "24000000", label: t("quiz_q3_opt3"), icon: icons.money }
                 ],
                 hasCustomInput: true
             };
@@ -107,19 +109,19 @@ export default function PCFinderQuiz() {
 
             <div className="flex-1 space-y-6 z-10 text-center md:text-left">
                 <div className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary font-black uppercase tracking-widest text-xs border border-primary/20">
-                    O'zingizga mosini toping
+                    {t("quiz_find_yours")}
                 </div>
                 <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter text-foreground">
-                    Sizga qanday kompyuter kerak?
+                    {t("quiz_what_pc")}
                 </h2>
                 <p className="text-surface-600 dark:text-surface-400 font-medium text-lg max-w-xl">
-                    Atigi 3 ta qisqa savolga javob bering va biz sizning ehtiyojingiz hamda byudjetingizga mos tushuvchi eng zo'r kompyuterni topib beramiz!
+                    {t("quiz_subtitle")}
                 </p>
                 <button
                     onClick={() => setIsOpen(true)}
                     className="btn-premium btn-premium-red text-white font-black py-4 px-8 rounded-xl uppercase tracking-widest text-sm inline-flex items-center gap-2 shadow-xl shadow-primary/30"
                 >
-                    Testni boshlash
+                    {t("quiz_start")}
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                 </button>
             </div>
@@ -181,7 +183,7 @@ export default function PCFinderQuiz() {
 
                                         {currentQuestion.hasCustomInput && (
                                             <div className="mt-2 border-t border-black/5 dark:border-white/5 pt-4">
-                                                <p className="text-xs font-bold text-surface-500 uppercase tracking-widest mb-3">Yoki o'zingiz kiriting (UZS)</p>
+                                                <p className="text-xs font-bold text-surface-500 uppercase tracking-widest mb-3">{t("quiz_q3_custom")}</p>
                                                 <div className="flex flex-col md:flex-row gap-3">
                                                     <div className="relative flex-1">
                                                         <input
@@ -198,7 +200,7 @@ export default function PCFinderQuiz() {
                                                         disabled={!budgetValue}
                                                         className="btn-premium btn-premium-red disabled:bg-surface-200 disabled:dark:bg-white/10 disabled:cursor-not-allowed text-white font-black px-6 py-3 rounded-xl uppercase tracking-widest text-xs shadow-xl shadow-primary/20 md:w-auto w-full flex-shrink-0 whitespace-nowrap"
                                                     >
-                                                        Tasdiqlash
+                                                        {t("quiz_confirm")}
                                                     </button>
                                                 </div>
                                             </div>
@@ -210,16 +212,16 @@ export default function PCFinderQuiz() {
                                     <div className="w-24 h-24 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
                                         <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
                                     </div>
-                                    <h3 className="text-3xl font-black uppercase tracking-tight text-foreground">Ajoyib tanlov!</h3>
+                                    <h3 className="text-3xl font-black uppercase tracking-tight text-foreground">{t("quiz_great_choice")}</h3>
                                     <p className="text-surface-500 font-medium text-lg">
-                                        Sizning ehtiyojlaringiz va narx byudjetingizga ({Number(answers[2]).toLocaleString()} UZS atrofida) eng mos keluvchi kompyuterlarni topamiz!
+                                        {t("quiz_result_desc").replace("{price}", Number(answers[2]).toLocaleString())}
                                     </p>
                                     <div className="pt-4 flex flex-col items-center gap-4">
                                         <a href={`/prebuilts?purpose=${answers[0]}&budget=${answers[2]}`} className="btn-premium btn-premium-red text-white font-black py-4 px-8 rounded-xl uppercase tracking-widest text-sm inline-block shadow-xl shadow-primary/30 w-full md:w-auto">
-                                            Kompyuterlarni Ko'rish
+                                            {t("quiz_view_pcs")}
                                         </a>
                                         <button onClick={resetQuiz} className="text-xs font-bold uppercase tracking-widest text-surface-400 hover:text-foreground transition-colors p-2">
-                                            Qaytadan boshlash
+                                            {t("quiz_restart")}
                                         </button>
                                     </div>
                                 </div>

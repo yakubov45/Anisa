@@ -266,6 +266,18 @@ export default function ProductListing({ initialProducts = [], allCategories = [
         setPriceRange(prev => ({ ...prev, max: maxProductPrice }))
     }, [maxProductPrice])
 
+    // Lock body scroll when filter dropdown is open
+    useEffect(() => {
+        if (isCatOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isCatOpen])
+
     const filteredProducts = useMemo(() => {
         return initialProducts.filter(product => {
             const matchesSearch = !searchQuery || 
@@ -274,7 +286,7 @@ export default function ProductListing({ initialProducts = [], allCategories = [
             
             const matchesCategory = selectedCategories.length === 0 || 
                 selectedCategories.includes(product.categoryId) || 
-                selectedCategories.includes(product.category)
+                selectedCategories.some(c => c?.toLowerCase() === product.category?.toLowerCase())
             
             const matchesPrice = product.price >= priceRange.min && product.price <= priceRange.max
 

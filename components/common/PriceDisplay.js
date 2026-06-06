@@ -22,18 +22,18 @@ export default function PriceDisplay({ price, className = "" }) {
 
         if (activeCurrency === 'USD') {
             const usdValue = isDbPriceInUZS ? val / activeRate : val;
+            const roundedUSD = Math.round(usdValue);
             return (
                 <>
                     <span className="opacity-60 text-[0.8em] mr-0.5">$</span>
-                    {usdValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {roundedUSD.toLocaleString('en-US')}
                 </>
             )
         } else {
             const uzsValue = isDbPriceInUZS ? val : val * activeRate;
-            const remainder = uzsValue % 100000
-            const roundedUZS = remainder >= 50000
-                ? Math.ceil(uzsValue / 100000) * 100000
-                : Math.floor(uzsValue / 100000) * 100000
+            const roundedUZS = uzsValue >= 100000 
+                ? Math.round(uzsValue / 10000) * 10000 
+                : Math.round(uzsValue);
 
             return (
                 <>

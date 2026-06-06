@@ -5,8 +5,10 @@ import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
 import toast from "react-hot-toast";
 import useStore from "@/store/useStore";
+import { useTranslation } from "@/lib/LanguageContext";
 
 export default function FeaturedPrebuilts({ prebuilts }) {
+    const { t, lang: language } = useTranslation();
     const [isExpanded, setIsExpanded] = useState(false);
     const [expandedCardId, setExpandedCardId] = useState(null);
     if (!prebuilts || prebuilts.length === 0) return null;
@@ -23,10 +25,10 @@ export default function FeaturedPrebuilts({ prebuilts }) {
                         OnePC Extreme Prebuilts
                     </h2>
                     <p className="text-surface-500 dark:text-surface-400 text-lg md:text-xl font-medium mb-8">
-                        Professionallar tomonidan yig'ilgan, maksimal unumdorlik va mukammal dizaynga ega tayyor kompyuterlar.
+                        {language === 'ru' ? 'Готовые компьютеры премиум-класса, собранные профессионалами для максимальной производительности.' : language === 'en' ? 'Premium prebuilt computers assembled by professionals for maximum performance.' : "Professionallar tomonidan yig'ilgan, maksimal unumdorlik va mukammal dizaynga ega tayyor kompyuterlar."}
                     </p>
                     <Link href="/prebuilts" className="inline-block bg-primary hover:bg-primary-600 text-white font-black px-8 py-4 rounded-xl uppercase tracking-widest text-sm transition-all hover:scale-105 shadow-xl shadow-primary/20">
-                        Barcha kompyuterlarni ko'rish
+                        {language === 'ru' ? 'Посмотреть все компьютеры' : language === 'en' ? 'View all computers' : "Barcha kompyuterlarni ko'rish"}
                     </Link>
                 </div>
                 <div className="absolute right-0 top-0 w-1/2 h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-surface-50/0 dark:from-primary/20 dark:via-[#0A0A0B]/0 to-transparent blur-3xl pointer-events-none"></div>
@@ -41,6 +43,8 @@ export default function FeaturedPrebuilts({ prebuilts }) {
                                 key={pc.id} 
                                 pc={pc}
                                 index={index}
+                                t={t}
+                                language={language}
                             />
                         ))}
                     </div>
@@ -60,6 +64,8 @@ export default function FeaturedPrebuilts({ prebuilts }) {
                                             key={pc.id} 
                                             pc={pc}
                                             index={index + 3}
+                                            t={t}
+                                            language={language}
                                         />
                                     ))}
                                 </div>
@@ -74,7 +80,9 @@ export default function FeaturedPrebuilts({ prebuilts }) {
                             onClick={() => setIsExpanded(!isExpanded)}
                             className="flex flex-col items-center gap-2 text-surface-400 hover:text-primary transition-all group"
                         >
-                            <span className="text-xs font-black uppercase tracking-widest">{isExpanded ? 'Yashirish' : "Ko'proq ko'rish"}</span>
+                            <span className="text-xs font-black uppercase tracking-widest">
+                                {isExpanded ? (language === 'ru' ? 'Скрыть' : language === 'en' ? 'Hide' : 'Yashirish') : t("btn_view_more")}
+                            </span>
                             <svg className={`w-8 h-8 transition-transform duration-500 ${isExpanded ? 'rotate-180' : 'group-hover:translate-y-1'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                             </svg>
@@ -86,7 +94,7 @@ export default function FeaturedPrebuilts({ prebuilts }) {
     );
 }
 
-function PrebuiltCard({ pc, index = 0 }) {
+function PrebuiltCard({ pc, index = 0, t, language }) {
     const { addToCart, currency, exchangeRate, compareList, toggleCompare } = useStore();
     const images = pc.images?.length > 0 ? pc.images : ['https://via.placeholder.com/400x300?text=No+Image'];
     const hasSecondImage = images.length > 1;
@@ -101,7 +109,7 @@ function PrebuiltCard({ pc, index = 0 }) {
             category: 'prebuilt',
             quantity: 1
         });
-        toast.success(`${pc.name} savatchaga qo'shildi!`);
+        toast.success(language === 'ru' ? `${pc.name} добавлен в корзину!` : language === 'en' ? `${pc.name} added to cart!` : `${pc.name} savatchaga qo'shildi!`);
     };
 
     const price = formatPrice(pc.price, currency || 'UZS', exchangeRate);
@@ -139,11 +147,16 @@ function PrebuiltCard({ pc, index = 0 }) {
             <div className="relative w-full md:w-[45%] lg:w-[48%] bg-surface-50/50 dark:bg-black/30 rounded-2xl overflow-hidden flex items-center justify-center p-6 min-h-[200px] md:min-h-[260px] shrink-0">
                 {pc.badges && (
                     <div className="absolute top-4 left-4 z-20 flex flex-wrap gap-1.5 max-w-[70%]">
-                        {(Array.isArray(pc.badges) ? pc.badges : [pc.badges]).map((b, i) => (
+                        {(Array.isArray(pc.badges) ? pc.badges : [pc.badges]).map((b, i) => {
+                            let transB = b;
+                            if(b.toLowerCase() === 'best value') transB = t("badge_best_value") || 'Best Value';
+                            if(b.toLowerCase() === 'hot') transB = t("badge_hot") || 'Hot';
+                            if(b.toLowerCase() === 'new' || b.toLowerCase() === 'yangi') transB = t("filter_new") || 'New';
+                            return (
                             <span key={i} className="bg-primary text-white text-[8px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg shadow-md border border-white/5 shrink-0">
-                                {b}
+                                {transB}
                             </span>
-                        ))}
+                        )})}
                     </div>
                 )}
                 
@@ -152,7 +165,7 @@ function PrebuiltCard({ pc, index = 0 }) {
                     onClick={(e) => {
                         e.preventDefault();
                         toggleCompare(pc);
-                        if (!inCompare) toast.success("Taqqoslashga qo'shildi!");
+                        if (!inCompare) toast.success(language === 'ru' ? 'Добавлено к сравнению!' : language === 'en' ? 'Added to compare!' : "Taqqoslashga qo'shildi!");
                     }}
                     className={`absolute top-4 right-4 z-20 w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-md ${inCompare ? 'bg-blue-500 text-white shadow-blue-500/20' : 'bg-white dark:bg-zinc-800 text-foreground hover:bg-blue-500 hover:text-white'}`}
                     title="Taqqoslash"
@@ -233,13 +246,13 @@ function PrebuiltCard({ pc, index = 0 }) {
                         href={`/prebuilts/${pc.id}`}
                         className="flex-1 bg-transparent hover:bg-surface-100 dark:hover:bg-white/5 text-foreground text-center py-3.5 px-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center border border-surface-200 dark:border-white/10"
                     >
-                        Batafsil
+                        {language === 'ru' ? 'Подробнее' : language === 'en' ? 'Details' : 'Batafsil'}
                     </Link>
                     <button
                         onClick={handleAddToCart}
                         className="flex-1 bg-primary hover:bg-primary/95 text-white shadow-lg shadow-primary/10 hover:shadow-primary/25 text-center py-3.5 px-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center border border-transparent"
                     >
-                        Savatga
+                        {language === 'ru' ? 'В корзину' : language === 'en' ? 'To Cart' : 'Savatga'}
                     </button>
                 </div>
 

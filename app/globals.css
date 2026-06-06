@@ -60,6 +60,11 @@
       radial-gradient(at 0% 0%, var(--primary-glow) 0px, transparent 50%),
       radial-gradient(at 100% 0%, var(--primary-glow) 0px, transparent 50%);
     transition: background-color 0.5s ease, color 0.5s ease;
+    overscroll-behavior-y: none;
+  }
+
+  select, .scrollable-dropdown {
+    overscroll-behavior: contain;
   }
 
   /* Custom Scrollbar */
@@ -144,6 +149,25 @@
   isolation: isolate;
 }
 
+/* Bottom-to-Top Wave Fill Effect */
+.btn-premium::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 250%;
+  padding-bottom: 250%;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 40%;
+  transform: translate(-50%, 0) rotate(0deg);
+  z-index: -1;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-premium:hover::before {
+  transform: translate(-50%, -60%) rotate(180deg);
+}
+
 .btn-premium::after {
   content: '';
   position: absolute;
@@ -190,18 +214,22 @@
   color: #000000 !important;
 }
 
+.btn-premium-white::before {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
 .btn-premium-white:hover {
   box-shadow: 0 10px 25px rgba(255, 255, 255, 0.2), 0 0 15px rgba(255, 255, 255, 0.15);
 }
 
 .btn-premium-dark {
-  background-color: rgba(255, 255, 255, 0.04) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background-color: #111113 !important; /* Fixed dark background for visibility in light mode */
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
   color: #ffffff !important;
 }
 
 .btn-premium-dark:hover {
-  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: #1A1A1D !important;
   border-color: rgba(227, 30, 36, 0.5) !important;
   box-shadow: 0 0 20px rgba(227, 30, 36, 0.25);
 }

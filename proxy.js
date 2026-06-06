@@ -2,20 +2,20 @@ import { NextResponse } from 'next/server';
 
 // Tizimga kiritilishi taqiqlangan yomon niyatli (malicious) so'zlar ro'yxati
 const sqlInjectionPatterns = [
-  /(\b(UNION|SELECT|INSERT|UPDATE|DELETE|DROP|ALTER)\b.*\b(FROM|INTO|TABLE|DATABASE)\b)/i,
-  /(\b(OR|AND)\b\s+\d+\s*=\s*\d+)/i, // masalan: OR 1=1
-  /(--|\/\*|\*\/|;)/i,              // SQL commentlari yoki statement tugatuvchilari
-  /(\$ne|\$gt|\$lt|\$regex|\$where)/i // NoSQL injection patternlari (MongoDB uchun)
+    /(\b(UNION|SELECT|INSERT|UPDATE|DELETE|DROP|ALTER)\b.*\b(FROM|INTO|TABLE|DATABASE)\b)/i,
+    /(\b(OR|AND)\b\s+\d+\s*=\s*\d+)/i, // masalan: OR 1=1
+    /(--|\/\*|\*\/|;)/i,              // SQL commentlari yoki statement tugatuvchilari
+    /(\$ne|\$gt|\$lt|\$regex|\$where)/i // NoSQL injection patternlari (MongoDB uchun)
 ];
 
 // IP manzilni aniqlash
 const getIP = (request) => {
-  let ip = request.ip ?? request.headers.get('x-real-ip');
-  const forwardedFor = request.headers.get('x-forwarded-for');
-  if (!ip && forwardedFor) {
-    ip = forwardedFor.split(',')[0] ?? 'Unknown';
-  }
-  return ip || 'Unknown';
+    let ip = request.ip ?? request.headers.get('x-real-ip');
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    if (!ip && forwardedFor) {
+        ip = forwardedFor.split(',')[0] ?? 'Unknown';
+    }
+    return ip || 'Unknown';
 };
 
 export function proxy(request) {
@@ -24,16 +24,16 @@ export function proxy(request) {
     // Faqat POST/PUT/DELETE yoki param-based GET yo'nalishlarida injection tekshirish
     if (request.method !== 'GET') {
         const searchParams = url.searchParams.toString();
-        
+
         for (let pattern of sqlInjectionPatterns) {
             if (pattern.test(searchParams) || pattern.test(decodeURIComponent(url.pathname))) {
                 const ip = getIP(request);
                 console.warn(`[SECURITY] Bloklangan IP: ${ip}. Sabab: Shubhali so'rov (SQL/NoSQL Injection harakati). URL: ${url.href}`);
-                
+
                 return new NextResponse(
-                    JSON.stringify({ 
-                        success: false, 
-                        message: "Xavfsizlik tizimi: Shubhali so'rov aniqlandi." 
+                    JSON.stringify({
+                        success: false,
+                        message: "Xavfsizlik tizimi: Shubhali so'rov aniqlandi."
                     }),
                     { status: 403, headers: { 'content-type': 'application/json' } }
                 );

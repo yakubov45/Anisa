@@ -131,24 +131,24 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
                         {/* CONFIGURATOR (Small Upgrades) */}
                         {pc.allow_upgrades !== false && (
                             <div className="pt-6 border-t border-black/5 dark:border-white/5 space-y-4">
-                                <h3 className="font-black uppercase tracking-widest text-sm text-foreground">Kompyuterni kuchaytirish</h3>
+                                <h3 className="font-black uppercase tracking-widest text-sm text-foreground">{t("comp_upgrade") || "Kompyuterni kuchaytirish"}</h3>
                                 
                                 {/* RAM Upgrade */}
                                 <div>
-                                    <label className="block text-xs font-bold text-surface-500 mb-2">Operativ Xotira (RAM)</label>
+                                    <label className="block text-xs font-bold text-surface-500 mb-2">{t("category_ram") || "Operativ Xotira (RAM)"}</label>
                                     <div className="grid grid-cols-2 gap-3">
                                         <button 
                                             onClick={() => setRamUpgrade(0)}
                                             className={`p-3 rounded-xl border-2 text-left transition-all ${ramUpgrade === 0 ? 'border-primary bg-primary/5' : 'border-black/5 dark:border-white/5 hover:border-black/20'}`}
                                         >
-                                            <div className="font-black text-sm text-foreground">Standart</div>
+                                            <div className="font-black text-sm text-foreground">{t("comp_standart") || "Standart"}</div>
                                             <div className="text-xs text-surface-500 font-bold">+ {formatPrice(0, currency || "UZS", exchangeRate)}</div>
                                         </button>
                                         <button 
                                             onClick={() => setRamUpgrade(45)}
                                             className={`p-3 rounded-xl border-2 text-left transition-all ${ramUpgrade === 45 ? 'border-primary bg-primary/5' : 'border-black/5 dark:border-white/5 hover:border-black/20'}`}
                                         >
-                                            <div className="font-black text-sm text-foreground">32GB ga oshirish</div>
+                                            <div className="font-black text-sm text-foreground">{t("comp_upgrade_32") || "32GB ga oshirish"}</div>
                                             <div className="text-xs text-primary font-bold">+ {formatPrice(45, currency || "UZS", exchangeRate)}</div>
                                         </button>
                                     </div>
@@ -156,20 +156,20 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
 
                                 {/* Storage Upgrade */}
                                 <div>
-                                    <label className="block text-xs font-bold text-surface-500 mb-2">Xotira (SSD)</label>
+                                    <label className="block text-xs font-bold text-surface-500 mb-2">{t("category_storage") || "Xotira (SSD)"}</label>
                                     <div className="grid grid-cols-2 gap-3">
                                         <button 
                                             onClick={() => setStorageUpgrade(0)}
                                             className={`p-3 rounded-xl border-2 text-left transition-all ${storageUpgrade === 0 ? 'border-primary bg-primary/5' : 'border-black/5 dark:border-white/5 hover:border-black/20'}`}
                                         >
-                                            <div className="font-black text-sm text-foreground">Standart</div>
+                                            <div className="font-black text-sm text-foreground">{t("comp_standart") || "Standart"}</div>
                                             <div className="text-xs text-surface-500 font-bold">+ {formatPrice(0, currency || "UZS", exchangeRate)}</div>
                                         </button>
                                         <button 
                                             onClick={() => setStorageUpgrade(35)}
                                             className={`p-3 rounded-xl border-2 text-left transition-all ${storageUpgrade === 35 ? 'border-primary bg-primary/5' : 'border-black/5 dark:border-white/5 hover:border-black/20'}`}
                                         >
-                                            <div className="font-black text-sm text-foreground">1TB ga oshirish</div>
+                                            <div className="font-black text-sm text-foreground">{t("comp_upgrade_1tb") || "1TB ga oshirish"}</div>
                                             <div className="text-xs text-primary font-bold">+ {formatPrice(35, currency || "UZS", exchangeRate)}</div>
                                         </button>
                                     </div>
@@ -237,7 +237,7 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
                         {/* Add to Cart Area */}
                         <div className="pt-8 border-t border-black/5 dark:border-white/5 flex flex-col sm:flex-row gap-4 items-end">
                             <div>
-                                <label className="block text-xs font-black uppercase tracking-widest text-surface-400 mb-2">Miqdor</label>
+                                <label className="block text-xs font-black uppercase tracking-widest text-surface-400 mb-2">{t("qty_label") || "Miqdor"}</label>
                                 <div className="flex items-center bg-surface-50 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5 p-1">
                                     <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-10 h-10 flex items-center justify-center text-foreground hover:text-primary transition-colors font-black text-xl">-</button>
                                     <span className="w-12 text-center font-black text-lg">{quantity}</span>
@@ -248,7 +248,7 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
                                 onClick={handleAddToCart}
                                 className="flex-1 bg-primary hover:bg-primary-600 text-white font-black py-4 px-8 rounded-xl uppercase tracking-widest text-sm transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-primary/20 h-[52px] flex items-center justify-center"
                             >
-                                Savatga Qo'shish
+                                {t("prebuilt_add_to_cart") || "Savatga Qo'shish"}
                             </button>
                         </div>
                     </div>
@@ -258,7 +258,7 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
                 <div className="py-24 border-t border-black/5 dark:border-white/5">
                     <div className="text-center max-w-3xl mx-auto mb-16">
                         <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4 text-foreground">
-                            {t("prebuilt_game_fps_title") || "O'YINLARDAGI KUCHI (FPS)"}
+                            {t("perf_title") || t("prebuilt_game_fps_title") || "O'YINLARDAGI KUCHI (FPS)"}
                         </h2>
                         <p className="text-xl text-surface-500 font-medium">
                             {t("prebuilt_game_fps_desc") || "Ushbu kompyuter bilan siz yoqtirgan o'yinlarda qanday natija olishingizni ko'ring."}
@@ -269,7 +269,7 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
                         {(() => {
                             const usdPrice = pc.price > 1000000 ? pc.price / 12600 : pc.price;
                             const fpsBaseScore = Math.max(60, usdPrice / 10);
-                            return <FPSCalculator baseScore={fpsBaseScore} />;
+                            return <FPSCalculator baseScore={fpsBaseScore} t={t} />;
                         })()}
                     </div>
                 </div>
@@ -360,7 +360,7 @@ function SpecChip({ icon, value, label }) {
     );
 }
 
-function FPSCalculator({ baseScore }) {
+function FPSCalculator({ baseScore, t }) {
     const games = [
         { name: "CS2", multiplier: 2.5, img: "https://preview.redd.it/today-marks-1-year-since-cs2-official-release-heres-to-10-v0-5227y6wa0frd1.png?auto=webp&s=a18f71a876dcf99bf418b3c191e8c267134aaa1b" },
         { name: "Valorant", multiplier: 2.8, img: "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt7270e5b7fbca5eb8/623277908b982e0e5aee08e6/VALORANT_Episode4_Act2_Press_KeyArt.png" },
@@ -401,7 +401,7 @@ function FPSCalculator({ baseScore }) {
             {/* Controls */}
             <div className="w-full lg:w-1/2 space-y-8">
                 <div>
-                    <label className="block text-sm font-black uppercase tracking-widest text-surface-400 mb-4">O'yinni tanlang</label>
+                    <label className="block text-sm font-black uppercase tracking-widest text-surface-400 mb-4">{t?.("perf_select_game") || "O'yinni tanlang"}</label>
                     <div className="flex flex-wrap gap-3">
                         {games.map((g, i) => (
                             <button
@@ -416,7 +416,7 @@ function FPSCalculator({ baseScore }) {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-black uppercase tracking-widest text-surface-400 mb-4">Grafika (Rezolyutsiya)</label>
+                    <label className="block text-sm font-black uppercase tracking-widest text-surface-400 mb-4">{t?.("perf_resolution") || "Grafika (Rezolyutsiya)"}</label>
                     <div className="flex gap-3 bg-white dark:bg-black/30 p-2 rounded-2xl border border-black/5 dark:border-white/5">
                         {resolutions.map(res => (
                             <button

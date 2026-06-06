@@ -1,1 +1,0 @@
-// Scratch database check file

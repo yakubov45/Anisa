@@ -119,7 +119,7 @@ export default function PrebuiltsClient({ initialData }) {
                     {t("nav_prebuilts") || "Tayyor Kompyuterlar"}
                 </h1>
                 <p className="text-sm md:text-base text-surface-500 dark:text-surface-400 font-medium max-w-3xl">
-                    O'zingizga mos kompyuterni tanlang. Har bir qurilma mutaxassislar tomonidan sinovdan o'tgan va kafolatlangan.
+                    {t("prebuilt_desc") || "O'zingizga mos kompyuterni tanlang. Har bir qurilma mutaxassislar tomonidan sinovdan o'tgan va kafolatlangan."}
                 </p>
             </div>
 
@@ -129,7 +129,7 @@ export default function PrebuiltsClient({ initialData }) {
                     <svg className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-surface-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     <input 
                         type="text" 
-                        placeholder={t("search_placeholder") || "Kompyuter nomini qidiring..."}
+                        placeholder={t("filter_placeholder") || "Kompyuter nomini qidiring..."}
                         className="w-full bg-white dark:bg-black/40 border border-black/10 dark:border-white/10 rounded-xl pl-11 pr-4 py-3 text-sm font-bold focus:outline-none focus:border-primary transition-colors text-foreground"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -141,7 +141,7 @@ export default function PrebuiltsClient({ initialData }) {
                         className={`flex items-center justify-center gap-2 px-6 py-3 border rounded-xl text-sm font-black uppercase tracking-widest transition-all flex-1 sm:flex-none ${showFilters ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'bg-white dark:bg-black/40 border-black/10 dark:border-white/10 text-foreground hover:border-primary'}`}
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
-                        Filtr
+                        {t("filter_button") || "Filtr"}
                     </button>
                     <div className="relative flex-1 sm:flex-none">
                         <select 
@@ -149,9 +149,9 @@ export default function PrebuiltsClient({ initialData }) {
                             onChange={(e) => setSortBy(e.target.value)}
                             className="w-full px-6 py-3 bg-white dark:bg-black/40 border border-black/10 dark:border-white/10 rounded-xl text-sm font-black uppercase tracking-widest hover:border-primary transition-colors focus:outline-none cursor-pointer appearance-none pr-10 text-foreground"
                         >
-                            <option value="newest">Yangi</option>
-                            <option value="price_asc">Arzonlari</option>
-                            <option value="price_desc">Qimmatlari</option>
+                            <option value="newest">{t("filter_new") || "Yangi"}</option>
+                            <option value="price_asc">{t("filter_cheap") || "Arzonlari"}</option>
+                            <option value="price_desc">{t("filter_expensive") || "Qimmatlari"}</option>
                         </select>
                         <svg className="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-surface-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/></svg>
                     </div>
@@ -162,16 +162,16 @@ export default function PrebuiltsClient({ initialData }) {
             {showFilters && (
                 <div className="mb-10 w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 bg-surface-50 dark:bg-white/5 p-6 rounded-2xl border border-black/5 dark:border-white/10 animate-in slide-in-from-top-4 fade-in duration-300 relative z-20">
                     <div>
-                        <label className="block text-xs font-black uppercase tracking-widest text-surface-500 mb-2">Protsessor (CPU)</label>
+                        <label className="block text-xs font-black uppercase tracking-widest text-surface-500 mb-2">{t("filter_cpu") || "Protsessor (CPU)"}</label>
                         <select className="w-full bg-white dark:bg-black/40 border border-black/10 dark:border-white/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary transition-colors text-foreground" value={selectedCpu} onChange={e => setSelectedCpu(e.target.value)}>
-                            <option value="">Barchasi</option>
+                            <option value="">{t("filter_all") || "Barchasi"}</option>
                             {cpus.map((cpu, i) => <option key={i} value={cpu}>{cpu}</option>)}
                         </select>
                     </div>
                     <div>
-                        <label className="block text-xs font-black uppercase tracking-widest text-surface-500 mb-2">Videokarta (GPU)</label>
+                        <label className="block text-xs font-black uppercase tracking-widest text-surface-500 mb-2">{t("filter_gpu") || "Videokarta (GPU)"}</label>
                         <select className="w-full bg-white dark:bg-black/40 border border-black/10 dark:border-white/10 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary transition-colors text-foreground" value={selectedGpu} onChange={e => setSelectedGpu(e.target.value)}>
-                            <option value="">Barchasi</option>
+                            <option value="">{t("filter_all") || "Barchasi"}</option>
                             {gpus.map((gpu, i) => <option key={i} value={gpu}>{gpu}</option>)}
                         </select>
                     </div>
@@ -284,9 +284,13 @@ export function CatalogCard({ pc, currency = "UZS", exchangeRate, layout = "row"
     const ssdVal = getSpecValue("SSD") || "N/A";
 
     const getBadgeText = (badge) => {
-        let cleanKey = badge.toLowerCase();
+        if (!badge) return "";
+        let cleanKey = badge.toLowerCase().trim().replace(/\s+/g, '_');
         if (cleanKey.startsWith("badge_")) {
             cleanKey = cleanKey.replace("badge_", "");
+        }
+        if (cleanKey === 'new' || cleanKey === 'yangi') {
+            return t("filter_new") || badge;
         }
         const translationKey = `badge_${cleanKey}`;
         return t(translationKey) || badge;

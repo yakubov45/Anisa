@@ -27,10 +27,24 @@ export default function SmoothScrollProvider({ children }) {
             // Only smooth wheel events, ignore standard page scrolls (e.g. keypress)
             if (isMobile()) return;
 
+            // Don't intercept scroll if scrolling inside a nested scrollable container
+            if (e.target.closest('.overflow-y-auto, .overflow-auto, .overflow-x-auto, .scrollable, .no-scrollbar')) {
+                state.targetY = window.scrollY;
+                state.currentY = window.scrollY;
+                return;
+            }
+
             e.preventDefault();
 
+            let delta = e.deltaY;
+            if (e.deltaMode === 1) { // DOM_DELTA_LINE
+                delta *= 40;
+            } else if (e.deltaMode === 2) { // DOM_DELTA_PAGE
+                delta *= window.innerHeight;
+            }
+
             const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-            state.targetY += e.deltaY * 0.75;
+            state.targetY += delta * 0.75;
             state.targetY = Math.max(0, Math.min(state.targetY, maxScroll));
 
             if (!state.isScrolling) {

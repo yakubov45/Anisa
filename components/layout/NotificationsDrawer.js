@@ -26,11 +26,11 @@ export default function NotificationsDrawer() {
         if (notificationsDrawerOpen) {
             document.body.style.overflow = "hidden";
         } else {
-            document.body.style.overflow = "unset";
+            document.body.style.overflow = "";
             setExpandedId(null);
         }
         return () => {
-            document.body.style.overflow = "unset";
+            document.body.style.overflow = "";
         };
     }, [notificationsDrawerOpen]);
 

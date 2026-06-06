@@ -16,10 +16,10 @@ export default function QuickView({ product, isOpen, onClose }) {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
         } else {
-            document.body.style.overflow = 'unset';
+            document.body.style.overflow = '';
         }
         return () => {
-            document.body.style.overflow = 'unset';
+            document.body.style.overflow = '';
         };
     }, [isOpen]);
     const { t } = useTranslation();
@@ -63,7 +63,7 @@ export default function QuickView({ product, isOpen, onClose }) {
                             <span className="text-[9px] md:text-[10px] text-surface-500 font-bold uppercase tracking-[0.2em] font-mono">ID: {product.id?.slice(-8).toUpperCase()}</span>
                         </div>
                         <h2 className="text-2xl md:text-5xl font-black text-foreground tracking-tighter leading-none uppercase">{product.name}</h2>
-                        <p className="text-surface-600 dark:text-surface-400 text-sm md:text-lg leading-relaxed font-sans">{product.specs || "Professional hardware specifications and technical parameters."}</p>
+                        <p className="text-surface-600 dark:text-surface-400 text-sm md:text-lg leading-relaxed font-sans">{product.description || "Professional hardware specifications and technical parameters."}</p>
                     </div>
 
                     <div className="flex items-center gap-6 md:gap-10">

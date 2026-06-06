@@ -6,6 +6,7 @@ import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
 import InventoryTools from "@/components/admin/InventoryTools";
 import { useTranslation } from "@/lib/LanguageContext";
+import { auth } from "@/lib/firebase/client";
 
 export default function AdminProductsPage() {
     const { t } = useTranslation();
@@ -28,6 +29,42 @@ export default function AdminProductsPage() {
         }
     };
 
+    const handleDeleteAll = async () => {
+        if (products.length === 0) return;
+        
+        if (confirm("DIQQAT! Barcha mahsulotlar o'chiriladi. Ishonchingiz komilmi?")) {
+            if (confirm("Ikkinchi tasdiqlash: Bu amalni ortga qaytarib bo'lmaydi! Rostdan ham HAMMA mahsulotni o'chirmoqchimisiz?")) {
+                setLoading(true);
+                try {
+                    const token = await auth.currentUser?.getIdToken();
+                    if (!token) throw new Error("Tasdiqlash tokeni topilmadi. Qaytadan tizimga kiring.");
+
+                    // Xavfsizlik uchun firebase-admin orqali tozalash API siga so'rov
+                    const res = await fetch('/api/admin/clear-products', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (!res.ok) {
+                        const errData = await res.json();
+                        throw new Error(errData.error || res.statusText);
+                    }
+                    
+                    setProducts([]);
+                    alert("Barcha mahsulotlar muvaffaqiyatli o'chirildi!");
+                } catch (error) {
+                    console.error("Xatolik:", error);
+                    alert("O'chirishda xatolik yuz berdi.");
+                } finally {
+                    setLoading(false);
+                }
+            }
+        }
+    };
+
     return (
         <div className="space-y-12 animate-fade-in">
             <div className="flex flex-col md:flex-row justify-between items-center gap-6">
@@ -35,9 +72,20 @@ export default function AdminProductsPage() {
                     <h1 className="text-4xl font-black text-surface-900 tracking-tighter uppercase">{t('prod_inventory_control')}</h1>
                     <p className="text-surface-500 font-bold italic text-sm">{t('prod_inventory_desc')}</p>
                 </div>
-                <Link href="/admin/products/new" className="bg-primary text-white font-black px-10 py-5 rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 transition-all uppercase tracking-widest text-xs">
-                    {t('prod_add_new')}
-                </Link>
+                <div className="flex gap-4">
+                    {products.length > 0 && (
+                        <button 
+                            onClick={handleDeleteAll}
+                            disabled={loading}
+                            className="bg-red-500/10 text-red-500 border border-red-500/20 font-black px-6 py-5 rounded-2xl hover:bg-red-500 hover:text-white transition-all uppercase tracking-widest text-xs disabled:opacity-50"
+                        >
+                            Hammasini O'chirish
+                        </button>
+                    )}
+                    <Link href="/admin/products/new" className="bg-primary text-white font-black px-10 py-5 rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 transition-all uppercase tracking-widest text-xs flex items-center justify-center">
+                        {t('prod_add_new')}
+                    </Link>
+                </div>
             </div>
 
             <InventoryTools />

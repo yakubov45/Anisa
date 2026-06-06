@@ -26,7 +26,7 @@ export default function CartDrawer() {
         }
 
         return () => {
-            document.body.style.overflow = "unset";
+            document.body.style.overflow = "";
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [cartDrawerOpen, setCartDrawerOpen]);

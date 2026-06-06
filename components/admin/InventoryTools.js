@@ -1,11 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { logActivity } from "@/lib/services/activity.service";
 import { productService } from "@/lib/services/product.service";
 import { useTranslation } from "@/lib/LanguageContext";
 
 export default function AdminInventoryTools() {
     const { t } = useTranslation();
+    const [isImporting, setIsImporting] = useState(false);
+
     const handleExport = async () => {
         const products = await productService.getAll();
         const csv = [
@@ -24,6 +27,34 @@ export default function AdminInventoryTools() {
         document.body.removeChild(a);
 
         logActivity("SYSTEM", "Admin", "EXPORT", "Inventory CSV generated");
+    };
+
+    const handleImport = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        try {
+            setIsImporting(true);
+            const text = await file.text();
+            const data = JSON.parse(text);
+
+            if (!Array.isArray(data) || data.length === 0) {
+                alert("Xato: JSON fayli ichida mahsulotlar ro'yxati (Array) bo'lishi kerak!");
+                return;
+            }
+
+            // Save to localStorage to process them one by one in the New Product page
+            localStorage.setItem('pendingImports', JSON.stringify(data));
+            
+            logActivity("SYSTEM", "Admin", "IMPORT", `${data.length} ta mahsulot importga tayyorlandi`);
+            window.location.href = '/admin/products/new?import=true';
+        } catch (error) {
+            console.error("Import error:", error);
+            alert("Faylni o'qishda yoki import qilishda xatolik yuz berdi: " + error.message);
+        } finally {
+            setIsImporting(false);
+            e.target.value = ''; // Reset input
+        }
     };
 
     return (
@@ -45,10 +76,20 @@ export default function AdminInventoryTools() {
                 </button>
 
                 <div className="relative group cursor-pointer">
-                    <input type="file" className="absolute inset-0 opacity-0 cursor-pointer z-10" />
-                    <div className="bg-surface-100 dark:bg-white/5 border-2 border-dashed border-white/5 py-8 rounded-xl flex flex-col items-center justify-center gap-4 group-hover:border-primary/40 transition-all">
-                        <span className="text-3xl group-hover:rotate-12 transition-transform">📤</span>
-                        <span className="uppercase text-[10px] tracking-[0.4em] font-black text-surface-500">{t('sys_init_import')}</span>
+                    <input 
+                        type="file" 
+                        accept=".json"
+                        onChange={handleImport}
+                        disabled={isImporting}
+                        className="absolute inset-0 opacity-0 cursor-pointer z-10 disabled:cursor-not-allowed" 
+                    />
+                    <div className={`bg-surface-100 dark:bg-white/5 border-2 border-dashed border-white/5 py-8 rounded-xl flex flex-col items-center justify-center gap-4 transition-all ${isImporting ? 'opacity-50 animate-pulse' : 'group-hover:border-primary/40'}`}>
+                        <span className="text-3xl group-hover:rotate-12 transition-transform">
+                            {isImporting ? '⏳' : '📤'}
+                        </span>
+                        <span className="uppercase text-[10px] tracking-[0.4em] font-black text-surface-500">
+                            {isImporting ? "Yuklanmoqda..." : t('sys_init_import')}
+                        </span>
                     </div>
                 </div>
             </div>

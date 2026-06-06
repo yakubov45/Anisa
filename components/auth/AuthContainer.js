@@ -44,13 +44,13 @@ export default function AuthContainer({ initialMode = "login" }) {
             }
             router.push("/");
         } catch (err) {
-            console.error(`${mode} error:`, err);
+            console.warn(`${mode} error:`, err.code);
             if (err.code === "auth/email-already-in-use") {
-                setError("This email is already in use.");
+                setError(t('auth_email_in_use') || "This email is already in use.");
             } else if (err.code === "auth/weak-password") {
-                setError("Password must be at least 6 characters.");
+                setError(t('auth_weak_password') || "Password must be at least 6 characters.");
             } else if (err.code === "auth/invalid-credential") {
-                setError(t('auth_invalid_credential') || "Invalid email or password.");
+                setError(t('auth_invalid_credential') || "Noto'g'ri email yoki parol kiritildi.");
             } else {
                 setError(err.message || "Authentication failed.");
             }

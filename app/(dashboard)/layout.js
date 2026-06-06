@@ -22,6 +22,18 @@ export default function DashboardLayout({ children }) {
     const pathname = usePathname();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+    // Lock body scroll when mobile sidebar is open
+    useEffect(() => {
+        if (isSidebarOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isSidebarOpen]);
+
     const isUserRoute = pathname.startsWith("/user");
     const isAdminRoute = pathname.startsWith("/admin");
     const isDeliveryRoute = pathname.startsWith("/delivery");
@@ -140,7 +152,7 @@ export default function DashboardLayout({ children }) {
     };
 
     const Sidebar = ({ isMobile = false }) => (
-        <aside className={`${isMobile ? 'w-full h-full' : 'w-80 hidden lg:flex'} bg-surface dark:bg-[#0A0A0A] border-r border-surface-100 dark:border-white/5 flex flex-col h-[calc(100vh-80px)] sticky top-20 p-6 z-[40]`}>
+        <aside className={`${isMobile ? 'w-full h-full pb-20' : 'w-80 hidden lg:flex h-[calc(100vh-80px)] sticky top-20'} bg-surface dark:bg-[#0A0A0A] border-r border-surface-100 dark:border-white/5 flex flex-col p-6 z-[40]`}>
             <div className="flex-1 space-y-2 overflow-y-auto no-scrollbar">
                 {isAdminRoute && (
                     <>
