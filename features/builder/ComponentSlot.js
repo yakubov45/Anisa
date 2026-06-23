@@ -56,13 +56,13 @@ export default function ComponentSlot({ category, title, selectedPart, onSelect,
                     {selectedPart ? (
                         <>
                             <div className="flex flex-col items-start sm:items-end">
-                                {selectedPart.discount && (
+                                {selectedPart.discount > 0 && (
                                     <PriceDisplay 
-                                        price={selectedPart.price / (1 - selectedPart.discount / 100)} 
+                                        price={selectedPart.price} 
                                         className="text-[9px] font-mono text-surface-400 line-through opacity-60" 
                                     />
                                 )}
-                                <PriceDisplay price={selectedPart.price} className="text-base md:text-lg font-black text-foreground tracking-tighter" />
+                                <PriceDisplay price={selectedPart.discount > 0 ? selectedPart.price * (1 - selectedPart.discount / 100) : selectedPart.price} className="text-base md:text-lg font-black text-foreground tracking-tighter" />
                             </div>
                             <div className="flex items-center gap-2">
                                 <button 

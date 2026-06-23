@@ -35,9 +35,10 @@ export default async function HomePage() {
         // Flash deals
         const flashSettings = await getFlashDealsSettingsAction().catch(() => null);
         if (flashSettings) {
+            const discountedProducts = allProducts.filter(p => p.discount > 0);
             flashDeals = {
                 settings: flashSettings,
-                products: allProducts.slice(0, 8)
+                products: discountedProducts.length > 0 ? discountedProducts.slice(0, 8) : allProducts.slice(0, 8) // Fallback if no discounted products exist yet
             };
         }
     } catch (error) {

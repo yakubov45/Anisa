@@ -101,9 +101,17 @@ export default function ProductDetailClient({ product, relatedProducts }) {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-20 px-4 md:px-0">
 
                 {/* IMAGE GALLERY WITH ZOOM */}
-                <div className="space-y-6 md:space-y-8 max-w-[600px] mx-auto lg:mx-0 w-full">
+                <div className="space-y-4 md:space-y-6 max-w-[450px] mx-auto lg:mx-0 w-full">
+                    {/* Show selected color name above the image */}
+                    {validVariants.length > 0 && (
+                        <div className="flex items-center gap-2">
+                            <span className="text-[11px] font-black text-surface-500 uppercase tracking-widest">{t('color') || 'Tanlangan rang'}:</span>
+                            <span className="text-sm font-black text-primary uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-md">{selectedVariant?.colorName}</span>
+                        </div>
+                    )}
+                    
                     <div 
-                        className="aspect-[4/3] md:aspect-square relative bg-surface-100 rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-surface-200 dark:border-white/10 group shadow-2xl cursor-crosshair"
+                        className="w-full aspect-square relative bg-surface-100 rounded-[1.5rem] md:rounded-[2rem] overflow-hidden border border-surface-200 dark:border-white/10 group shadow-xl cursor-crosshair"
                         onMouseEnter={() => setIsZooming(true)}
                         onMouseLeave={() => setIsZooming(false)}
                         onMouseMove={handleImageMouseMove}
@@ -146,14 +154,14 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                     
                     {/* Thumbnail Gallery */}
                     {displayImages.length > 1 && (
-                        <div className="grid grid-cols-4 gap-3 md:gap-4">
+                        <div className="flex flex-wrap gap-2 md:gap-3">
                             {displayImages.map((img, i) => (
                                 <div
                                     key={i}
                                     onClick={() => setActiveImage(img)}
-                                    className={`aspect-square bg-surface-100 rounded-xl cursor-pointer border transition-all overflow-hidden p-2 md:p-3 relative group ${activeImage === img ? 'border-primary shadow-[0_0_15px_rgba(var(--primary),0.3)]' : 'border-surface-200 dark:border-white/5 hover:border-primary/50'}`}
+                                    className={`w-16 h-16 md:w-20 md:h-20 flex-shrink-0 bg-surface-100 rounded-xl cursor-pointer border transition-all overflow-hidden p-1.5 md:p-2 relative group ${activeImage === img ? 'border-primary shadow-[0_0_15px_rgba(var(--primary),0.3)]' : 'border-surface-200 dark:border-white/5 hover:border-primary/50'}`}
                                 >
-                                    <img src={img} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500" />
+                                    <img src={img} className="w-full h-full object-cover rounded-lg group-hover:scale-110 transition-transform duration-500" />
                                 </div>
                             ))}
                         </div>
@@ -170,7 +178,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                             </span>
                         </div>
                         
-                        <h1 className="text-4xl md:text-6xl font-black text-foreground tracking-normal leading-[1.1] uppercase drop-shadow-sm">
+                        <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tight leading-[1.2] uppercase drop-shadow-sm">
                             {productName}
                         </h1>
                         
@@ -221,9 +229,9 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                         <div className="flex items-end gap-6 md:gap-8">
                             <div className="flex flex-col">
                                 {product.discount > 0 && (
-                                    <PriceDisplay price={displayPrice} className="text-surface-400 dark:text-surface-500 line-through font-bold text-lg md:text-xl opacity-60 decoration-2" />
+                                    <PriceDisplay price={displayPrice} className="text-surface-400 dark:text-surface-500 line-through font-bold text-base md:text-lg opacity-60 decoration-2" />
                                 )}
-                                <PriceDisplay price={finalPrice} className="text-5xl md:text-7xl font-black text-primary tracking-tighter drop-shadow-md" />
+                                <PriceDisplay price={finalPrice} className="text-4xl md:text-5xl font-black text-primary tracking-tight drop-shadow-sm" />
                             </div>
                             <div className="h-12 md:h-16 w-px bg-surface-200 dark:bg-white/10 hidden md:block" />
                             <div className="hidden md:block space-y-1.5 pb-2">

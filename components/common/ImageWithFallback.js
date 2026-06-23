@@ -1,10 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function ImageWithFallback({ src, alt, className, fallbackSrc = "/images/placeholder.webp", ...props }) {
     const [imgSrc, setImgSrc] = useState(src);
     const [hasError, setHasError] = useState(false);
+
+    useEffect(() => {
+        setImgSrc(src);
+        setHasError(false);
+    }, [src]);
 
     const handleError = () => {
         if (!hasError) {

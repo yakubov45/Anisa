@@ -223,8 +223,13 @@ export default function NewProductPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        if (variants.length === 0) {
-            alert("Iltimos, kamida bitta variant qo'shing (masalan, Standard variant).");
+        if (enableVariants && variants.length === 0) {
+            alert("Iltimos, kamida bitta rang (variant) qo'shing.");
+            return;
+        }
+
+        if (!enableVariants && standardImages.length === 0) {
+            alert("Iltimos, mahsulot uchun kamida bitta rasm yuklang.");
             return;
         }
 
@@ -361,8 +366,8 @@ export default function NewProductPage() {
                     <div className="bg-surface p-10 md:p-14 rounded-[2.5rem] shadow-premium border border-surface-50 space-y-8">
                         <div className="flex items-center justify-between border-b border-surface-100 pb-4">
                             <div>
-                                <h2 className="text-xl font-black text-surface-900 tracking-tighter uppercase">Technical Parameters</h2>
-                                <p className="text-[10px] font-bold text-surface-400 uppercase tracking-widest mt-1">Auto-generated based on taxonomy</p>
+                                <h2 className="text-xl font-black text-surface-900 tracking-tighter uppercase">Texnik parametrlar</h2>
+                                <p className="text-[10px] font-bold text-surface-400 uppercase tracking-widest mt-1">Soddalashtirilgan parametrlar ro'yxati</p>
                             </div>
                         </div>
 
@@ -533,8 +538,8 @@ export default function NewProductPage() {
                     <div className="bg-surface p-8 rounded-[2.5rem] shadow-premium border border-surface-50 space-y-6">
                         <div className="flex justify-between items-center">
                             <div className="space-y-1">
-                                <p className="text-[10px] font-black text-surface-400 uppercase tracking-widest">Color Variants</p>
-                                <p className="text-[9px] text-surface-500 font-bold">Enable this if the product has multiple colors.</p>
+                                <p className="text-[10px] font-black text-surface-400 uppercase tracking-widest">Rang qo'shish</p>
+                                <p className="text-[9px] text-surface-500 font-bold">Agar mahsulotning turli ranglari bo'lsa, buni yoqing (RAM, CPU, GPU da yoqish shart emas).</p>
                             </div>
                             <label className="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" className="sr-only peer" checked={enableVariants} onChange={e => setEnableVariants(e.target.checked)} />
@@ -568,8 +573,8 @@ export default function NewProductPage() {
                                 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1">
-                                        <label className="text-[9px] font-black text-surface-400 uppercase tracking-widest">Color Name</label>
-                                        <input type="text" value={variantForm.colorName} onChange={e => setVariantForm({...variantForm, colorName: e.target.value})} className="w-full bg-white/5 dark:bg-black/60 border border-surface-200 dark:border-surface-700 text-foreground rounded-lg px-3 py-2 text-xs font-bold focus:ring-1 focus:ring-primary outline-none" placeholder="e.g. Matte Black" />
+                                        <label className="text-[9px] font-black text-surface-400 uppercase tracking-widest">Rang nomi</label>
+                                        <input type="text" value={variantForm.colorName} onChange={e => setVariantForm({...variantForm, colorName: e.target.value})} className="w-full bg-white/5 dark:bg-black/60 border border-surface-200 dark:border-surface-700 text-foreground rounded-lg px-3 py-2 text-xs font-bold focus:ring-1 focus:ring-primary outline-none" placeholder="Masalan: Qora, Oq" />
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-[9px] font-black text-surface-400 uppercase tracking-widest">Color HEX</label>

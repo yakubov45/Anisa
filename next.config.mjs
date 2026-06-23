@@ -15,8 +15,8 @@ const securityHeaders = [
           "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com",
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
           "font-src 'self' https://fonts.gstatic.com",
-          "img-src 'self' data: blob: https://firebasestorage.googleapis.com https://images.unsplash.com https://api.dicebear.com https://avatars.mds.yandex.net https://i.rtings.com",
-          "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://api.telegram.org wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com",
+          "img-src 'self' data: blob: https://firebasestorage.googleapis.com https://storage.googleapis.com https://images.unsplash.com https://api.dicebear.com https://avatars.mds.yandex.net https://i.rtings.com https://ik.imagekit.io",
+          "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://api.telegram.org wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebasestorage.googleapis.com https://storage.googleapis.com https://upload.imagekit.io https://ik.imagekit.io",
           "frame-ancestors 'none'",
       ].join('; ')
   },
@@ -45,6 +45,7 @@ const nextConfig = {
             { protocol: 'https', hostname: 'www.google.com' },
             { protocol: 'https', hostname: 'i.rtings.com' },
             { protocol: 'https', hostname: 'avatars.mds.yandex.net' },
+            { protocol: 'https', hostname: 'ik.imagekit.io' },
         ],
     },
 };

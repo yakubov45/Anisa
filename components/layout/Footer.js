@@ -18,14 +18,29 @@ export default function Footer() {
     });
 
     useEffect(() => {
+        // Obunachilarni vaqt o'tishi bilan doimiy o'sib borishini avto-hisoblash (simulyatsiya)
+        // Agar haqiqiy API kerak bo'lsa, backend orqali ulash mumkin.
+        const baseDate = new Date('2024-06-01').getTime();
+        const now = Date.now();
+        const diffHours = (now - baseDate) / (1000 * 60 * 60); // O'tgan soatlar
+        
+        setCounts({
+            youtube: Math.floor(4261 + (diffHours * 1.5)), // Soatiga 1.5 ta
+            telegram: Math.floor(12808 + (diffHours * 3.2)), // Soatiga 3.2 ta
+            instagram: Math.floor(8441 + (diffHours * 2.8)), // Soatiga 2.8 ta
+            facebook: Math.floor(2100 + (diffHours * 0.5)) // Soatiga 0.5 ta
+        });
+
+        // Saytda turganda ham jonli qo'shilib turishi uchun
         const interval = setInterval(() => {
             setCounts(prev => ({
-                youtube: prev.youtube + Math.floor(Math.random() * 3),
-                telegram: prev.telegram + Math.floor(Math.random() * 2),
-                instagram: prev.instagram + Math.floor(Math.random() * 3),
-                facebook: prev.facebook + Math.floor(Math.random() * 1)
+                youtube: prev.youtube + (Math.random() > 0.7 ? 1 : 0),
+                telegram: prev.telegram + (Math.random() > 0.4 ? 1 : 0),
+                instagram: prev.instagram + (Math.random() > 0.5 ? 1 : 0),
+                facebook: prev.facebook + (Math.random() > 0.9 ? 1 : 0)
             }));
-        }, 8000);
+        }, 4000);
+        
         return () => clearInterval(interval);
     }, []);
 

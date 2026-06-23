@@ -68,14 +68,14 @@ export default function QuickView({ product, isOpen, onClose }) {
 
                     <div className="flex items-center gap-6 md:gap-10">
                         <div className="flex flex-col">
-                            {product.discount && (
+                            {product.discount > 0 && (
                                 <PriceDisplay 
-                                    price={product.price / (1 - product.discount / 100)} 
+                                    price={product.price} 
                                     className="text-surface-400 dark:text-surface-500 line-through font-bold text-[10px] md:text-sm opacity-50" 
                                 />
                             )}
                             <PriceDisplay 
-                                price={product.price} 
+                                price={product.discount > 0 ? product.price * (1 - product.discount / 100) : product.price} 
                                 className="text-3xl md:text-5xl font-black text-foreground tracking-tighter" 
                             />
                         </div>

@@ -35,17 +35,14 @@ export default function BrandStrip() {
                     {brands.map((brand, i) => (
                         <div 
                             key={`${brand.id || brand.name}-${i}`} 
-                            className="h-8 md:h-12 w-32 relative flex-shrink-0 flex items-center justify-center group cursor-pointer grayscale hover:grayscale-0 transition-all duration-300"
+                            className="h-8 md:h-12 w-auto relative flex-shrink-0 flex items-center justify-center group cursor-pointer transition-all duration-300"
                         >
-                            {brand.logo ? (
-                                <img 
-                                    src={brand.logo} 
-                                    alt={brand.name} 
-                                    className="max-h-full max-w-full object-contain filter brightness-0 dark:invert transition-all duration-300 group-hover:brightness-100 dark:group-hover:invert-0" 
-                                />
-                            ) : (
-                                <span className="text-xl font-black tracking-widest text-black/60 dark:text-white/60 transition-colors group-hover:text-black dark:group-hover:text-white">{brand.name}</span>
-                            )}
+                            <div className="flex items-center gap-8 md:gap-16">
+                                <span className="text-2xl md:text-3xl font-black tracking-[0.2em] text-white/40 transition-colors group-hover:text-primary uppercase whitespace-nowrap drop-shadow-sm font-outfit">
+                                    {brand.name}
+                                </span>
+                                <div className="w-2 h-2 rounded-full bg-primary/30 group-hover:bg-primary transition-colors duration-300" />
+                            </div>
                         </div>
                     ))}
                 </motion.div>

@@ -1,152 +1,31 @@
 "use client";
 
-import { Canvas, useFrame } from "@react-three/fiber";
-import {
-    Float,
-    Text,
-    Environment,
-    Sparkles
-} from "@react-three/drei";
-
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
-import * as THREE from "three";
-
-function RotatingCore() {
-    const meshRef = useRef(null);
-
-    useFrame((state, delta) => {
-        if (!meshRef.current) return;
-
-        meshRef.current.rotation.y += delta * 0.7;
-        meshRef.current.rotation.x += delta * 0.3;
-    });
-
-    return (
-        <Float speed={2} rotationIntensity={1.5} floatIntensity={2}>
-            <mesh ref={meshRef}>
-                <octahedronGeometry args={[1.4, 0]} />
-                <meshStandardMaterial
-                    color="#00ffff"
-                    emissive="#00ffff"
-                    emissiveIntensity={3}
-                    metalness={1}
-                    roughness={0.1}
-                />
-            </mesh>
-        </Float>
-    );
-}
-
-function NeonFloor() {
-    return (
-        <gridHelper
-            args={[50, 50, "#00ffff", "#001a1a"]}
-            rotation={[0, 0, 0]}
-            position={[0, -2, 0]}
-        />
-    );
-}
-
-function FlyingParticles() {
-    return (
-        <Sparkles
-            count={250}
-            speed={0.6}
-            opacity={1}
-            scale={20}
-            size={2}
-            color="#00ffff"
-        />
-    );
-}
-
-function Scene() {
-    const cameraRef = useRef(null);
-
-    useFrame((state) => {
-        const time = state.clock.getElapsedTime();
-
-        if (cameraRef.current) {
-            cameraRef.current.position.z =
-                8 + Math.sin(time * 0.5) * 1;
-
-            cameraRef.current.position.x =
-                Math.sin(time * 0.3) * 2;
-
-            cameraRef.current.lookAt(0, 0, 0);
-        }
-    });
-
-    return (
-        <>
-            <perspectiveCamera
-                ref={cameraRef}
-                makeDefault
-                position={[0, 0, 8]}
-            />
-
-            <color attach="background" args={["#02040a"]} />
-
-            <fog attach="fog" args={["#02040a", 8, 25]} />
-
-            <ambientLight intensity={0.3} />
-
-            <pointLight
-                position={[0, 4, 4]}
-                intensity={20}
-                color="#00ffff"
-            />
-
-            <pointLight
-                position={[0, -4, -4]}
-                intensity={10}
-                color="#0066ff"
-            />
-
-            <Environment preset="night" />
-
-            <NeonFloor />
-
-            <FlyingParticles />
-
-            <RotatingCore />
-
-            <Text
-                position={[0, -3.5, 0]}
-                fontSize={0.7}
-                color="#ffffff"
-                anchorX="center"
-                anchorY="middle"
-            >
-                ONEPC
-            </Text>
-        </>
-    );
-}
+import { useEffect, useState } from "react";
 
 export default function IntroOverlay() {
+    // Start as true — show by default, hide if already seen
     const [visible, setVisible] = useState(true);
     const [exit, setExit] = useState(false);
-    const [isMounted, setIsMounted] = useState(false);
+    const [checked, setChecked] = useState(false);
 
     useEffect(() => {
-        setIsMounted(true);
         const shown = sessionStorage.getItem("onepc_intro_shown");
 
         if (shown) {
+            // Already seen this session — hide immediately without animation
             setVisible(false);
+            setChecked(true);
             return;
         }
 
-        const exitTimer = setTimeout(() => {
-            setExit(true);
-        }, 4000);
+        setChecked(true);
 
+        const exitTimer = setTimeout(() => setExit(true), 2200);
         const removeTimer = setTimeout(() => {
             setVisible(false);
             sessionStorage.setItem("onepc_intro_shown", "true");
-        }, 5200);
+        }, 3000);
 
         return () => {
             clearTimeout(exitTimer);
@@ -154,53 +33,111 @@ export default function IntroOverlay() {
         };
     }, []);
 
-    if (!isMounted || !visible) return null;
+    // Don't render anything until we've checked sessionStorage
+    // (prevents flash on returning visitors)
+    if (!checked || !visible) return null;
 
     return (
         <AnimatePresence>
             <motion.div
+                key="intro"
                 initial={{ opacity: 1 }}
-                animate={{
-                    opacity: exit ? 0 : 1,
-                    scale: exit ? 1.3 : 1,
-                    filter: exit
-                        ? "blur(20px)"
-                        : "blur(0px)"
-                }}
-                transition={{
-                    duration: 1.4,
-                    ease: [0.16, 1, 0.3, 1]
-                }}
-                className="fixed inset-0 z-[9999]"
+                animate={{ opacity: exit ? 0 : 1 }}
+                transition={{ duration: 0.8, ease: "easeInOut" }}
+                className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden"
+                style={{ background: "#02040a" }}
             >
-                <Canvas>
-                    <Scene />
-                </Canvas>
-
-                {/* overlay glow */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.12),transparent_60%)] pointer-events-none" />
-
-                {/* scanlines */}
+                {/* Grid background */}
                 <div
-                    className="absolute inset-0 opacity-[0.05] pointer-events-none"
+                    className="absolute inset-0 opacity-20"
                     style={{
                         backgroundImage:
-                            "linear-gradient(transparent 50%, rgba(255,255,255,0.08) 50%)",
-                        backgroundSize: "100% 4px"
+                            "linear-gradient(rgba(0,255,255,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,255,0.15) 1px, transparent 1px)",
+                        backgroundSize: "60px 60px",
                     }}
                 />
 
-                {/* bottom text */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1 }}
-                    className="absolute bottom-16 left-1/2 -translate-x-1/2 pointer-events-none"
-                >
-                    <p className="text-cyan-300 text-xs tracking-[0.4em] font-mono">
-                        INITIALIZING SYSTEM
-                    </p>
-                </motion.div>
+                {/* Radial glow */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.12),transparent_60%)] pointer-events-none" />
+
+                {/* Center content */}
+                <div className="relative flex flex-col items-center gap-8">
+                    {/* Spinning ring */}
+                    <div className="relative w-28 h-28 flex items-center justify-center">
+                        <motion.div
+                            className="absolute inset-0 rounded-full"
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                            style={{
+                                border: "2px solid transparent",
+                                borderTopColor: "#00ffff",
+                                borderRightColor: "rgba(0,255,255,0.2)",
+                            }}
+                        />
+                        <motion.div
+                            className="absolute inset-3 rounded-full"
+                            animate={{ rotate: -360 }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                            style={{
+                                border: "1px solid transparent",
+                                borderBottomColor: "#00ffff",
+                                borderLeftColor: "rgba(0,255,255,0.15)",
+                            }}
+                        />
+                        {/* Logo center */}
+                        <motion.div
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ delay: 0.2, duration: 0.6, ease: "backOut" }}
+                            className="w-14 h-14 rounded-xl flex items-center justify-center"
+                            style={{
+                                background: "rgba(0,255,255,0.08)",
+                                border: "1px solid rgba(0,255,255,0.3)",
+                            }}
+                        >
+                            <span className="text-cyan-400 font-black text-xl tracking-tighter">1PC</span>
+                        </motion.div>
+                    </div>
+
+                    {/* Brand name */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4, duration: 0.6 }}
+                        className="text-center"
+                    >
+                        <p className="text-white font-black text-3xl tracking-[0.3em] uppercase">OnePC</p>
+                        <p style={{ color: "rgba(0,255,255,0.6)" }} className="text-[10px] tracking-[0.5em] font-mono mt-1 uppercase">
+                            Initializing System
+                        </p>
+                    </motion.div>
+
+                    {/* Loading bar */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.7 }}
+                        className="w-48 h-[2px] rounded-full overflow-hidden"
+                        style={{ background: "rgba(255,255,255,0.05)" }}
+                    >
+                        <motion.div
+                            className="h-full rounded-full"
+                            style={{ background: "#00ffff" }}
+                            initial={{ width: "0%" }}
+                            animate={{ width: "100%" }}
+                            transition={{ delay: 0.8, duration: 1.5, ease: "easeInOut" }}
+                        />
+                    </motion.div>
+                </div>
+
+                {/* Scanlines overlay */}
+                <div
+                    className="absolute inset-0 opacity-[0.04] pointer-events-none"
+                    style={{
+                        backgroundImage: "linear-gradient(transparent 50%, rgba(255,255,255,0.08) 50%)",
+                        backgroundSize: "100% 4px",
+                    }}
+                />
             </motion.div>
         </AnimatePresence>
     );

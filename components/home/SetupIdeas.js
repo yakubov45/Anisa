@@ -10,21 +10,21 @@ export default function SetupIdeas() {
         { 
             name: t('setup_gaming_name'), 
             price: 1250, 
-            image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=800&q=80",
+            image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&q=80",
             items: t('setup_gaming_items'), 
             badge: "ESPORTS READY"
         },
         { 
             name: t('setup_studio_name'), 
             price: 950, 
-            image: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=800&q=80",
+            image: "https://images.unsplash.com/photo-1555680202-c86f0e12f086?w=800&q=80",
             items: t('setup_studio_items'), 
             badge: "CREATIVE PRO"
         },
         { 
             name: t('setup_streamer_name'), 
             price: 1800, 
-            image: "https://images.unsplash.com/photo-1614018424563-29f1bb346b94?w=800&q=80",
+            image: "https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=800&q=80",
             items: t('setup_streamer_items'), 
             badge: "CREATOR ELITE"
         },
