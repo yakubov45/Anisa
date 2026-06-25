@@ -207,7 +207,7 @@ function ProductCard({ product, badge = null, rating = null }) {
                 </div>
 
                 <Link href={`/products/${product.id}`} className="py-1">
-                    <h3 className="font-extrabold text-foreground text-[11px] md:text-lg tracking-wider md:tracking-widest group-hover:text-primary transition-colors line-clamp-2 uppercase leading-relaxed md:leading-relaxed">
+                    <h3 className="font-extrabold text-foreground text-[10px] md:text-base tracking-wider md:tracking-widest group-hover:text-primary transition-colors line-clamp-2 uppercase leading-relaxed md:leading-relaxed">
                         {product.name}
                     </h3>
                 </Link>
@@ -225,7 +225,7 @@ function ProductCard({ product, badge = null, rating = null }) {
                         )}
                         <PriceDisplay
                             price={product.discount > 0 ? displayPrice * (1 - product.discount / 100) : displayPrice}
-                            className="font-black text-xs md:text-xl text-foreground tracking-tight"
+                            className="font-black text-[11px] md:text-lg text-foreground tracking-tight"
                         />
                     </div>
 

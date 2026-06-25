@@ -115,7 +115,7 @@ export default function PrebuiltsClient({ initialData }) {
         <div className="w-full px-4 md:px-8 xl:px-16 py-8 text-foreground pb-24">
             {/* Header */}
             <div className="mb-10 text-center md:text-left">
-                <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-foreground mb-4 bg-gradient-to-r from-primary to-rose-500 bg-clip-text text-transparent inline-block">
+                <h1 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase tracking-tighter text-foreground mb-4 bg-gradient-to-r from-primary to-rose-500 bg-clip-text text-transparent inline-block">
                     {t("nav_prebuilts") || "Tayyor Kompyuterlar"}
                 </h1>
                 <p className="text-sm md:text-base text-surface-500 dark:text-surface-400 font-medium max-w-3xl">
@@ -345,11 +345,11 @@ export function CatalogCard({ pc, currency = "UZS", exchangeRate, layout = "row"
                 
                 {/* Header & Title */}
                 <div>
-                    <h3 className="text-xl md:text-2xl font-bold uppercase tracking-tight text-foreground group-hover:text-primary transition-colors duration-300">
+                    <h3 className="text-base md:text-2xl font-bold uppercase tracking-tight text-foreground group-hover:text-primary transition-colors duration-300 line-clamp-2">
                         {pc.name}
                     </h3>
                     <div className="flex items-baseline gap-2 mt-2">
-                        <span className="text-2xl font-black text-foreground tracking-tight">{price}</span>
+                        <span className="text-lg md:text-2xl font-black text-foreground tracking-tight">{price}</span>
                     </div>
                 </div>
 
@@ -395,13 +395,13 @@ export function CatalogCard({ pc, currency = "UZS", exchangeRate, layout = "row"
                 <div className="flex items-center gap-3 mt-auto pt-4">
                     <a
                         href={`/prebuilts/${pc.id}`}
-                        className="flex-1 bg-transparent hover:bg-surface-100 dark:hover:bg-white/5 text-foreground text-center py-3.5 px-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center border border-surface-200 dark:border-white/10"
+                        className="flex-1 bg-transparent hover:bg-surface-100 dark:hover:bg-white/5 text-foreground text-center py-3.5 px-3 md:px-4 rounded-2xl text-[9px] md:text-[11px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center border border-surface-200 dark:border-white/10 truncate"
                     >
                         {t("prebuilt_details") || "Batafsil"}
                     </a>
                     <button
                         onClick={handleAddToCart}
-                        className="flex-1 bg-primary hover:bg-primary/95 text-white shadow-lg shadow-primary/10 hover:shadow-primary/25 text-center py-3.5 px-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center border border-transparent"
+                        className="flex-[2] bg-primary text-white text-center py-3.5 px-3 md:px-4 rounded-2xl text-[9px] md:text-[11px] font-black uppercase tracking-widest transition-all duration-300 shadow-xl shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98] flex items-center justify-center gap-2 truncate"
                     >
                         {t("prebuilt_add_to_cart") || "Savatga"}
                     </button>
