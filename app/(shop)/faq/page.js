@@ -97,7 +97,7 @@ export default function FAQPage() {
                     <div className="mt-12 bg-zinc-900 text-white p-8 rounded-[2rem] space-y-4 border border-white/5">
                         <h4 className="text-sm font-black uppercase tracking-widest">{t('faq_still_curious') || 'Still curious?'}</h4>
                         <p className="text-xs text-white/60 font-medium">{t('faq_still_curious_desc') || "If you can't find your answer, our tech command center is standing by."}</p>
-                        <Link href="https://t.me/onepc_support" target="_blank" className="bg-primary text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest inline-block hover:bg-primary-600 transition-all">
+                        <Link href="https://t.me/onepc_uz_bot" target="_blank" className="bg-primary text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest inline-block hover:bg-primary-600 transition-all">
                             {t('faq_talk_support') || 'Talk to Tech Support'}
                         </Link>
                     </div>

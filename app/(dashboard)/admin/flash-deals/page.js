@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { getFlashDealsSettingsAction, updateFlashDealsSettingsAction } from "@/lib/actions/flash-deals.actions"
-import { getProducts } from "@/features/product/api"
+import { getAdminProductsAction, getSearchProductsAction, getProductsByIdsAction } from "@/lib/actions/product.actions"
 import { categoryService } from "@/lib/services/category.service"
 import { useRouter } from "next/navigation"
 import { useTranslation } from "@/lib/LanguageContext"
@@ -16,6 +16,8 @@ export default function FlashDealsAdmin() {
     const [categories, setCategories] = useState([])
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
     
     // Filtering States
     const [searchQuery, setSearchQuery] = useState("")
@@ -23,20 +25,50 @@ export default function FlashDealsAdmin() {
     
     const router = useRouter()
 
-    useEffect(() => {
-        async function loadData() {
-            const [s, p, c] = await Promise.all([
-                getFlashDealsSettingsAction(),
-                getProducts(),
-                categoryService.getAll()
-            ])
-            if (s) setSettings(s)
-            setAllProducts(p)
-            setCategories(c)
-            setLoading(false)
+    const loadProducts = useCallback(async (currentPage, query, cat) => {
+        setLoading(true);
+        try {
+            let p = [];
+            if (query) {
+                p = await getSearchProductsAction(query, 50); // limit search to 50
+                if (cat !== "all") p = p.filter(prod => prod.category === cat);
+                setHasMore(false);
+            } else {
+                p = await getAdminProductsAction(currentPage, 10);
+                if (p.length < 10) setHasMore(false);
+                else setHasMore(true);
+            }
+            setAllProducts(p);
+        } catch (error) {
+            console.error(error);
         }
-        loadData()
-    }, [])
+        setLoading(false);
+    }, []);
+
+    useEffect(() => {
+        async function initData() {
+            setLoading(true);
+            const [s, c] = await Promise.all([
+                getFlashDealsSettingsAction(),
+                categoryService.getAll()
+            ]);
+            if (s) {
+                setSettings(s);
+            }
+            setCategories(c);
+            await loadProducts(1, "", "all");
+        }
+        initData();
+    }, [loadProducts]);
+
+    // Handle search/category filter with debouncing
+    useEffect(() => {
+        setPage(1);
+        const timer = setTimeout(() => {
+            loadProducts(1, searchQuery, selectedCategory);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchQuery, selectedCategory, loadProducts]);
 
     const handleSave = async () => {
         setSaving(true)
@@ -177,8 +209,8 @@ export default function FlashDealsAdmin() {
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin">
-                            {filteredProducts.length > 0 ? (
-                                filteredProducts.map((product) => {
+                            {allProducts.length > 0 ? (
+                                allProducts.map((product) => {
                                     const isSelected = settings.productIds.includes(product.id)
                                     return (
                                         <div
@@ -211,6 +243,35 @@ export default function FlashDealsAdmin() {
                                 </div>
                             )}
                         </div>
+
+                        {/* Pagination */}
+                        {!searchQuery && (
+                            <div className="flex justify-center items-center gap-4 pt-4 border-t border-black/5 dark:border-white/5">
+                                <button
+                                    onClick={() => {
+                                        const newPage = Math.max(1, page - 1);
+                                        setPage(newPage);
+                                        loadProducts(newPage, "", selectedCategory);
+                                    }}
+                                    disabled={page === 1}
+                                    className="px-4 py-2 bg-surface-100 dark:bg-surface-200 rounded-lg text-xs font-bold disabled:opacity-50 text-foreground dark:text-white"
+                                >
+                                    Oldingi
+                                </button>
+                                <span className="text-xs font-black text-foreground dark:text-white">Sahifa {page}</span>
+                                <button
+                                    onClick={() => {
+                                        const newPage = page + 1;
+                                        setPage(newPage);
+                                        loadProducts(newPage, "", selectedCategory);
+                                    }}
+                                    disabled={!hasMore}
+                                    className="px-4 py-2 bg-surface-100 dark:bg-surface-200 rounded-lg text-xs font-bold disabled:opacity-50 text-foreground dark:text-white"
+                                >
+                                    Keyingi
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

@@ -24,9 +24,16 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
     const [quantity, setQuantity] = useState(1);
     const { currency, exchangeRate, addToCart } = useStore();
     
+    // Fix hydration issue for currency
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
+
     // Calculate total price including upgrades
-    const totalPrice = pc.price + ramUpgrade + storageUpgrade;
-    const price = formatPrice(totalPrice, currency || "UZS", exchangeRate);
+    const isDbPriceInUZS = pc.price > 100000;
+    const ramCost = isDbPriceInUZS ? (ramUpgrade > 0 ? ramUpgrade * exchangeRate : 0) : ramUpgrade;
+    const storageCost = isDbPriceInUZS ? (storageUpgrade > 0 ? storageUpgrade * exchangeRate : 0) : storageUpgrade;
+    const totalPrice = pc.price + ramCost + storageCost;
+    const price = mounted ? formatPrice(totalPrice, currency || "UZS", exchangeRate) : formatPrice(totalPrice, "UZS", exchangeRate);
 
     const handleAddToCart = () => {
         let upgradeText = [];
@@ -72,26 +79,7 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
             { name: "SSD", value: pc.quick_specs?.storage || pc.quick_specs?.ssd }
         ].filter(s => s.value);
 
-    const gamePerformanceList = [
-        {
-            name: "Battlefield 6",
-            resolution: "4K Ultra",
-            fps: "101",
-            bg: "https://mms.businesswire.com/media/20251010673629/en/2605462/5/BF6_Key_Art.jpg"
-        },
-        {
-            name: "Counter-Strike 2",
-            resolution: "4K Ultra",
-            fps: "340",
-            bg: "https://preview.redd.it/today-marks-1-year-since-cs2-official-release-heres-to-10-v0-5227y6wa0frd1.png?auto=webp&s=a18f71a876dcf99bf418b3c191e8c267134aaa1b"
-        },
-        {
-            name: "Fortnite",
-            resolution: "4K Pro",
-            fps: "351",
-            bg: "https://img.lemde.fr/2023/05/08/0/0/0/0/1920/0/75/0/1eb3ee1_1683538507924-thumbnail-cinematic-1920x1080-fe7e748660c2.jpg"
-        }
-    ];
+    const hasFpsTests = pc.fps_tests && pc.fps_tests.length > 0;
 
     return (
         <div className="w-full py-6">
@@ -142,14 +130,14 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
                                             className={`p-3 rounded-xl border-2 text-left transition-all ${ramUpgrade === 0 ? 'border-primary bg-primary/5' : 'border-black/5 dark:border-white/5 hover:border-black/20'}`}
                                         >
                                             <div className="font-black text-sm text-foreground">{t("comp_standart") || "Standart"}</div>
-                                            <div className="text-xs text-surface-500 font-bold">+ {formatPrice(0, currency || "UZS", exchangeRate)}</div>
+                                            <div className="text-xs text-surface-500 font-bold">+ {mounted ? formatPrice(0, currency || "UZS", exchangeRate) : "..."}</div>
                                         </button>
                                         <button 
                                             onClick={() => setRamUpgrade(45)}
                                             className={`p-3 rounded-xl border-2 text-left transition-all ${ramUpgrade === 45 ? 'border-primary bg-primary/5' : 'border-black/5 dark:border-white/5 hover:border-black/20'}`}
                                         >
                                             <div className="font-black text-sm text-foreground">{t("comp_upgrade_32") || "32GB ga oshirish"}</div>
-                                            <div className="text-xs text-primary font-bold">+ {formatPrice(45, currency || "UZS", exchangeRate)}</div>
+                                            <div className="text-xs text-primary font-bold">+ {mounted ? formatPrice(isDbPriceInUZS ? 45 * exchangeRate : 45, currency || "UZS", exchangeRate) : "..."}</div>
                                         </button>
                                     </div>
                                 </div>
@@ -163,14 +151,14 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
                                             className={`p-3 rounded-xl border-2 text-left transition-all ${storageUpgrade === 0 ? 'border-primary bg-primary/5' : 'border-black/5 dark:border-white/5 hover:border-black/20'}`}
                                         >
                                             <div className="font-black text-sm text-foreground">{t("comp_standart") || "Standart"}</div>
-                                            <div className="text-xs text-surface-500 font-bold">+ {formatPrice(0, currency || "UZS", exchangeRate)}</div>
+                                            <div className="text-xs text-surface-500 font-bold">+ {mounted ? formatPrice(0, currency || "UZS", exchangeRate) : "..."}</div>
                                         </button>
                                         <button 
                                             onClick={() => setStorageUpgrade(35)}
                                             className={`p-3 rounded-xl border-2 text-left transition-all ${storageUpgrade === 35 ? 'border-primary bg-primary/5' : 'border-black/5 dark:border-white/5 hover:border-black/20'}`}
                                         >
                                             <div className="font-black text-sm text-foreground">{t("comp_upgrade_1tb") || "1TB ga oshirish"}</div>
-                                            <div className="text-xs text-primary font-bold">+ {formatPrice(35, currency || "UZS", exchangeRate)}</div>
+                                            <div className="text-xs text-primary font-bold">+ {mounted ? formatPrice(isDbPriceInUZS ? 35 * exchangeRate : 35, currency || "UZS", exchangeRate) : "..."}</div>
                                         </button>
                                     </div>
                                 </div>
@@ -255,24 +243,22 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
                 </div>
 
                 {/* Marketing Section: Performance */}
-                <div className="py-24 border-t border-black/5 dark:border-white/5">
-                    <div className="text-center max-w-3xl mx-auto mb-16">
-                        <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4 text-foreground">
-                            {t("perf_title") || t("prebuilt_game_fps_title") || "O'YINLARDAGI KUCHI (FPS)"}
-                        </h2>
-                        <p className="text-xl text-surface-500 font-medium">
-                            {t("prebuilt_game_fps_desc") || "Ushbu kompyuter bilan siz yoqtirgan o'yinlarda qanday natija olishingizni ko'ring."}
-                        </p>
-                    </div>
+                {hasFpsTests && (
+                    <div className="py-24 border-t border-black/5 dark:border-white/5">
+                        <div className="text-center max-w-3xl mx-auto mb-16">
+                            <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4 text-foreground">
+                                {t("perf_title") || t("prebuilt_game_fps_title") || "O'YINLARDAGI KUCHI (FPS)"}
+                            </h2>
+                            <p className="text-xl text-surface-500 font-medium">
+                                {t("prebuilt_game_fps_desc") || "Ushbu kompyuter bilan siz yoqtirgan o'yinlarda qanday natija olishingizni ko'ring."}
+                            </p>
+                        </div>
 
-                    <div className="bg-surface-50 dark:bg-white/5 rounded-[2.5rem] border border-black/5 dark:border-white/10 p-8 md:p-12">
-                        {(() => {
-                            const usdPrice = pc.price > 1000000 ? pc.price / 12600 : pc.price;
-                            const fpsBaseScore = Math.max(60, usdPrice / 10);
-                            return <FPSCalculator baseScore={fpsBaseScore} t={t} />;
-                        })()}
+                        <div className="bg-surface-50 dark:bg-white/5 rounded-[2.5rem] border border-black/5 dark:border-white/10 p-8 md:p-12">
+                            <FPSCalculator fpsTests={pc.fps_tests} t={t} />
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* Marketing Section: What's Included */}
                 <div className="py-24 border-t border-black/5 dark:border-white/5">
@@ -360,22 +346,28 @@ function SpecChip({ icon, value, label }) {
     );
 }
 
-function FPSCalculator({ baseScore, t }) {
-    const games = [
-        { name: "CS2", multiplier: 2.5, img: "https://preview.redd.it/today-marks-1-year-since-cs2-official-release-heres-to-10-v0-5227y6wa0frd1.png?auto=webp&s=a18f71a876dcf99bf418b3c191e8c267134aaa1b" },
-        { name: "Valorant", multiplier: 2.8, img: "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt7270e5b7fbca5eb8/623277908b982e0e5aee08e6/VALORANT_Episode4_Act2_Press_KeyArt.png" },
-        { name: "GTA V", multiplier: 1.8, img: "https://media-rockstargames-com.akamaized.net/rockstargames-newsite/global/23fbdd3d-f21d-4006-a83a-867df3c9c614.jpg" },
-        { name: "Cyberpunk", multiplier: 0.8, img: "https://mms.businesswire.com/media/20201209005953/en/845688/5/Cyberpunk_2077_Key_Art.jpg" },
-        { name: "PUBG", multiplier: 1.5, img: "https://wstatic-prod-boc.krafton.com/common/bg/pubg-bg.jpg" }
-    ];
+function FPSCalculator({ fpsTests, t }) {
+    const gameImages = {
+        "CS2": "https://preview.redd.it/today-marks-1-year-since-cs2-official-release-heres-to-10-v0-5227y6wa0frd1.png?auto=webp&s=a18f71a876dcf99bf418b3c191e8c267134aaa1b",
+        "Valorant": "https://images.contentstack.io/v3/assets/bltb6530b271fddd0b1/blt7270e5b7fbca5eb8/623277908b982e0e5aee08e6/VALORANT_Episode4_Act2_Press_KeyArt.png",
+        "GTA V": "https://media-rockstargames-com.akamaized.net/rockstargames-newsite/global/23fbdd3d-f21d-4006-a83a-867df3c9c614.jpg",
+        "Cyberpunk": "https://mms.businesswire.com/media/20201209005953/en/845688/5/Cyberpunk_2077_Key_Art.jpg",
+        "PUBG": "https://wstatic-prod-boc.krafton.com/common/bg/pubg-bg.jpg"
+    };
+
+    const games = fpsTests.map(test => ({
+        name: test.name,
+        fps: parseInt(test.fps) || 60,
+        img: gameImages[test.name] || gameImages["CS2"]
+    }));
+
     const resolutions = ["1080p", "1440p", "4K"];
     const [selectedGame, setSelectedGame] = useState(games[0]);
-    const [selectedRes, setSelectedRes] = useState("1440p");
+    const [selectedRes, setSelectedRes] = useState("1080p");
 
-    const getResMultiplier = (res) => res === "1080p" ? 1.5 : res === "1440p" ? 1.0 : 0.6;
+    const getResMultiplier = (res) => res === "1080p" ? 1.0 : res === "1440p" ? 0.75 : 0.5;
     
-    // Very simple pseudo-calculation based on price
-    const calculatedFps = Math.round(baseScore * selectedGame.multiplier * getResMultiplier(selectedRes));
+    const calculatedFps = Math.round(selectedGame.fps * getResMultiplier(selectedRes));
     
     // Animate numbers smoothly
     const [displayFps, setDisplayFps] = useState(0);
@@ -388,7 +380,6 @@ function FPSCalculator({ baseScore, t }) {
         const animate = (time) => {
             const elapsed = time - startTime;
             const progress = Math.min(elapsed / duration, 1);
-            // Ease out quad
             const easeProgress = progress * (2 - progress);
             setDisplayFps(Math.round(start + (end - start) * easeProgress));
             if (progress < 1) requestAnimationFrame(animate);

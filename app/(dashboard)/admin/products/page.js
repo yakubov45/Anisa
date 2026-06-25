@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { productService } from "@/lib/services/product.service";
+import { getAdminProductsAction } from "@/lib/actions/product.actions";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
 import InventoryTools from "@/components/admin/InventoryTools";
@@ -12,15 +13,20 @@ export default function AdminProductsPage() {
     const { t } = useTranslation();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const limit = 10;
 
     useEffect(() => {
         const fetch = async () => {
-            const data = await productService.getAll();
-            setProducts(data || []);
+            setLoading(true);
+            const data = await getAdminProductsAction(page, limit);
+            setProducts(data?.products || []);
+            setTotalPages(Math.ceil((data?.total || 0) / limit) || 1);
             setLoading(false);
         };
         fetch();
-    }, []);
+    }, [page]);
 
     const handleDelete = async (id) => {
         if (confirm(t('prod_confirm_delete'))) {
@@ -133,6 +139,30 @@ export default function AdminProductsPage() {
                         </tbody>
                     </table>
                 </div>
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className="flex items-center justify-between px-8 py-4 border-t border-surface-100 bg-surface-50">
+                        <span className="text-xs font-bold text-surface-400">
+                            Sahifa {page} / {totalPages}
+                        </span>
+                        <div className="flex items-center gap-2">
+                            <button
+                                disabled={page === 1}
+                                onClick={() => setPage(p => p - 1)}
+                                className="px-4 py-2 text-xs font-black uppercase tracking-widest bg-white border border-surface-200 rounded-xl disabled:opacity-50 hover:border-primary transition-all text-surface-900"
+                            >
+                                Oldingi
+                            </button>
+                            <button
+                                disabled={page === totalPages}
+                                onClick={() => setPage(p => p + 1)}
+                                className="px-4 py-2 text-xs font-black uppercase tracking-widest bg-white border border-surface-200 rounded-xl disabled:opacity-50 hover:border-primary transition-all text-surface-900"
+                            >
+                                Keyingi
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

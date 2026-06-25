@@ -3,7 +3,8 @@ import {
     getProductsAction, 
     getCategoriesAction, 
     getProductsCountAction,
-    getSearchProductsAction
+    getSearchProductsAction,
+    getFilteredProductsAction
 } from "@/lib/actions/product.actions";
 
 export default async function ProductsPage({ searchParams }) {
@@ -14,10 +15,10 @@ export default async function ProductsPage({ searchParams }) {
     let countPromise;
 
     if (search) {
-        productsPromise = getSearchProductsAction(search);
-        countPromise = Promise.resolve(0);
+        productsPromise = getSearchProductsAction(search, 12);
+        countPromise = Promise.resolve(null); // Count search natijasidan olinadi
     } else if (category) {
-        productsPromise = getSearchProductsAction();
+        productsPromise = getFilteredProductsAction({ categoryId: category, page: currentPage, pageSize: 12 });
         countPromise = getProductsCountAction(category);
     } else {
         productsPromise = getProductsAction(currentPage, 12);

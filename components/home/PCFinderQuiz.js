@@ -127,7 +127,7 @@ export default function PCFinderQuiz() {
             </div>
 
             <div className="flex-1 w-full relative z-10 hidden md:block">
-                <img src="https://www.google.com/imgres?q=modern%20computer%20fotos&imgurl=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1525547719571-a2d4ac8945e2%3Ffm%3Djpg%26q%3D60%26w%3D3000%26auto%3Dformat%26fit%3Dcrop%26ixlib%3Drb-4.1.0%26ixid%3DM3wxMjA3fDB8MHxzZWFyY2h8M3x8Y29tcHV0ZXJ8ZW58MHx8MHx8fDA%253D&imgrefurl=https%3A%2F%2Funsplash.com%2Fs%2Fphotos%2Fcomputer&docid=WjFMXVMU2MKcuM&tbnid=uGvESnLpLrohcM&vet=12ahUKEwjq6NPxsc2UAxU3_rsIHTxOEmkQnPAOegQINRAB..i&w=3000&h=3750&hcb=2&ved=2ahUKEwjq6NPxsc2UAxU3_rsIHTxOEmkQnPAOegQINRAB" alt="PC Finder" className="w-full h-auto drop-shadow-2xl scale-110 hover:scale-125 transition-transform duration-700" />
+                <img src="https://darkflash-image-cloud.s3.us-west-2.amazonaws.com/cdn/article/attach/000000000000193/202504300032068.jpg" alt="PC Finder" className="w-full h-64 md:h-80 lg:h-96 object-cover object-center drop-shadow-2xl hover:scale-105 transition-transform duration-700 rounded-3xl" />
             </div>
 
             {/* Modal */}

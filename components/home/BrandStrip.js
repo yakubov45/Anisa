@@ -23,7 +23,7 @@ export default function BrandStrip() {
     return (
         <section className="py-12 md:py-16 border-y border-white/5 overflow-hidden relative">
             <div className="flex">
-                <motion.div 
+                <motion.div
                     className="flex gap-16 md:gap-24 pr-16 md:pr-24 items-center opacity-60 hover:opacity-100 transition-opacity duration-500"
                     animate={{ x: ["0%", "-50%"] }}
                     transition={{
@@ -33,8 +33,8 @@ export default function BrandStrip() {
                     }}
                 >
                     {brands.map((brand, i) => (
-                        <div 
-                            key={`${brand.id || brand.name}-${i}`} 
+                        <div
+                            key={`${brand.id || brand.name}-${i}`}
                             className="h-8 md:h-12 w-auto relative flex-shrink-0 flex items-center justify-center group cursor-pointer transition-all duration-300"
                         >
                             <div className="flex items-center gap-8 md:gap-16">

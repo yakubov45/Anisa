@@ -1,13 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { createPreBuiltSystemAction } from "@/lib/actions/product.actions";
+import { getPreBuiltByIdAction, updatePreBuiltSystemAction } from "@/lib/actions/product.actions";
 import toast from "react-hot-toast";
 
-export default function NewPrebuiltPage() {
+export default function EditPrebuiltPage({ params }) {
+    const { id } = params;
     const [loading, setLoading] = useState(false);
+    const [fetching, setFetching] = useState(true);
     const [file, setFile] = useState(null);
+    const [existingImage, setExistingImage] = useState("");
     const [form, setForm] = useState({ 
         name: "", 
         price: "", 
@@ -28,6 +31,40 @@ export default function NewPrebuiltPage() {
         { name: "PUBG", fps: "", isTested: false }
     ]);
     const router = useRouter();
+
+    useEffect(() => {
+        async function loadData() {
+            const data = await getPreBuiltByIdAction(id);
+            if (data) {
+                setForm({
+                    name: data.name || "",
+                    price: data.price || "",
+                    badges: data.badges?.[0] || "New",
+                    isFeatured: data.isFeatured ?? true
+                });
+                if (data.specifications && data.specifications.length > 0) {
+                    setSpecs(data.specifications);
+                }
+                if (data.fps_tests && data.fps_tests.length > 0) {
+                    const mergedFps = fpsGames.map(game => {
+                        const found = data.fps_tests.find(g => g.name === game.name);
+                        if (found) {
+                            return { ...game, ...found, isTested: true };
+                        }
+                        return game;
+                    });
+                    setFpsGames(mergedFps);
+                }
+                if (data.images && data.images.length > 0) {
+                    setExistingImage(data.images[0]);
+                }
+            } else {
+                toast.error("Topilmadi!");
+            }
+            setFetching(false);
+        }
+        loadData();
+    }, [id]);
 
     const handleFileChange = (e) => {
         if (e.target.files[0]) {
@@ -60,10 +97,9 @@ export default function NewPrebuiltPage() {
         setLoading(true);
         
         try {
-            let imageUrl = "";
+            let imageUrl = existingImage;
 
             if (file) {
-                // ImageKit orqali yuklash (Firebase Storage o'rniga)
                 const authRes = await fetch('/api/imagekit/auth');
                 if (!authRes.ok) throw new Error("ImageKit auth xatosi");
                 const { signature, expire, token } = await authRes.json();
@@ -91,7 +127,6 @@ export default function NewPrebuiltPage() {
                 imageUrl = uploadData.url;
             }
 
-            // Fallback for standard quick_specs compatibility
             const cpuVal = specs.find(s => s.name.toUpperCase() === "CPU")?.value || "";
             const gpuVal = specs.find(s => s.name.toUpperCase() === "GPU")?.value || "";
             const ramVal = specs.find(s => s.name.toUpperCase() === "RAM")?.value || "";
@@ -113,22 +148,24 @@ export default function NewPrebuiltPage() {
                 isFeatured: form.isFeatured
             };
 
-            const res = await createPreBuiltSystemAction(data);
+            const res = await updatePreBuiltSystemAction(id, data);
             
             if (res.success) {
-                toast.success("Tayyor kompyuter muvaffaqiyatli qo'shildi!");
-                router.push("/prebuilts");
+                toast.success("Tayyor kompyuter muvaffaqiyatli saqlandi!");
+                router.push("/admin/prebuilts");
             } else {
                 toast.error("Xatolik: " + res.error);
             }
 
         } catch (error) {
-            console.error("Failed to create prebuilt:", error);
+            console.error("Failed to update prebuilt:", error);
             toast.error("Xatolik yuz berdi");
         } finally {
             setLoading(false);
         }
     };
+
+    if (fetching) return <div className="p-10 text-center">Yuklanmoqda...</div>;
 
     return (
         <div className="max-w-5xl mx-auto space-y-10 animate-fade-in pb-24 px-4 md:px-0 text-foreground">
@@ -136,19 +173,16 @@ export default function NewPrebuiltPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-black/5 dark:border-white/5 pb-6">
                 <div className="space-y-1">
                     <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase bg-gradient-to-r from-primary to-rose-500 bg-clip-text text-transparent">
-                        Yangi Prebuilt Tizim
+                        Tahrirlash: {form.name}
                     </h1>
                     <p className="text-sm text-surface-500 font-medium">
-                        ZTT darajasidagi yangi tayyor kompyuterni bazaga qo'shish va nashr qilish.
+                        Tayyor kompyuterni tahrirlash
                     </p>
                 </div>
                 <a 
-                    href="/admin" 
+                    href="/admin/prebuilts" 
                     className="self-start md:self-auto bg-surface-100 dark:bg-white/10 hover:bg-surface-200 dark:hover:bg-white/20 text-foreground px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-colors flex items-center gap-2 border border-black/5 dark:border-white/5"
                 >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
                     Orqaga
                 </a>
             </div>
@@ -164,6 +198,7 @@ export default function NewPrebuiltPage() {
                             </label>
                             <input 
                                 type="text" 
+                                value={form.name}
                                 placeholder="Masalan: ZTT War Machine v1"
                                 onChange={e => setForm({ ...form, name: e.target.value })} 
                                 className="w-full bg-surface-50 dark:bg-black/30 border border-black/10 dark:border-white/10 text-foreground rounded-2xl px-5 py-4 text-sm font-bold focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-surface-400" 
@@ -174,7 +209,7 @@ export default function NewPrebuiltPage() {
                         {/* File Upload Dropzone */}
                         <div className="space-y-2">
                             <label className="text-[11px] font-black text-surface-400 dark:text-surface-500 uppercase tracking-widest pl-1">
-                                Rasm yuklash
+                                Rasm yuklash (Ixtiyoriy)
                             </label>
                             <div className="relative group cursor-pointer">
                                 <input 
@@ -184,19 +219,14 @@ export default function NewPrebuiltPage() {
                                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
                                 />
                                 <div className="border-2 border-dashed border-black/10 dark:border-white/15 rounded-2xl p-8 text-center group-hover:border-primary/50 transition-colors flex flex-col items-center justify-center gap-3 bg-surface-50 dark:bg-black/20">
-                                    <div className="w-12 h-12 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary transition-transform group-hover:scale-115">
-                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                    </div>
                                     <div className="space-y-1">
                                         <span className="block text-xs font-black uppercase tracking-wider text-foreground">
-                                            {file ? file.name : "Rasm tanlash uchun bosing"}
-                                        </span>
-                                        <span className="block text-[10px] text-surface-400 font-medium">
-                                            Sudrab kelish ham mumkin • PNG, JPG, WEBP
+                                            {file ? file.name : (existingImage ? "Yangi rasm tanlash" : "Rasm tanlash uchun bosing")}
                                         </span>
                                     </div>
+                                    {existingImage && !file && (
+                                        <img src={existingImage} className="h-20 object-contain rounded-xl" alt="Mavjud rasm" />
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -212,9 +242,6 @@ export default function NewPrebuiltPage() {
                                     onClick={addSpecRow}
                                     className="bg-primary/10 dark:bg-primary/25 hover:bg-primary/20 text-primary text-[10px] font-black uppercase tracking-wider px-3.5 py-2 rounded-xl transition-all hover:scale-102 flex items-center gap-1.5"
                                 >
-                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
-                                    </svg>
                                     Parametr Qo'shish
                                 </button>
                             </div>
@@ -225,7 +252,6 @@ export default function NewPrebuiltPage() {
                                         key={i} 
                                         className="grid grid-cols-12 gap-3 items-center bg-surface-50 dark:bg-black/20 p-3 rounded-2xl border border-black/5 dark:border-white/5 shadow-inner"
                                     >
-                                        {/* Spec Name (e.g. CPU) */}
                                         <div className="col-span-4">
                                             <input 
                                                 type="text" 
@@ -237,7 +263,6 @@ export default function NewPrebuiltPage() {
                                             />
                                         </div>
                                         
-                                        {/* Spec Value (e.g. Ryzen 7) */}
                                         <div className="col-span-5">
                                             <input 
                                                 type="text" 
@@ -249,7 +274,6 @@ export default function NewPrebuiltPage() {
                                             />
                                         </div>
 
-                                        {/* Featured Toggle Checkbox */}
                                         <div className="col-span-2 flex justify-center">
                                             <label className="flex items-center gap-1.5 cursor-pointer select-none">
                                                 <input 
@@ -262,7 +286,6 @@ export default function NewPrebuiltPage() {
                                             </label>
                                         </div>
 
-                                        {/* Delete Button */}
                                         <div className="col-span-1 flex justify-end">
                                             <button 
                                                 type="button" 
@@ -330,6 +353,7 @@ export default function NewPrebuiltPage() {
                             </label>
                             <input 
                                 type="number" 
+                                value={form.price}
                                 onChange={e => setForm({ ...form, price: e.target.value })} 
                                 className="w-full bg-surface-50 dark:bg-black/30 border border-black/10 dark:border-white/10 rounded-2xl px-5 py-4 text-sm font-black text-primary focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-surface-400" 
                                 placeholder="0"
@@ -343,6 +367,7 @@ export default function NewPrebuiltPage() {
                                 Nishon (Badge)
                             </label>
                             <select 
+                                value={form.badges}
                                 onChange={e => setForm({ ...form, badges: e.target.value })} 
                                 className="w-full bg-surface-50 dark:bg-black/30 border border-black/10 dark:border-white/10 rounded-2xl px-5 py-4 text-sm font-black uppercase tracking-widest focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all cursor-pointer text-foreground"
                             >
@@ -373,22 +398,7 @@ export default function NewPrebuiltPage() {
                         disabled={loading}
                         className="w-full bg-gradient-to-r from-primary to-rose-500 text-white font-black py-5 rounded-[2rem] shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 active:scale-98 transition-all disabled:opacity-50 disabled:hover:scale-100 uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-2 border border-white/10"
                     >
-                        {loading ? (
-                            <>
-                                <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                                </svg>
-                                Yuklanmoqda...
-                            </>
-                        ) : (
-                            <>
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                                </svg>
-                                Saqlash va Joylash
-                            </>
-                        )}
+                        {loading ? "Saqlanmoqda..." : "Saqlash"}
                     </button>
                 </div>
             </form>

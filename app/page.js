@@ -38,7 +38,7 @@ export default async function HomePage() {
             const discountedProducts = allProducts.filter(p => p.discount > 0);
             flashDeals = {
                 settings: flashSettings,
-                products: discountedProducts.length > 0 ? discountedProducts.slice(0, 8) : allProducts.slice(0, 8) // Fallback if no discounted products exist yet
+                products: discountedProducts // Only show products that actually have a discount assigned by admin
             };
         }
     } catch (error) {

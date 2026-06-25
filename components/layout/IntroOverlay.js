@@ -52,13 +52,13 @@ export default function IntroOverlay() {
                     className="absolute inset-0 opacity-20"
                     style={{
                         backgroundImage:
-                            "linear-gradient(rgba(0,255,255,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,255,0.15) 1px, transparent 1px)",
+                            "linear-gradient(rgba(227,30,36,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(227,30,36,0.15) 1px, transparent 1px)",
                         backgroundSize: "60px 60px",
                     }}
                 />
 
                 {/* Radial glow */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,255,255,0.12),transparent_60%)] pointer-events-none" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(227,30,36,0.12),transparent_60%)] pointer-events-none" />
 
                 {/* Center content */}
                 <div className="relative flex flex-col items-center gap-8">
@@ -70,8 +70,8 @@ export default function IntroOverlay() {
                             transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
                             style={{
                                 border: "2px solid transparent",
-                                borderTopColor: "#00ffff",
-                                borderRightColor: "rgba(0,255,255,0.2)",
+                                borderTopColor: "#E31E24",
+                                borderRightColor: "rgba(227,30,36,0.2)",
                             }}
                         />
                         <motion.div
@@ -80,8 +80,8 @@ export default function IntroOverlay() {
                             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                             style={{
                                 border: "1px solid transparent",
-                                borderBottomColor: "#00ffff",
-                                borderLeftColor: "rgba(0,255,255,0.15)",
+                                borderBottomColor: "#E31E24",
+                                borderLeftColor: "rgba(227,30,36,0.15)",
                             }}
                         />
                         {/* Logo center */}
@@ -91,11 +91,11 @@ export default function IntroOverlay() {
                             transition={{ delay: 0.2, duration: 0.6, ease: "backOut" }}
                             className="w-14 h-14 rounded-xl flex items-center justify-center"
                             style={{
-                                background: "rgba(0,255,255,0.08)",
-                                border: "1px solid rgba(0,255,255,0.3)",
+                                background: "rgba(227,30,36,0.08)",
+                                border: "1px solid rgba(227,30,36,0.3)",
                             }}
                         >
-                            <span className="text-cyan-400 font-black text-xl tracking-tighter">1PC</span>
+                            <span className="text-[#E31E24] font-black text-xl tracking-tighter">1PC</span>
                         </motion.div>
                     </div>
 
@@ -107,7 +107,7 @@ export default function IntroOverlay() {
                         className="text-center"
                     >
                         <p className="text-white font-black text-3xl tracking-[0.3em] uppercase">OnePC</p>
-                        <p style={{ color: "rgba(0,255,255,0.6)" }} className="text-[10px] tracking-[0.5em] font-mono mt-1 uppercase">
+                        <p style={{ color: "rgba(227,30,36,0.6)" }} className="text-[10px] tracking-[0.5em] font-mono mt-1 uppercase">
                             Initializing System
                         </p>
                     </motion.div>
@@ -122,7 +122,7 @@ export default function IntroOverlay() {
                     >
                         <motion.div
                             className="h-full rounded-full"
-                            style={{ background: "#00ffff" }}
+                            style={{ background: "#E31E24" }}
                             initial={{ width: "0%" }}
                             animate={{ width: "100%" }}
                             transition={{ delay: 0.8, duration: 1.5, ease: "easeInOut" }}

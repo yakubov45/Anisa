@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { getCurrencySettingsAction, updateCurrencyRateAction } from "@/lib/actions/currency.actions"
+import toast from "react-hot-toast"
 
 export default function CurrencyAdmin() {
     const [rate, setRate] = useState(12800)
@@ -25,8 +26,10 @@ export default function CurrencyAdmin() {
         setSaving(true)
         const success = await updateCurrencyRateAction(rate)
         if (success) {
-            alert("Exchange rate updated successfully!")
+            toast.success("Kurs muvaffaqiyatli yangilandi!")
             setLastUpdated(new Date().toISOString())
+        } else {
+            toast.error("Xatolik yuz berdi")
         }
         setSaving(false)
     }

@@ -241,7 +241,7 @@ function PrebuiltCard({ pc, index = 0, t, language }) {
                 </div>
 
                 {/* Actions Bottom Bar */}
-                <div className="flex items-center gap-3 mt-2">
+                <div className="flex items-center gap-3 mt-auto pt-4">
                     <Link
                         href={`/prebuilts/${pc.id}`}
                         className="flex-1 bg-transparent hover:bg-surface-100 dark:hover:bg-white/5 text-foreground text-center py-3.5 px-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center border border-surface-200 dark:border-white/10"

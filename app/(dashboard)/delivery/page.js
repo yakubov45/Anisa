@@ -135,7 +135,7 @@ export default function DeliveryDashboard() {
                     { name: t('del_my_active'), href: "/delivery/orders", icon: "📦" },
                     { name: t('del_history'), href: "/delivery/history", icon: "📊" },
                     { name: t('del_verification'), href: "/delivery/scan", icon: "🔐" },
-                    { name: t('del_support'), href: "https://t.me/onepc_support", icon: "💬", external: true }
+                    { name: t('del_support'), href: "https://t.me/onepc_uz_bot", icon: "💬", external: true }
                 ].map((action, i) => (
                     action.external ? (
                         <a key={i} href={action.href} target="_blank" rel="noopener noreferrer" className="bg-[#161B22] border border-white/5 p-8 rounded-[2rem] flex flex-col items-center gap-4 hover:bg-primary transition-all text-center group">

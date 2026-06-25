@@ -121,7 +121,7 @@ export default function DiscountBanner({ flashDeals }) {
                     <div ref={scrollRef} onScroll={handleScroll} className="flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4 pt-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                         {products.map((product) => (
                             <div key={product.id} className="min-w-[280px] sm:min-w-[320px] md:min-w-[360px] snap-start">
-                                <ProductCard product={{ ...product, discount: settings?.discountPercentage || 15 }} badge="FLASH" />
+                                <ProductCard product={product} badge="FLASH" />
                             </div>
                         ))}
                     </div>
