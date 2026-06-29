@@ -24,6 +24,12 @@ service firebase.storage {
       allow write: if isAdmin();
     }
     
+    // Prebuilts rasmlari
+    match /prebuilts/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
     // Brands rasmlari
     match /brands/{allPaths=**} {
       allow read: if true;
@@ -34,6 +40,11 @@ service firebase.storage {
     match /users/{userId}/{allPaths=**} {
       allow read: if true;
       allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    match /avatars/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAuthenticated();
     }
     
     // Boshqa barcha fayllar - yopiq

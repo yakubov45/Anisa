@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPreBuiltSystemAction } from "@/lib/actions/product.actions";
+import { uploadService } from "@/lib/services/upload.service";
 import toast from "react-hot-toast";
 
 export default function NewPrebuiltPage() {
@@ -63,32 +64,8 @@ export default function NewPrebuiltPage() {
             let imageUrl = "";
 
             if (file) {
-                // ImageKit orqali yuklash (Firebase Storage o'rniga)
-                const authRes = await fetch('/api/imagekit/auth');
-                if (!authRes.ok) throw new Error("ImageKit auth xatosi");
-                const { signature, expire, token } = await authRes.json();
-
-                const formData = new FormData();
-                formData.append("file", file);
-                formData.append("fileName", `${Date.now()}_${file.name}`);
-                formData.append("folder", "/prebuilts");
-                formData.append("publicKey", process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY);
-                formData.append("signature", signature);
-                formData.append("expire", expire);
-                formData.append("token", token);
-
-                const uploadRes = await fetch("https://upload.imagekit.io/api/v1/files/upload", {
-                    method: "POST",
-                    body: formData,
-                });
-
-                if (!uploadRes.ok) {
-                    const err = await uploadRes.json();
-                    throw new Error(err.message || "Rasm yuklashda xato");
-                }
-
-                const uploadData = await uploadRes.json();
-                imageUrl = uploadData.url;
+                // Firebase Storage orqali yuklash
+                imageUrl = await uploadService.uploadImage(file, 'prebuilts');
             }
 
             // Fallback for standard quick_specs compatibility
