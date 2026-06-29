@@ -82,11 +82,11 @@ function ProductCard({ product, badge = null, rating = null }) {
             {/* Precision Badge */}
             <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
                 {badge ? (
-                    <div className="bg-primary text-white text-[8px] md:text-[9px] font-black px-2 py-0.5 md:px-2.5 md:py-1 rounded-lg uppercase tracking-widest shadow-xl">
+                    <div className="bg-primary text-white text-[7px] md:text-[9px] font-black px-1.5 py-0.5 md:px-2.5 md:py-1 rounded-md md:rounded-lg uppercase tracking-wider md:tracking-widest shadow-xl">
                         {badgeKeys[badge] || badge}
                     </div>
                 ) : product.discount ? (
-                    <div className="bg-primary/20 backdrop-blur-md border border-primary/30 text-primary text-[8px] md:text-[9px] font-black px-2 py-0.5 md:px-2.5 md:py-1 rounded-lg uppercase tracking-widest">
+                    <div className="bg-primary/20 backdrop-blur-md border border-primary/30 text-primary text-[7px] md:text-[9px] font-black px-1.5 py-0.5 md:px-2.5 md:py-1 rounded-md md:rounded-lg uppercase tracking-wider md:tracking-widest">
                         SALE {product.discount}%
                     </div>
                 ) : null}
@@ -207,7 +207,7 @@ function ProductCard({ product, badge = null, rating = null }) {
                 </div>
 
                 <Link href={`/products/${product.id}`} className="py-1">
-                    <h3 className="font-extrabold text-foreground text-[10px] md:text-base tracking-wider md:tracking-widest group-hover:text-primary transition-colors line-clamp-2 uppercase leading-relaxed md:leading-relaxed">
+                    <h3 className="font-extrabold text-foreground text-[9px] md:text-sm tracking-normal md:tracking-wider group-hover:text-primary transition-colors line-clamp-2 uppercase leading-snug md:leading-relaxed">
                         {product.name}
                     </h3>
                 </Link>
@@ -218,26 +218,26 @@ function ProductCard({ product, badge = null, rating = null }) {
                         {product.discount > 0 ? (
                             <PriceDisplay
                                 price={displayPrice}
-                                className="text-[9px] md:text-[10px] text-surface-400 line-through font-bold opacity-60 min-h-[14px] md:min-h-[15px]"
+                                className="text-[8px] md:text-[10px] text-surface-400 line-through font-bold opacity-60 min-h-[12px] md:min-h-[15px]"
                             />
                         ) : (
-                            <div className="min-h-[14px] md:min-h-[15px]" />
+                            <div className="min-h-[12px] md:min-h-[15px]" />
                         )}
                         <PriceDisplay
                             price={product.discount > 0 ? displayPrice * (1 - product.discount / 100) : displayPrice}
-                            className="font-black text-[11px] md:text-lg text-foreground tracking-tight"
+                            className="font-black text-[10px] md:text-base text-foreground tracking-tight"
                         />
                     </div>
 
                     {/* Buttons */}
-                    <div className="flex gap-2">
-                        <Link href={`/products/${product.id}`} className="btn-premium btn-premium-dark flex-1 h-9 md:h-11 font-black text-[9px] md:text-[10px] uppercase tracking-widest rounded-lg md:rounded-xl flex items-center justify-center">
+                    <div className="flex gap-1.5 md:gap-2">
+                        <Link href={`/products/${product.id}`} className="btn-premium btn-premium-dark flex-1 h-8 md:h-11 font-black text-[7px] md:text-[10px] uppercase tracking-wider md:tracking-widest rounded-md md:rounded-xl flex items-center justify-center">
                             {t('details')}
                         </Link>
                         <button
                             onClick={handleAddToCart}
                             disabled={displayStock <= 0}
-                            className={`btn-premium flex-[2] h-9 md:h-11 font-black text-[8px] md:text-[10px] uppercase tracking-widest rounded-lg md:rounded-xl shadow-lg transition-all
+                            className={`btn-premium flex-[2] h-8 md:h-11 font-black text-[7px] md:text-[10px] uppercase tracking-wider md:tracking-widest rounded-md md:rounded-xl shadow-lg transition-all
                                 ${displayStock > 0 ? 'btn-premium-red' : 'bg-surface-300 text-surface-500 cursor-not-allowed border-none'}
                             `}
                         >
