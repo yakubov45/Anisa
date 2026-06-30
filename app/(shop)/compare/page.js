@@ -7,6 +7,8 @@ import ImageWithFallback from "@/components/common/ImageWithFallback";
 import PriceDisplay from "@/components/common/PriceDisplay";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { translateSpec } from "@/lib/utils/translateSpec";
+import { getSpecExplanation } from "@/lib/utils/specExplanations";
 
 export default function ComparePage() {
     const { compareList, removeFromCompare } = useStore();
@@ -85,57 +87,6 @@ export default function ComparePage() {
     const openModal = (spec) => setActiveModal(spec);
     const closeModal = () => setActiveModal(null);
 
-    // Xususiyatlar nima uchun kerakligini tushuntiruvchi lug'at
-    const getExplanation = (specName) => {
-        const key = specName.toUpperCase();
-        if (key.includes('CPU') || key.includes('PROTSESSOR')) return {
-            uz: "Protsessor (CPU) — kompyuterning 'miyasi'. U barcha hisoblash ishlarini bajaradi. Kuchli protsessor o'yinlarda qotib qolmaslikni va dasturlar tez ishlashini ta'minlaydi.",
-            ru: "Процессор (CPU) — это 'мозг' компьютера. Он выполняет все вычисления. Мощный процессор обеспечивает плавную игру без лагов и быструю работу программ.",
-            en: "The Processor (CPU) is the 'brain' of the computer. It performs all calculations. A powerful CPU ensures smooth gaming without lag and fast program execution."
-        };
-        if (key.includes('GPU') || key.includes('VIDEOKARTA') || key.includes('VGA')) return {
-            uz: "Videokarta (GPU) — vizual ma'lumotlarni qayta ishlaydi. O'yinlarda yuqori grafika va ravon tasvir (FPS) olish uchun eng muhim qism hisoblanadi.",
-            ru: "Видеокарта (GPU) — обрабатывает визуальные данные. Это самая важная часть для получения высокой графики и плавного изображения (FPS) в играх.",
-            en: "The Graphics Card (GPU) renders visuals. It is the most important part for achieving high graphics and smooth frame rates (FPS) in games."
-        };
-        if (key.includes('RAM') || (key.includes('XOTIRA') && key.includes('TEZKOR')) || key.includes('MEMORY')) return {
-            uz: "Tezkor xotira (RAM) — kompyuter ayni paytda ishlayotgan dasturlar va o'yinlar ma'lumotlarini vaqtinchalik saqlaydi. RAM qancha ko'p bo'lsa, bir vaqtning o'zida shuncha ko'p dastur ishlatish mumkin.",
-            ru: "Оперативная память (RAM) — временно хранит данные программ и игр, с которыми компьютер работает в данный момент. Чем больше RAM, тем больше программ можно использовать одновременно.",
-            en: "Random Access Memory (RAM) temporarily stores data for currently running programs and games. More RAM allows you to run more applications simultaneously."
-        };
-        if (key.includes('STORAGE') || key.includes('SSD') || key.includes('HDD') || key.includes('NVME') || (key.includes('XOTIRA') && !key.includes('TEZKOR'))) return {
-            uz: "Xotira (SSD/HDD) — o'yinlar, rasmlar va Windows operatsion tizimi saqlanadigan joy. SSD qancha tez bo'lsa, kompyuter shuncha tez yonadi va o'yinlar tez yuklanadi.",
-            ru: "Накопитель (SSD/HDD) — место, где хранятся игры, фото и операционная система. Чем быстрее SSD, тем быстрее включается компьютер и загружаются игры.",
-            en: "Storage (SSD/HDD) is where games, files, and the OS are kept. A faster SSD means the computer turns on faster and games load instantly."
-        };
-        if (key.includes('MOTHERBOARD') || key.includes('ONA PLATA') || key.includes('MOBO') || key.includes('PLATA')) return {
-            uz: "Ona plata (Motherboard) — barcha qismlarni bir-biriga bog'lovchi asosiy plata. U qismlar o'rtasida ma'lumot almashinuvini ta'minlaydi va kelajakda kompyuterni kuchaytirish imkoniyatini belgilaydi.",
-            ru: "Материнская плата — основная плата, соединяющая все компоненты. Она обеспечивает обмен данными между ними и определяет возможности для будущего апгрейда.",
-            en: "The Motherboard connects all components together. It enables data exchange and determines the upgradeability of your computer in the future."
-        };
-        if (key.includes('POWER') || key.includes('QUVVAT') || key.includes('PSU') || key.includes('BLOK')) return {
-            uz: "Quvvat bloki (PSU) — barcha qismlarni elektr energiya bilan ta'minlaydi. Uning sifatli bo'lishi kompyuterning uzoq va xavfsiz ishlashi uchun juda muhim.",
-            ru: "Блок питания (PSU) — снабжает все компоненты электроэнергией. Его качество крайне важно для долгой и безопасной работы компьютера.",
-            en: "The Power Supply Unit (PSU) provides electricity to all parts. A high-quality PSU is crucial for the long and safe operation of the computer."
-        };
-        if (key.includes('COOLER') || key.includes('SOVUTISH') || key.includes('AIO') || key.includes('COOLING')) return {
-            uz: "Sovutish tizimi (Cooler) — protsessor va boshqa qismlar qizib ketmasligini ta'minlaydi. Yaxshi sovutkich kompyuterning barqaror va tinch ishlashini kafolatlaydi.",
-            ru: "Система охлаждения — предотвращает перегрев процессора и других деталей. Хороший кулер гарантирует стабильную и тихую работу.",
-            en: "The Cooling system prevents the CPU and other parts from overheating. A good cooler guarantees stable and quiet operation."
-        };
-        if (key.includes('CASE') || key.includes('KORPUS')) return {
-            uz: "Korpus (Case) — barcha qismlarni o'zida jamlovchi quti. Uning yaxshi shamollatilishi qismlarning qizib ketishini oldini oladi va dizayn jihatdan chiroyli ko'rinish beradi.",
-            ru: "Корпус — коробка, вмещающая все детали. Хорошая вентиляция предотвращает перегрев, а дизайн придает красивый вид.",
-            en: "The Case houses all components. Good airflow prevents overheating, and its design gives the computer its aesthetic appeal."
-        };
-        
-        return {
-            uz: "Bu ushbu kompyuterning qo'shimcha texnik xususiyatlaridan biridir.",
-            ru: "Это одна из дополнительных технических характеристик данного компьютера.",
-            en: "This is one of the additional technical specifications of this computer."
-        };
-    };
-
     const getSpecValue = (product, specKeyObj) => {
         // 1. Asosiy: specifications array dan izlash
         if (product.specifications) {
@@ -212,7 +163,7 @@ export default function ComparePage() {
                                 {/* Spec Label */}
                                 <div className="w-24 md:w-32 lg:w-48 shrink-0 p-3 md:p-4 bg-surface-50 dark:bg-black/20 flex flex-col justify-center items-start">
                                     <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-surface-500 break-words w-full">
-                                        {spec.originalName}
+                                        {translateSpec(spec.originalName, lang)}
                                     </span>
                                     <button 
                                         onClick={() => openModal(spec)}
@@ -231,7 +182,7 @@ export default function ComparePage() {
                                     return (
                                         <div key={product.id} className="flex-1 min-w-0 p-3 md:p-4 border-l border-surface-200 dark:border-white/5 flex items-center">
                                             <span className={`text-[10px] md:text-xs font-bold break-words w-full ${value ? 'text-foreground' : 'text-surface-400 italic'}`}>
-                                                {value || '-'}
+                                                {value ? translateSpec(value, lang) : '-'}
                                             </span>
                                         </div>
                                     )
@@ -262,10 +213,10 @@ export default function ComparePage() {
                             </svg>
                         </div>
                         <h3 className="text-xl font-black uppercase tracking-tight text-foreground mb-3">
-                            {activeModal.originalName}
+                            {translateSpec(activeModal.originalName, lang)}
                         </h3>
                         <p className="text-sm text-surface-600 dark:text-surface-300 font-medium leading-relaxed">
-                            {getExplanation(activeModal.originalName)[lang] || getExplanation(activeModal.originalName)['en']}
+                            {getSpecExplanation(activeModal.originalName)[lang] || getSpecExplanation(activeModal.originalName)['en']}
                         </p>
                         <button 
                             onClick={closeModal}

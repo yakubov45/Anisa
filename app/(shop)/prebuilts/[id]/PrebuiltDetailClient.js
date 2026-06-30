@@ -7,12 +7,15 @@ import toast from "react-hot-toast";
 import useStore from "@/store/useStore";
 import { CatalogCard } from "../PrebuiltsClient";
 import { useTranslation } from "@/lib/LanguageContext";
+import { translateSpec } from "@/lib/utils/translateSpec";
+import { getSpecExplanation } from "@/lib/utils/specExplanations";
 
 export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
-    const { t } = useTranslation();
+    const { t, lang } = useTranslation();
     const [activeImage, setActiveImage] = useState(0);
     const [ramUpgrade, setRamUpgrade] = useState(0);
     const [storageUpgrade, setStorageUpgrade] = useState(0);
+    const [activeModal, setActiveModal] = useState(null);
 
     useEffect(() => {
         if (!pc.images || pc.images.length <= 1) return;
@@ -192,8 +195,23 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
                         <div className="space-y-2.5">
                             {specsList.map((spec, i) => (
                                 <div key={i} className="flex gap-2 text-sm items-center py-1 border-b border-black/5 dark:border-white/5">
-                                    <span className="font-black text-surface-400 dark:text-surface-500 uppercase tracking-wider w-24 shrink-0">{spec.label}</span>
-                                    <span className="font-bold text-foreground">{spec.value}</span>
+                                    <span className="font-black text-surface-400 dark:text-surface-500 uppercase tracking-wider w-24 shrink-0">
+                                        <div className="flex flex-col">
+                                            <span>{translateSpec(spec.label, lang)}</span>
+                                            <button 
+                                                onClick={() => setActiveModal({ name: spec.label })}
+                                                className="text-[8px] md:text-[9px] text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 font-bold uppercase tracking-wider mt-0.5 hover:underline transition-colors text-left flex items-center gap-1"
+                                            >
+                                                <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                {lang === 'uz' ? "Nima bu?" : lang === 'ru' ? "Что это?" : "What is this?"}
+                                            </button>
+                                        </div>
+                                    </span>
+                                    <span className="font-bold text-foreground">
+                                        {translateSpec(spec.value, lang)}
+                                    </span>
                                 </div>
                             ))}
                         </div>
@@ -214,7 +232,7 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
                                         icon = <img src="/ssd-removebg-preview.png" alt="SSD" className="w-8 h-8 object-contain scale-[1.8]" />;
                                     }
                                     return (
-                                        <SpecChip key={i} icon={icon} value={spec.value} label={spec.name || spec.label} />
+                                        <SpecChip key={i} icon={icon} value={translateSpec(spec.value, lang)} label={translateSpec(spec.name || spec.label, lang)} />
                                     );
                                 })}
                             </div>
@@ -324,6 +342,40 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
                                     layout="col"
                                 />
                             ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Explanation Modal */}
+                {activeModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in" onClick={() => setActiveModal(null)}>
+                        <div 
+                            className="bg-white dark:bg-zinc-900 border border-black/10 dark:border-white/10 p-6 md:p-8 rounded-3xl max-w-md w-full shadow-2xl relative"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <button 
+                                onClick={() => setActiveModal(null)}
+                                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-surface-100 dark:bg-white/10 hover:bg-surface-200 dark:hover:bg-white/20 transition-colors text-foreground"
+                            >
+                                ✕
+                            </button>
+                            <div className="w-12 h-12 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center mb-4">
+                                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h3 className="text-xl font-black uppercase tracking-tight text-foreground mb-3">
+                                {translateSpec(activeModal.name, lang)}
+                            </h3>
+                            <p className="text-sm text-surface-600 dark:text-surface-300 font-medium leading-relaxed">
+                                {getSpecExplanation(activeModal.name)[lang] || getSpecExplanation(activeModal.name)['en']}
+                            </p>
+                            <button 
+                                onClick={() => setActiveModal(null)}
+                                className="w-full mt-6 bg-surface-100 dark:bg-white/5 hover:bg-surface-200 dark:hover:bg-white/10 text-foreground font-black uppercase tracking-wider text-xs py-3 rounded-xl transition-colors"
+                            >
+                                {lang === 'uz' ? "Tushunarli" : lang === 'ru' ? "Понятно" : "Got it"}
+                            </button>
                         </div>
                     </div>
                 )}

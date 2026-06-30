@@ -6,9 +6,10 @@ import { getPreBuiltSystemsAction } from "@/lib/actions/product.actions"
 import { useTranslation } from "@/lib/LanguageContext"
 import useStore from "@/store/useStore"
 import { formatPrice } from "@/lib/utils"
+import { translateSpec } from "@/lib/utils/translateSpec"
 
 export default function ReadyBuilds() {
-    const { t } = useTranslation()
+    const { t, lang } = useTranslation()
     const { currency, exchangeRate } = useStore()
     const [currentIndex, setCurrentIndex] = useState(0);
     const [builds, setBuilds] = useState([]);
@@ -114,8 +115,8 @@ export default function ReadyBuilds() {
 
                             <div className="grid grid-cols-2 gap-8 border-y border-white/5 py-8">
                                 <div className="space-y-1">
-                                    <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Specifications</span>
-                                    <p className="text-[10px] md:text-xs font-bold text-white uppercase tracking-wider">{activePC.specs}</p>
+                                    <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">{t('technical_specs') || 'Specifications'}</span>
+                                    <p className="text-[10px] md:text-xs font-bold text-white uppercase tracking-wider">{translateSpec(activePC.specs, lang) || 'N/A'}</p>
                                 </div>
                                 <div className="space-y-1">
                                     <span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Build Status</span>
