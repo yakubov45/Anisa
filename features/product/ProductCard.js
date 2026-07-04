@@ -166,12 +166,12 @@ function ProductCard({ product, badge = null, rating = null }) {
                     {/* Color Swatches */}
                     {validVariants.length > 0 ? (
                         <div className="flex flex-wrap gap-1.5 h-5 items-center">
-                            {validVariants.map((v) => {
+                            {validVariants.map((v, index) => {
                                 const isOutOfStock = v.stock <= 0;
-                                const isSelected = selectedVariant?.id === v.id;
+                                const isSelected = selectedVariant?.id ? selectedVariant.id === v.id : selectedVariant === v;
                                 return (
                                     <button
-                                        key={v.id}
+                                        key={v.id || v.sku || index}
                                         onMouseEnter={() => setHoverVariant(v)}
                                         onMouseLeave={() => setHoverVariant(null)}
                                         onClick={(e) => { e.preventDefault(); setSelectedVariant(v); }}

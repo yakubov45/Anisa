@@ -445,16 +445,16 @@ export default function ProductListing({ initialProducts = [], allCategories = [
                                                     )}
                                                 </button>
 
-                                                {/* Category List */}
                                                 {allCategories.map((cat) => {
-                                                    const isSelected = selectedCategories.includes(cat.id);
+                                                    const catFilterId = cat.slug || cat.id;
+                                                    const isSelected = selectedCategories.includes(catFilterId);
                                                     return (
                                                         <motion.button
                                                             key={cat.id}
                                                             whileHover={{ scale: 1.02, x: 2 }}
                                                             whileTap={{ scale: 0.98 }}
                                                             onClick={() => {
-                                                                toggleCategory(cat.id)
+                                                                toggleCategory(catFilterId)
                                                                 setIsCatOpen(false)
                                                             }}
                                                             className={`text-left px-4 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-between border ${

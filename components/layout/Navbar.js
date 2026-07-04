@@ -29,21 +29,19 @@ export default function Navbar() {
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false)
     const pathname = usePathname()
     const [categories, setCategories] = useState([
-        { id: 'cpu', name: 'Processor (CPU)' },
-        { id: 'gpu', name: 'Video Card (GPU)' },
-        { id: 'motherboard', name: 'Материнская плата' },
-        { id: 'ram', name: 'Оперативная память (DDR)' },
-        { id: 'ssd', name: 'SSD Накопители' },
-        { id: 'hdd', name: 'Жесткий диск (HDD)' },
-        { id: 'monitor', name: 'Мониторы' },
-        { id: 'laptop', name: 'Ноутбуки' },
-        { id: 'mouse', name: 'Мышь' },
-        { id: 'keyboard', name: 'Клавиатура' },
-        { id: 'headset', name: 'Наушники' },
-        { id: 'cooler', name: 'Куллер (Cooling)' },
-        { id: 'psu', name: 'Блок питания (UPS)' },
-        { id: 'case', name: 'Корпус' },
-        { id: 'accessories', name: 'Accessories' }
+        { id: 'Processors', name: 'Processor (CPU)' },
+        { id: 'Graphics', name: 'Video Card (GPU)' },
+        { id: 'Motherboards', name: 'Материнская плата' },
+        { id: 'Memory', name: 'Оперативная память (DDR)' },
+        { id: 'Storage', name: 'SSD/HDD Накопители' },
+        { id: 'monitors', name: 'Мониторы' },
+        { id: 'mice', name: 'Мышь' },
+        { id: 'keyboards', name: 'Клавиатура' },
+        { id: 'headsets', name: 'Наушники' },
+        { id: 'Cooling', name: 'Куллер (Cooling)' },
+        { id: 'PSUs', name: 'Блок питания (UPS)' },
+        { id: 'Cases', name: 'Корпус' },
+        { id: 'chairs', name: 'Gaming Chair' }
     ])
 
     useEffect(() => {
@@ -516,7 +514,9 @@ export default function Navbar() {
                                     <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30 ml-2">{t('nav_categories') || "CATEGORIES"}</p>
                                     
                                     <div className="grid grid-cols-1 gap-1 pl-2">
-                                        {categories.map((cat, idx) => (
+                                        {categories.map((cat, idx) => {
+                                            const catFilterId = cat.slug || cat.id;
+                                            return (
                                             <motion.div
                                                 key={cat.id}
                                                 initial={{ opacity: 0 }}
@@ -524,7 +524,7 @@ export default function Navbar() {
                                                 transition={{ delay: idx * 0.015 + 0.2 }}
                                             >
                                                 <Link
-                                                    href={`/products?category=${cat.id}`}
+                                                    href={`/products?category=${catFilterId}`}
                                                     onClick={() => setIsMobileMenuOpen(false)}
                                                     className="flex items-center justify-between py-3 border-b border-white/[0.02] group transition-all"
                                                 >
@@ -532,7 +532,8 @@ export default function Navbar() {
                                                     <svg className="w-3 h-3 text-white/10 group-hover:text-primary group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7" /></svg>
                                                 </Link>
                                             </motion.div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             </div>
