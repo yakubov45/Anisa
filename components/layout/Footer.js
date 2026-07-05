@@ -111,13 +111,12 @@ export default function Footer() {
                     </div>
 
                     <div className="col-span-1 space-y-4">
-                        <h4 className="text-[10px] md:text-[11px] font-black text-white uppercase tracking-[0.4em]">{t('footer_resources')}</h4>
+                        <h4 className="text-[10px] md:text-[11px] font-black text-white uppercase tracking-[0.4em]">{t('nav_categories') || 'KATEGORIYALAR'}</h4>
                         <ul className="space-y-3 md:space-y-2">
                             {[
-                                { name: t('footer_product_map'), url: '/support' },
-                                { name: t('footer_warranty'), url: '/support' },
-                                { name: t('footer_support'), url: '/support' },
-                                { name: t('footer_deployments'), url: '/support' }
+                                { name: t('nav_products') || 'BARCHA MAHSULOTLAR', url: '/products' },
+                                { name: t('nav_prebuilts') || 'TAYYOR KOMPYUTERLAR', url: '/prebuilts' },
+                                { name: t('nav_pc_builder') || 'PC BUILDER', url: '/pc-builder' }
                             ].map(item => (
                                 <li key={item.name}>
                                     <a href={item.url} className="text-zinc-500 text-[10px] md:text-[11px] font-black uppercase tracking-widest hover:text-primary transition-colors">{item.name}</a>
@@ -127,13 +126,12 @@ export default function Footer() {
                     </div>
 
                     <div className="col-span-1 space-y-4">
-                        <h4 className="text-[10px] md:text-[11px] font-black text-white uppercase tracking-[0.4em]">{t('nav_about')}</h4>
+                        <h4 className="text-[10px] md:text-[11px] font-black text-white uppercase tracking-[0.4em]">{t('nav_about') || "MA'LUMOTLAR"}</h4>
                         <ul className="space-y-3 md:space-y-2">
                             {[
-                                { name: t('nav_products'), url: '/products' },
-                                { name: t('nav_prebuilts'), url: '/prebuilts' },
-                                { name: t('nav_faq'), url: '/faq' },
-                                { name: t('nav_about'), url: '/about' }
+                                { name: t('nav_delivery') || 'YETKAZIB BERISH', url: '/delivery' },
+                                { name: t('nav_faq') || "KO'P SO'RALADIGAN SAVOLLAR", url: '/faq' },
+                                { name: t('nav_about') || 'BIZ HAQIMIZDA', url: '/about' }
                             ].map(item => (
                                 <li key={item.name}>
                                     <a href={item.url} className="text-zinc-500 text-[10px] md:text-[11px] font-black uppercase tracking-widest hover:text-primary transition-colors">{item.name}</a>

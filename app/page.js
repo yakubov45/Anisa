@@ -1,15 +1,8 @@
 import ProductGrid from "@/features/product/ProductGrid"
 import CategoryGrid from "@/components/home/CategoryGrid"
-import TrustSection from "@/components/home/TrustSection"
-import SetupIdeas from "@/components/home/SetupIdeas"
-import BrandStrip from "@/components/home/BrandStrip"
-import Newsletter from "@/components/home/Newsletter"
 import HeroSlider from "@/components/home/HeroSlider"
-import DiscountBanner from "@/components/home/DiscountBanner"
-import PromotionSlider from "@/components/home/PromotionSlider"
-import FeaturedPrebuilts from "@/components/home/FeaturedPrebuilts"
-import PCFinderQuiz from "@/components/home/PCFinderQuiz"
 import SectionHeading from "@/components/common/SectionHeading"
+import HomeSections from "@/components/home/HomeSections"
 import { getProductsAction, getBannersAction, getPreBuiltSystemsAction } from "@/lib/actions/product.actions"
 import { getFlashDealsSettingsAction } from "@/lib/actions/flash-deals.actions"
 
@@ -59,24 +52,11 @@ export default async function HomePage() {
             {/* 2. CATEGORIES */}
             <CategoryGrid />
 
-            {/* 3. ZTT PREBUILTS HERO SECTION */}
-            {featuredPrebuilts && featuredPrebuilts.length > 0 && (
-                <FeaturedPrebuilts prebuilts={featuredPrebuilts} />
-            )}
-
-            {/* 4. PC FINDER QUIZ (Engaging Banner) */}
-            <PCFinderQuiz />
-
             {/* 3. NEW ARRIVALS */}
             <section className="space-y-10">
                 <SectionHeading titleKey="new_arrivals" />
                 <ProductGrid products={hotProducts} badge="Hot" />
             </section>
-
-            {/* 3.5 PROMOTION SLIDER */}
-            {promoSlides.length > 0 && (
-                <PromotionSlider slides={promoSlides} />
-            )}
 
             {/* 4. BEST SELLERS */}
             <section className="space-y-10">
@@ -84,20 +64,13 @@ export default async function HomePage() {
                 <ProductGrid products={topSelling} badge="Bestseller" rating={5} />
             </section>
 
-            {/* 5. WHY CHOOSE US */}
-            <TrustSection />
-
-            {/* 5.1 FLASH DEALS BANNER */}
-            <DiscountBanner flashDeals={flashDeals} />
-
-            {/* 6. SETUP IDEAS */}
-            <SetupIdeas />
-
-            {/* 7. BRANDS */}
-            <BrandStrip />
-
-            {/* 8. NEWSLETTER */}
-            <Newsletter />
+            {/* 5. ALL BELOW-THE-FOLD SECTIONS (lazily loaded client-side) */}
+            <HomeSections
+                featuredPrebuilts={featuredPrebuilts}
+                flashDeals={flashDeals}
+                topSelling={topSelling}
+                promoSlides={promoSlides}
+            />
 
         </div>
     )

@@ -76,22 +76,43 @@ export default function CategoryGrid() {
 const MotionLink = motion.create(Link);
 
 function CategoryCard({ cat, index }) {
+    const chamferPolygon = "polygon(15% 0, 100% 0, 100% 85%, 85% 100%, 0 100%, 0 15%)";
+
     return (
         <MotionLink 
             href={cat.href}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.35, delay: index * 0.04, ease: "easeOut" }}
-            className={`group relative overflow-hidden bg-[#0A0A0B] border border-white/5 p-4 md:p-6 rounded-2xl md:rounded-[2rem] transition-all hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/15`}
+            transition={{ duration: 0.4, delay: index * 0.05, ease: "easeOut" }}
+            className="group relative block w-full aspect-square md:aspect-auto md:h-32 hover:-translate-y-2 transition-transform duration-500"
+            // The outer wrapper has the clip path and the gradient border
+            style={{ clipPath: chamferPolygon }}
         >
-            <div className={`absolute inset-0 bg-gradient-to-br ${cat.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 to-transparent blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-0"></div>
-            <div className="relative z-10 flex flex-col items-center gap-3 md:gap-5">
-                <div className="text-white/40 group-hover:text-primary group-hover:scale-110 transition-all duration-500 drop-shadow-md [&>svg]:w-7 [&>svg]:h-7 md:[&>svg]:w-10 md:[&>svg]:h-10">
+            {/* Animated glowing gradient border */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-white/5 group-hover:from-primary group-hover:via-red-500 group-hover:to-orange-600 transition-all duration-500" />
+            
+            {/* Inner dark container (leaves 1px for the gradient border to show) */}
+            <div 
+                className="absolute inset-[1px] md:inset-[2px] bg-[#0c0c0e] group-hover:bg-[#120a0a] flex flex-col items-center justify-center gap-3 transition-colors duration-500"
+                style={{ clipPath: chamferPolygon }}
+            >
+                {/* Cyberpunk Grid Background on Hover */}
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#ef444415_1px,transparent_1px),linear-gradient(to_bottom,#ef444415_1px,transparent_1px)] bg-[size:10px_10px] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+                {/* Icon */}
+                <div className="text-white/30 group-hover:text-primary group-hover:scale-125 group-hover:-translate-y-1 group-hover:drop-shadow-[0_0_15px_rgba(239,68,68,0.8)] transition-all duration-500 relative z-10 [&>svg]:w-8 [&>svg]:h-8 md:[&>svg]:w-10 md:[&>svg]:h-10">
                     {cat.icon}
                 </div>
-                <span className="font-black text-[8px] md:text-[10px] uppercase tracking-[0.15em] text-white/40 group-hover:text-primary transition-colors text-center leading-tight">{cat.name}</span>
+
+                {/* Text */}
+                <span className="font-black text-[8px] md:text-[10px] uppercase tracking-[0.2em] text-white/40 group-hover:text-white transition-colors text-center relative z-10 px-2 leading-tight">
+                    {cat.name}
+                </span>
+
+                {/* Decorative neon accent lines */}
+                <div className="absolute top-2 left-2 w-2 h-[2px] bg-primary/0 group-hover:bg-primary transition-all duration-300" />
+                <div className="absolute bottom-2 right-2 w-2 h-[2px] bg-primary/0 group-hover:bg-primary transition-all duration-300" />
             </div>
         </MotionLink>
     );

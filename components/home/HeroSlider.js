@@ -13,7 +13,7 @@ const SLIDE_DATA = [
         subtitleKey: 'hero_1_subtitle',
         badgeKey: 'hero_1_badge',
         descKey: 'hero_1_desc',
-        image: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=1600&q=90",
+        image: "/images (1).jpg",
         link: "/products",
         linkKey: 'hero_cta_shop'
     },
@@ -23,7 +23,8 @@ const SLIDE_DATA = [
         subtitleKey: 'hero_2_subtitle',
         badgeKey: 'hero_2_badge',
         descKey: 'hero_2_desc',
-        image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=1600&q=90",
+        // Ichki detallari ko'rinib turgan, RGB va to'q fonli Case
+        image: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?auto=format&fit=crop&w=1920&h=1080&q=80",
         link: "/pc-builder",
         linkKey: 'hero_cta_builder'
     },
@@ -33,7 +34,8 @@ const SLIDE_DATA = [
         subtitleKey: 'hero_3_subtitle',
         badgeKey: 'hero_3_badge',
         descKey: 'hero_3_desc',
-        image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1600&q=90",
+        // Kiber-sport muhitidagi qizg'ish PC setup
+        image: "/19ed9846ffda2a5a9763a7d9be6d112c.jpg",
         link: "/prebuilts",
         linkKey: 'hero_cta_prebuilts'
     },
@@ -43,10 +45,12 @@ const SLIDE_DATA = [
         subtitleKey: 'hero_4_subtitle',
         badgeKey: 'hero_4_badge',
         descKey: 'hero_4_desc',
-        image: "https://images.unsplash.com/photo-1591488320449-011701bb6704?w=1600&q=90",
+        // Qorong'i fonda yonib turgan kuchli e-sport kompyuteri
+        image: "https://images.unsplash.com/photo-1616588589676-62b3bd4ff6d2?auto=format&fit=crop&w=1920&h=1080&q=80",
         link: "/products",
         linkKey: 'hero_cta_deals'
-    }
+    },
+
 ];
 
 export default function HeroSlider({ initialSlides }) {
@@ -131,15 +135,6 @@ export default function HeroSlider({ initialSlides }) {
 
     const slide = slides[current];
 
-    let imgSrc = slide?.image || "";
-    if (imgSrc && imgSrc.includes('google.com/imgres')) {
-        try {
-            const urlParams = new URLSearchParams(imgSrc.split('?')[1]);
-            const directUrl = urlParams.get('imgurl');
-            if (directUrl) imgSrc = directUrl;
-        } catch (e) {}
-    }
-
     return (
         <section
             ref={sliderRef}
@@ -152,13 +147,11 @@ export default function HeroSlider({ initialSlides }) {
         >
             {/* ─── MOBILE LAYOUT (< md) ─────────────────────────────── */}
             <div className="flex flex-col md:hidden">
-                {/* Image area — fixed aspect ratio so it's never too short/tall */}
                 <div className="relative w-full aspect-[21/9] overflow-hidden">
                     <div
                         className="absolute inset-0 flex h-full transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"
                         style={{
                             transform: `translateX(calc(-${current * 100}% + ${dragOffset}px))`,
-                            width: `${slides.length * 100}%`,
                         }}
                     >
                         {slides.map((s, idx) => {
@@ -167,10 +160,11 @@ export default function HeroSlider({ initialSlides }) {
                                 try {
                                     const p = new URLSearchParams(src.split('?')[1]);
                                     src = p.get('imgurl') || src;
-                                } catch (e) {}
+                                } catch (e) { }
                             }
                             return (
-                                <div key={s.id} className="relative min-w-full h-full flex-shrink-0">
+                                // XATO TUG'IRLANDI: min-w-full o'rniga w-full flex-shrink-0 qo'yildi
+                                <div key={s.id} className="relative w-full h-full flex-shrink-0">
                                     <Image
                                         src={src || "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=800&q=80"}
                                         alt={s.title || "Slide"}
@@ -178,14 +172,12 @@ export default function HeroSlider({ initialSlides }) {
                                         priority={idx < 2}
                                         className="object-cover object-[center_30%]"
                                     />
-                                    {/* bottom fade */}
                                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#050505]/90" />
                                 </div>
                             );
                         })}
                     </div>
 
-                    {/* Badge over image */}
                     <div className="absolute top-4 left-4 z-20">
                         <div className="inline-flex items-center gap-1.5 bg-black/50 border border-white/10 px-3 py-1.5 rounded-full text-white font-bold text-[9px] uppercase tracking-[0.25em] backdrop-blur-md">
                             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
@@ -194,7 +186,6 @@ export default function HeroSlider({ initialSlides }) {
                     </div>
                 </div>
 
-                {/* Text area — sits below the image */}
                 <div className="bg-[#080a0d] px-5 py-6 space-y-4">
                     <h2 className="text-xl md:text-2xl font-black text-white leading-tight tracking-tight">
                         {slide?.title?.split(' ').map((word, i) => (
@@ -221,7 +212,6 @@ export default function HeroSlider({ initialSlides }) {
                         </Link>
                     </div>
 
-                    {/* Mobile dots */}
                     <div className="flex items-center justify-center gap-2 pt-2">
                         {slides.map((_, idx) => (
                             <button
@@ -243,7 +233,6 @@ export default function HeroSlider({ initialSlides }) {
 
             {/* ─── DESKTOP LAYOUT (≥ md) ───────────────────────────── */}
             <div className="hidden md:block relative h-[400px] lg:h-[460px]">
-                {/* Glowing orb following mouse */}
                 <div
                     className="absolute w-[400px] h-[400px] bg-primary/20 rounded-full blur-[120px] pointer-events-none z-10 transition-transform duration-700 ease-out mix-blend-screen"
                     style={{
@@ -253,12 +242,10 @@ export default function HeroSlider({ initialSlides }) {
                     }}
                 />
 
-                {/* Slide strip */}
                 <div
                     className="absolute inset-0 flex h-full transition-transform duration-[800ms] ease-[cubic-bezier(0.25,1,0.5,1)]"
                     style={{
                         transform: `translateX(calc(-${current * 100}% + ${dragOffset}px))`,
-                        width: `${slides.length * 100}%`,
                     }}
                 >
                     {slides.map((s, idx) => {
@@ -267,25 +254,26 @@ export default function HeroSlider({ initialSlides }) {
                             try {
                                 const p = new URLSearchParams(src.split('?')[1]);
                                 src = p.get('imgurl') || src;
-                            } catch (e) {}
+                            } catch (e) { }
                         }
                         return (
-                            <div key={s.id} className="relative min-w-full h-full flex-shrink-0 flex items-center">
+                            // XATO TUG'IRLANDI: min-w-full o'rniga w-full flex-shrink-0 qo'yildi
+                            <div key={s.id} className="relative w-full h-full flex-shrink-0 flex items-center">
                                 <div className="absolute inset-0 z-0">
                                     <Image
                                         src={src || "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=1600&q=90"}
                                         alt={s.title || "Slide"}
                                         fill
                                         priority={idx < 2}
-                                        className="object-cover object-[center_30%] opacity-50"
+                                        className="object-cover object-[80%_center] opacity-100"
                                         style={{
                                             transform: idx === current
                                                 ? `scale(1.02) translate(${mousePos.x * -10}px, ${mousePos.y * -10}px)`
                                                 : 'scale(1.08)'
                                         }}
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/80 to-transparent z-10" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent z-10 opacity-80" />
+                                    <div className="absolute inset-0 w-full md:w-[75%] bg-gradient-to-r from-[#050505] via-[#050505]/90 to-transparent z-10" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent z-10 opacity-60" />
                                 </div>
 
                                 <div className={`relative z-20 px-10 md:px-24 max-w-[1400px] w-full space-y-6 transition-all duration-[800ms] delay-200 ${idx === current ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-32'}`}>
@@ -326,7 +314,7 @@ export default function HeroSlider({ initialSlides }) {
                                                 href="/products?sort=popular"
                                                 className="text-white/60 font-bold hover:text-white transition-all duration-300 flex items-center gap-3 group/link text-xs uppercase tracking-[0.2em] relative"
                                             >
-                                                <span>TOP PRODUCTS</span>
+                                                <span>{t('top_products')}</span>
                                                 <div className="h-[2px] w-0 bg-primary absolute -bottom-1 left-0 group-hover/link:w-full transition-all duration-300" />
                                             </Link>
                                         </div>
@@ -337,7 +325,6 @@ export default function HeroSlider({ initialSlides }) {
                     })}
                 </div>
 
-                {/* Desktop nav arrows */}
                 <div className="absolute inset-0 z-30 pointer-events-none flex items-center justify-between px-8 lg:px-12">
                     <button onClick={prev} className="pointer-events-auto w-14 h-14 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:border-white/30 hover:bg-white/10 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 active:scale-90">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
@@ -347,7 +334,6 @@ export default function HeroSlider({ initialSlides }) {
                     </button>
                 </div>
 
-                {/* Desktop pagination dots */}
                 <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-3 z-40">
                     {slides.map((_, idx) => (
                         <button
@@ -365,7 +351,6 @@ export default function HeroSlider({ initialSlides }) {
                     ))}
                 </div>
 
-                {/* Scroll indicator */}
                 <div className="absolute bottom-8 right-24 z-40 flex flex-col items-center gap-2 opacity-50">
                     <span className="text-[9px] font-bold text-white uppercase tracking-[0.4em] rotate-90 origin-right translate-x-3 mb-8">SCROLL</span>
                     <div className="w-[1px] h-12 bg-gradient-to-b from-white to-transparent" />

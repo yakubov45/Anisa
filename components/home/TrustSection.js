@@ -1,7 +1,6 @@
 "use client";
 
 import { useTranslation } from "@/lib/LanguageContext";
-
 import { motion } from "framer-motion";
 
 export default function TrustSection() {
@@ -30,34 +29,78 @@ export default function TrustSection() {
         },
     ];
 
+    const chamferPolygon = "polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)";
+
     return (
-        <section className="bg-surface-50 border border-white/5 rounded-3xl md:rounded-[3rem] p-8 md:p-20 overflow-hidden">
-            <motion.h2 
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                className="text-xl md:text-4xl font-black text-center mb-10 md:mb-16 uppercase tracking-tight"
-            >
-                {t('features_title')}
-            </motion.h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-12">
-                {features.map((f, idx) => (
+        <section className="relative overflow-hidden py-10 md:py-16">
+            
+            {/* Background Accent */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] bg-primary/10 rounded-full blur-[120px] pointer-events-none z-0" />
+
+            <div className="relative z-10 w-full max-w-7xl mx-auto">
+                <div className="flex flex-col md:flex-row items-center justify-between mb-12 md:mb-16 gap-6">
                     <motion.div 
-                        key={idx} 
-                        initial={{ opacity: 0, scale: 0.92, y: 15 }}
-                        whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-30px" }}
-                        whileHover={{ y: -5 }}
-                        transition={{ duration: 0.35, delay: idx * 0.05, ease: "easeOut" }}
-                        className="flex flex-col items-center text-center gap-3 md:gap-4 group hover:bg-surface-100 dark:hover:bg-white/5 p-4 md:p-6 rounded-2xl md:rounded-[2rem] transition-all hover:shadow-2xl hover:shadow-primary/10 border border-transparent hover:border-black/5 dark:hover:border-white/5"
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        className="flex items-center gap-4 w-full justify-center md:justify-start"
                     >
-                        <div className="w-14 h-14 md:w-20 md:h-20 bg-surface-100 dark:bg-white/5 rounded-2xl md:rounded-3xl flex items-center justify-center text-primary shadow-inner group-hover:bg-primary group-hover:text-white group-hover:scale-110 transition-all duration-300">
-                            {f.icon}
-                        </div>
-                        <h3 className="font-black text-foreground uppercase tracking-tight text-sm md:text-lg group-hover:text-primary transition-colors">{f.title}</h3>
-                        <p className="text-surface-600 dark:text-surface-400 text-[10px] md:text-xs font-bold leading-relaxed max-w-[120px] md:max-w-[150px]">{f.desc}</p>
+                        {/* High-tech Title Accent */}
+                        <div className="w-1.5 h-8 bg-primary shadow-[0_0_10px_rgba(239,68,68,0.8)]" />
+                        <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tighter text-white">
+                            {t('features_title')}
+                        </h2>
                     </motion.div>
-                ))}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 px-4 sm:px-0">
+                    {features.map((f, idx) => (
+                        <motion.div 
+                            key={idx} 
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-20px" }}
+                            transition={{ duration: 0.4, delay: idx * 0.1, ease: "easeOut" }}
+                            className="group relative h-full p-[1px]"
+                            style={{ clipPath: chamferPolygon }}
+                        >
+                            {/* Glowing Gradient Border Container */}
+                            <div 
+                                className="absolute inset-0 bg-gradient-to-br from-white/10 via-white/5 to-transparent group-hover:from-primary group-hover:via-red-500/50 group-hover:to-transparent transition-all duration-500"
+                            />
+                            
+                            {/* Inner Dark Card */}
+                            <div 
+                                className="relative z-10 h-full w-full bg-[#0c0c0e] group-hover:bg-[#100a0a] transition-colors duration-500 p-6 md:p-8 flex flex-col justify-start gap-4 md:gap-6"
+                                style={{ clipPath: chamferPolygon }}
+                            >
+                                {/* Grid scanline effect */}
+                                <div className="absolute inset-0 bg-[linear-gradient(to_right,#ef44440a_1px,transparent_1px),linear-gradient(to_bottom,#ef44440a_1px,transparent_1px)] bg-[size:10px_10px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                                
+                                <div className="w-14 h-14 md:w-16 md:h-16 relative z-10 flex items-center justify-center">
+                                    {/* Abstract background shape for icon */}
+                                    <div className="absolute inset-0 bg-white/5 group-hover:bg-primary/20 rotate-45 group-hover:rotate-90 transition-all duration-500" />
+                                    
+                                    <div className="text-white/50 group-hover:text-primary group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(239,68,68,0.8)] transition-all duration-300 relative z-20">
+                                        {f.icon}
+                                    </div>
+                                </div>
+                                
+                                <div className="relative z-10 mt-auto">
+                                    <h3 className="font-black text-white uppercase tracking-wider text-sm md:text-base group-hover:text-primary transition-colors mb-2">
+                                        {f.title}
+                                    </h3>
+                                    <p className="text-white/40 group-hover:text-white/70 text-[10px] md:text-xs font-bold leading-relaxed transition-colors">
+                                        {f.desc}
+                                    </p>
+                                </div>
+
+                                {/* Cyberpunk decorative corner line */}
+                                <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-transparent group-hover:border-primary opacity-0 group-hover:opacity-100 transition-all duration-500 -translate-x-2 translate-y-2 group-hover:translate-x-0 group-hover:translate-y-0" />
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
             </div>
         </section>
     );
