@@ -12,6 +12,7 @@ const PromotionSlider = dynamic(() => import("@/components/home/PromotionSlider"
 const FeaturedPrebuilts = dynamic(() => import("@/components/home/FeaturedPrebuilts"), { ssr: false })
 const PCFinderQuiz = dynamic(() => import("@/components/home/PCFinderQuiz"), { ssr: false })
 const JoinOnePCBanner = dynamic(() => import("@/components/home/JoinOnePCBanner"), { ssr: false })
+const ProductGrid = dynamic(() => import("@/features/product/ProductGrid"), { ssr: false })
 
 export default function HomeSections({ featuredPrebuilts, flashDeals, topSelling, promoSlides }) {
     return (
@@ -34,6 +35,18 @@ export default function HomeSections({ featuredPrebuilts, flashDeals, topSelling
 
             {/* Join OnePC Banner */}
             <JoinOnePCBanner />
+
+            {/* Hit Products */}
+            {topSelling && topSelling.length > 0 && (
+                <section className="space-y-6 md:space-y-10 px-4 sm:px-0 mt-10 md:mt-16">
+                    <div className="flex items-center gap-4">
+                        <h2 className="text-2xl md:text-3xl font-black uppercase text-foreground font-mono tracking-tight">
+                            XIT MAHSULOTLAR
+                        </h2>
+                    </div>
+                    <ProductGrid products={topSelling.slice(0, 8)} badge="Hot" rating={5} />
+                </section>
+            )}
 
             {/* Flash Deals Banner */}
             <DiscountBanner flashDeals={flashDeals} />

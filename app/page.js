@@ -38,8 +38,8 @@ export default async function HomePage() {
         console.error("HomePage data fetch error:", error);
     }
 
-    const hotProducts = allProducts.slice(0, 8);
-    const topSelling = allProducts.slice(8, 16);
+    const hotProducts = allProducts.slice(0, 4);
+    const topSelling = allProducts.slice(8, 12);
     const heroSlides = banners.filter(b => b.type !== "promo");
     const promoSlides = banners.filter(b => b.type === "promo");
 
