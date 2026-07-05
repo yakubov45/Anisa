@@ -73,33 +73,47 @@ function ProductCard({ product, badge = null, rating = null }) {
         addToast(t('cart_added_msg').replace('{name}', product.name));
     };
 
+    const clipPathCard = "polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px))";
+
     return (
         <div 
-            className="product-card rounded-2xl p-2 md:p-5 flex flex-col h-full group relative overflow-hidden animate-slide-up bg-surface/50 border border-border-alpha hover:border-primary/50 transition-all duration-500 group-hover:shadow-[0_0_30px_rgba(239,68,68,0.15)] will-change-transform"
+            className="group relative flex flex-col h-full bg-white/5 p-[1px] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_rgba(239,68,68,0.3)] will-change-transform"
+            style={{ clipPath: clipPathCard }}
             onMouseEnter={() => setIsCardHovered(true)}
             onMouseLeave={() => setIsCardHovered(false)}
         >
-            {/* Precision Badge */}
-            <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
-                {badge ? (
-                    <div className="bg-primary text-white text-[7px] md:text-[9px] font-black px-1.5 py-0.5 md:px-2.5 md:py-1 rounded-md md:rounded-lg uppercase tracking-wider md:tracking-widest shadow-xl">
-                        {badgeKeys[badge] || badge}
-                    </div>
-                ) : product.discount ? (
-                    <div className="bg-primary/20 backdrop-blur-md border border-primary/30 text-primary text-[7px] md:text-[9px] font-black px-1.5 py-0.5 md:px-2.5 md:py-1 rounded-md md:rounded-lg uppercase tracking-wider md:tracking-widest">
-                        SALE {product.discount}%
-                    </div>
-                ) : null}
-            </div>
+            {/* Animated Gradient Border */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-white/5 group-hover:from-primary group-hover:via-primary/30 group-hover:to-red-700 transition-all duration-700 opacity-60 group-hover:opacity-100 z-0" />
+            
+            {/* Inner Dark Container */}
+            <div 
+                className="relative z-10 bg-[#0c0c0e] hover:bg-[#0f0f12] transition-colors duration-500 flex flex-col flex-grow h-full p-3 md:p-5"
+                style={{ clipPath: clipPathCard }}
+            >
+                {/* Precision Badge */}
+                <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
+                    {badge ? (
+                        <div className="bg-primary text-white text-[8px] md:text-[10px] font-black px-2 py-1 md:px-3 md:py-1.5 uppercase tracking-widest shadow-[0_0_15px_rgba(239,68,68,0.5)] border border-white/20" style={{ clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))" }}>
+                            {badgeKeys[badge] || badge}
+                        </div>
+                    ) : product.discount ? (
+                        <div className="bg-primary/20 backdrop-blur-md border border-primary/50 text-primary text-[8px] md:text-[10px] font-black px-2 py-1 md:px-3 md:py-1.5 uppercase tracking-widest shadow-[0_0_15px_rgba(239,68,68,0.2)]" style={{ clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))" }}>
+                            SALE {product.discount}%
+                        </div>
+                    ) : null}
+                </div>
 
-            {/* IMAGE */}
-            <div className="block relative overflow-hidden rounded-xl bg-surface-50 w-full aspect-[4/3] md:aspect-square group/image">
-                <ImageWithFallback
-                    src={displayImage}
-                    fallbackSrc="https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=500&auto=format&fit=crop&q=80"
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover/image:scale-105 transition-all duration-700"
-                />
+                {/* IMAGE */}
+                <div 
+                    className="block relative overflow-hidden bg-white w-full aspect-[4/3] md:aspect-square group/image transition-all duration-500 group-hover:shadow-[inset_0_0_20px_rgba(0,0,0,0.1)]"
+                    style={{ clipPath: "polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px))" }}
+                >
+                    <ImageWithFallback
+                        src={displayImage}
+                        fallbackSrc="https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=500&auto=format&fit=crop&q=80"
+                        alt={product.name}
+                        className="w-full h-full object-contain p-4 group-hover/image:scale-110 transition-transform duration-700 ease-out mix-blend-multiply"
+                    />
 
                 {/* Thumbnail Gallery Preview on Hover (if multiple images exist for active variant) */}
                 {activeImages.length > 1 && (
@@ -231,14 +245,15 @@ function ProductCard({ product, badge = null, rating = null }) {
 
                     {/* Buttons */}
                     <div className="flex gap-1.5 md:gap-2">
-                        <Link href={`/products/${product.id}`} className="btn-premium btn-premium-dark flex-1 h-8 md:h-11 font-black text-[7px] md:text-[10px] uppercase tracking-wider md:tracking-widest rounded-md md:rounded-xl flex items-center justify-center">
+                        <Link href={`/products/${product.id}`} className="btn-premium btn-premium-dark flex-1 h-8 md:h-11 font-black text-[7px] md:text-[10px] uppercase tracking-wider md:tracking-widest rounded-md md:rounded-xl flex items-center justify-center" style={{ clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))" }}>
                             {t('details')}
                         </Link>
                         <button
                             onClick={handleAddToCart}
                             disabled={displayStock <= 0}
-                            className={`btn-premium flex-[2] h-8 md:h-11 font-black text-[7px] md:text-[10px] uppercase tracking-wider md:tracking-widest rounded-md md:rounded-xl shadow-lg transition-all
-                                ${displayStock > 0 ? 'btn-premium-red' : 'bg-surface-300 text-surface-500 cursor-not-allowed border-none'}
+                            style={{ clipPath: "polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))" }}
+                            className={`btn-premium flex-[2] h-8 md:h-11 font-black text-[7px] md:text-[10px] uppercase tracking-wider md:tracking-widest transition-all
+                                ${displayStock > 0 ? 'btn-premium-red hover:shadow-[0_0_15px_rgba(239,68,68,0.5)]' : 'bg-surface-300 text-surface-500 cursor-not-allowed border-none'}
                             `}
                         >
                             {displayStock > 0 ? t('buy_now') : t('out_of_stock')}
@@ -246,6 +261,8 @@ function ProductCard({ product, badge = null, rating = null }) {
                     </div>
                 </div>
             </div>
+            </div> {/* <-- Added missing closing tag for Inner Dark Container */}
+
             <QuickView product={product} isOpen={isQuickViewOpen} onClose={() => setIsQuickViewOpen(false)} />
         </div>
     );
