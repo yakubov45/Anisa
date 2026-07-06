@@ -506,6 +506,19 @@ export default function Navbar() {
                                             </button>
                                         ))}
                                     </div>
+
+                                    {/* Currency Switcher - Mobile */}
+                                    <div className="flex bg-black/40 border border-white/5 rounded-2xl p-1">
+                                        {['USD', 'UZS'].map(cur => (
+                                            <button
+                                                key={cur}
+                                                onClick={() => setCurrency(cur)}
+                                                className={`flex-1 py-3 text-[10px] font-black rounded-xl transition-all duration-300 ${activeCurrency === cur ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white'}`}
+                                            >
+                                                {cur === 'USD' ? '🇺🇸 USD' : '🇺🇿 UZS'}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
 
                                 {/* Categories Section */}

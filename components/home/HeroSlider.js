@@ -147,7 +147,7 @@ export default function HeroSlider({ initialSlides }) {
         >
             {/* ─── MOBILE LAYOUT (< md) ─────────────────────────────── */}
             <div className="flex flex-col md:hidden">
-                <div className="relative w-full aspect-[21/9] overflow-hidden">
+                <div className="relative w-full aspect-[16/9] overflow-hidden">
                     <div
                         className="absolute inset-0 flex h-full transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"
                         style={{

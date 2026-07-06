@@ -113,7 +113,7 @@ function ProductCard({ product, badge = null, rating = null }) {
                         fallbackSrc="https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=500&auto=format&fit=crop&q=80"
                         alt={product.name}
                         className="w-full h-full"
-                        imgClassName="object-contain p-7 md:p-1 group-hover/image:scale-110 transition-transform duration-700 ease-out mix-blend-multiply drop-shadow-xl"
+                        imgClassName="object-contain p-3 md:p-2 group-hover/image:scale-110 transition-transform duration-700 ease-out mix-blend-multiply drop-shadow-xl"
                     />
 
                     {/* Thumbnail Gallery Preview on Hover (if multiple images exist for active variant) */}

@@ -24,6 +24,7 @@ export default function ImageWithFallback({ src, alt, className, imgClassName = 
                 src={imgSrc || fallbackSrc}
                 alt={alt}
                 onError={handleError}
+                loading={props.priority ? "eager" : "lazy"}
                 className={`w-full h-full transition-all duration-500 ${imgClassName} ${hasError ? 'opacity-50 grayscale' : 'opacity-100'}`}
                 {...props}
             />

@@ -127,13 +127,55 @@ export default function ProfilePage() {
         }
     };
 
+    const compressImage = (file) => {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    const MAX_SIZE = 400; // Avatarlar uchun kichik o'lcham yetarli
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > height && width > MAX_SIZE) {
+                        height *= MAX_SIZE / width;
+                        width = MAX_SIZE;
+                    } else if (height > MAX_SIZE) {
+                        width *= MAX_SIZE / height;
+                        height = MAX_SIZE;
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // WebP formatida siqish (80% sifat)
+                    canvas.toBlob((blob) => {
+                        const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", {
+                            type: 'image/webp',
+                            lastModified: Date.now()
+                        });
+                        resolve(newFile);
+                    }, 'image/webp', 0.8);
+                };
+            };
+        });
+    };
+
     const handleAvatarUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
         setUploading(true);
         try {
-            await userService.uploadAvatar(user.uid, file);
+            // Rasmni Firebase'ga jo'natishdan oldin siqish (WebP)
+            const compressedFile = await compressImage(file);
+            await userService.uploadAvatar(user.uid, compressedFile);
             await refreshUser();
             setStatus({ type: "success", message: "Biometric visual updated." });
         } catch (err) {
