@@ -8,7 +8,7 @@ import {
 } from "@/lib/actions/product.actions";
 
 export default async function ProductsPage({ searchParams }) {
-    const { category, page = "1", search } = await searchParams;
+    const { category, brand, page = "1", search } = await searchParams;
     const currentPage = parseInt(page);
 
     let productsPromise;
@@ -17,9 +17,9 @@ export default async function ProductsPage({ searchParams }) {
     if (search) {
         productsPromise = getSearchProductsAction(search, 12);
         countPromise = Promise.resolve(null); // Count search natijasidan olinadi
-    } else if (category) {
-        productsPromise = getFilteredProductsAction({ categoryId: category, page: currentPage, pageSize: 12 });
-        countPromise = getProductsCountAction(category);
+    } else if (category || brand) {
+        productsPromise = getFilteredProductsAction({ categoryId: category, brand, page: currentPage, pageSize: 12 });
+        countPromise = getProductsCountAction(category, brand);
     } else {
         productsPromise = getProductsAction(currentPage, 12);
         countPromise = getProductsCountAction();
