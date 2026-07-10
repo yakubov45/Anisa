@@ -163,8 +163,8 @@ export default function HeroSlider({ initialSlides }) {
                                 } catch (e) { }
                             }
                             return (
-                                // XATO TUG'IRLANDI: min-w-full o'rniga w-full flex-shrink-0 qo'yildi
-                                <div key={s.id} className="relative w-full h-full flex-shrink-0">
+                                // XATO TUG'IRLANDI: min-w-full o'rniga w-full flex-shrink-0 qo'yildi va overflow-hidden qo'shildi
+                                <div key={s.id} className="relative w-full h-full flex-shrink-0 overflow-hidden">
                                     <Image
                                         src={src || "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=800&q=80"}
                                         alt={s.title || "Slide"}
@@ -257,8 +257,8 @@ export default function HeroSlider({ initialSlides }) {
                             } catch (e) { }
                         }
                         return (
-                            // XATO TUG'IRLANDI: min-w-full o'rniga w-full flex-shrink-0 qo'yildi
-                            <div key={s.id} className="relative w-full h-full flex-shrink-0 flex items-center">
+                            // XATO TUG'IRLANDI: min-w-full o'rniga w-full flex-shrink-0 qo'yildi va overflow-hidden qo'shildi
+                            <div key={s.id} className="relative w-full h-full flex-shrink-0 flex items-center overflow-hidden">
                                 <div className="absolute inset-0 z-0">
                                     <Image
                                         src={src || "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=1600&q=90"}

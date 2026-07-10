@@ -47,7 +47,7 @@ export default function TrustSection() {
                     >
                         {/* High-tech Title Accent */}
                         <div className="w-1.5 h-8 bg-primary shadow-[0_0_10px_rgba(239,68,68,0.8)]" />
-                        <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tighter text-white">
+                        <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tighter text-foreground">
                             {t('features_title')}
                         </h2>
                     </motion.div>
