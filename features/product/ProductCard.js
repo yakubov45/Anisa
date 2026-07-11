@@ -28,7 +28,9 @@ function ProductCard({ product, badge = null, rating = null }) {
     const [isInteracting, setIsInteracting] = useState(false);
 
     const activeVariant = hoverVariant || selectedVariant;
-    const activeImages = activeVariant?.images || (product.image ? [product.image] : []);
+    const activeImages = activeVariant?.images?.length > 0 
+        ? activeVariant.images 
+        : (product.images?.length > 0 ? product.images : (product.image ? [product.image] : []));
 
     useEffect(() => {
         let timeout;
