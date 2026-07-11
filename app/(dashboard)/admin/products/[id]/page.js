@@ -171,15 +171,17 @@ export default function EditProductPage() {
     // Image Upload Handler
     const handleImageUpload = async (e) => {
         const target = e.target;
-        const file = target.files[0];
-        if (!file) return;
+        const files = Array.from(target.files);
+        if (files.length === 0) return;
         
         setIsUploading(true);
         try {
-            const url = await uploadService.uploadImage(file, 'products', (progress) => {
-                setImageUploadProgress(progress);
-            });
-            setVariantForm(prev => ({ ...prev, images: [...prev.images, url] }));
+            const urls = await Promise.all(files.map(file => 
+                uploadService.uploadImage(file, 'products', (progress) => {
+                    setImageUploadProgress(progress);
+                })
+            ));
+            setVariantForm(prev => ({ ...prev, images: [...prev.images, ...urls] }));
         } catch (error) {
             console.error("Upload failed", error);
             alert("Rasm yuklashda xatolik yuz berdi: " + error.message);
@@ -199,16 +201,18 @@ export default function EditProductPage() {
 
     const handleStandardImageUpload = async (e) => {
         const target = e.target;
-        const file = target.files[0];
-        if (!file) return;
+        const files = Array.from(target.files);
+        if (files.length === 0) return;
         
         setIsStandardUploading(true);
         setStandardUploadProgress(0);
         try {
-            const url = await uploadService.uploadImage(file, 'products', (progress) => {
-                setStandardUploadProgress(progress);
-            });
-            setStandardImages(prev => [...prev, url]);
+            const urls = await Promise.all(files.map(file => 
+                uploadService.uploadImage(file, 'products', (progress) => {
+                    setStandardUploadProgress(progress);
+                })
+            ));
+            setStandardImages(prev => [...prev, ...urls]);
         } catch (error) {
             console.error("Upload failed", error);
             alert("Rasm yuklashda xatolik yuz berdi: " + (error?.message || error));
@@ -593,7 +597,7 @@ export default function EditProductPage() {
                                     </div>
 
                                     <div className="relative">
-                                        <input type="file" accept="image/*" onChange={handleImageUpload} disabled={isUploading} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed" />
+                                        <input type="file" accept="image/*" multiple onChange={handleImageUpload} disabled={isUploading} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed" />
                                         <div className="w-full bg-white/5 dark:bg-black/60 border border-surface-200 dark:border-surface-700 border-dashed rounded-lg px-4 py-6 flex flex-col items-center justify-center text-center hover:bg-white/10 transition-colors">
                                             {isUploading ? (
                                                 <div className="space-y-2">
@@ -650,7 +654,7 @@ export default function EditProductPage() {
                                         ))}
                                         
                                         <div className="relative aspect-square">
-                                            <input type="file" accept="image/*" onChange={handleStandardImageUpload} disabled={isStandardUploading} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10" />
+                                            <input type="file" accept="image/*" multiple onChange={handleStandardImageUpload} disabled={isStandardUploading} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed z-10" />
                                             <div className="absolute inset-0 w-full h-full bg-surface-50 dark:bg-surface-900 border border-surface-200 dark:border-surface-700 border-dashed rounded-lg flex flex-col items-center justify-center text-center hover:bg-surface-100 transition-colors pointer-events-none">
                                                 {isStandardUploading ? (
                                                     <div className="space-y-2">

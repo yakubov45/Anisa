@@ -25,7 +25,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
 
     const displayImages = selectedVariant?.images?.length > 0 
         ? selectedVariant.images 
-        : (product.image ? [product.image] : []);
+        : (product.images?.length > 0 ? product.images : (product.image ? [product.image] : []));
     
     const [activeImage, setActiveImage] = useState(displayImages[0]);
 
