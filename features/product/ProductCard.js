@@ -192,8 +192,8 @@ function ProductCard({ product, badge = null, rating = null }) {
                                             onMouseEnter={() => setHoverVariant(v)}
                                             onMouseLeave={() => setHoverVariant(null)}
                                             onClick={(e) => { e.preventDefault(); setSelectedVariant(v); }}
-                                            className={`w-4 h-4 rounded-full border border-surface-300 relative transition-all duration-300 group/swatch
-                                            ${isSelected ? 'ring-2 ring-primary ring-offset-2 ring-offset-surface' : 'hover:scale-110'} 
+                                            className={`w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-black/40 dark:border-white/40 relative transition-all duration-300 group/swatch
+                                            ${isSelected ? 'ring-2 ring-primary ring-offset-2 ring-offset-surface scale-110' : 'hover:scale-110'} 
                                             ${isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
                                         `}
                                             style={{ backgroundColor: v.colorHex || '#000000' }}

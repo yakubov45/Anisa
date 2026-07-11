@@ -222,16 +222,21 @@ const getCategorySvg = (name) => {
     return icons[key] || fallback;
 };
 
-export default function ProductListing({ initialProducts = [], allCategories = [], totalProducts = 0, currentPage: serverPage = 1 }) {
+export default function ProductListing({ initialProducts = [], allCategories = [], totalProducts = 0, currentPage: serverPage = 1, globalMaxPrice = 5000 }) {
     const { t, lang } = useTranslation()
     const searchParams = useSearchParams()
     const router = useRouter()
     
     const searchQuery = searchParams.get("search")
     const categoryQuery = searchParams.get("category")
+    const minPriceQuery = searchParams.get("minPrice")
+    const maxPriceQuery = searchParams.get("maxPrice")
 
     const [selectedCategories, setSelectedCategories] = useState([])
-    const [priceRange, setPriceRange] = useState({ min: 0, max: 5000 })
+    const [priceRange, setPriceRange] = useState({ 
+        min: minPriceQuery ? parseInt(minPriceQuery) : 0, 
+        max: maxPriceQuery ? parseInt(maxPriceQuery) : globalMaxPrice 
+    })
     const [sortBy, setSortBy] = useState("newest")
     const [isCatOpen, setIsCatOpen] = useState(false)
     const itemsPerPage = 12
@@ -245,12 +250,19 @@ export default function ProductListing({ initialProducts = [], allCategories = [
         }
     }, [categoryQuery])
 
-    const maxProductPrice = useMemo(() => {
-        if (!initialProducts || initialProducts.length === 0) return 5000
-        const prices = initialProducts.map(p => Number(p.price)).filter(p => !isNaN(p) && p > 0)
-        if (prices.length === 0) return 5000
-        return Math.max(...prices)
-    }, [initialProducts])
+    useEffect(() => {
+        // Sync url params to state when they change externally (like back button or clear filters)
+        const newMin = minPriceQuery ? parseInt(minPriceQuery) : 0;
+        const newMax = maxPriceQuery ? parseInt(maxPriceQuery) : globalMaxPrice;
+        
+        // Only update if they differ from current state to prevent infinite loops
+        setPriceRange(prev => {
+            if (prev.min !== newMin || prev.max !== newMax) {
+                return { min: newMin, max: newMax };
+            }
+            return prev;
+        });
+    }, [minPriceQuery, maxPriceQuery, globalMaxPrice])
 
     const activeCategoryName = useMemo(() => {
         if (selectedCategories.length === 0) return t('view_all') || 'All Categories';
@@ -262,9 +274,46 @@ export default function ProductListing({ initialProducts = [], allCategories = [
         return activeCat.name;
     }, [selectedCategories, allCategories, t, lang]);
 
+    // Remove the old useEffect that depended on maxProductPrice.
+    // Instead, we add a debounced effect to push priceRange changes to URL.
     useEffect(() => {
-        setPriceRange(prev => ({ ...prev, max: maxProductPrice }))
-    }, [maxProductPrice])
+        // We only want to push to URL if the state differs from the URL parameters
+        // meaning the user changed it via the slider.
+        const currentUrlMin = minPriceQuery ? parseInt(minPriceQuery) : 0;
+        const currentUrlMax = maxPriceQuery ? parseInt(maxPriceQuery) : globalMaxPrice;
+
+        if (priceRange.min === currentUrlMin && priceRange.max === currentUrlMax) {
+            return; // No change needed
+        }
+
+        const timeout = setTimeout(() => {
+            const params = new URLSearchParams(searchParams.toString())
+            let changed = false;
+            
+            if (priceRange.min > 0) {
+                params.set("minPrice", priceRange.min.toString());
+                changed = true;
+            } else if (params.has("minPrice")) {
+                params.delete("minPrice");
+                changed = true;
+            }
+
+            if (priceRange.max < globalMaxPrice) {
+                params.set("maxPrice", priceRange.max.toString());
+                changed = true;
+            } else if (params.has("maxPrice")) {
+                params.delete("maxPrice");
+                changed = true;
+            }
+
+            if (changed) {
+                params.set("page", "1");
+                router.push(`/products?${params.toString()}`, { scroll: false });
+            }
+        }, 500);
+
+        return () => clearTimeout(timeout);
+    }, [priceRange.min, priceRange.max, globalMaxPrice, searchParams, router, minPriceQuery, maxPriceQuery])
 
     // Lock body scroll when filter dropdown is open
     useEffect(() => {
@@ -324,7 +373,7 @@ export default function ProductListing({ initialProducts = [], allCategories = [
 
     const resetFilters = () => {
         setSelectedCategories([]);
-        setPriceRange({ min: 0, max: maxProductPrice });
+        setPriceRange({ min: 0, max: globalMaxPrice });
         router.push('/products');
     }
 
@@ -363,7 +412,7 @@ export default function ProductListing({ initialProducts = [], allCategories = [
                         <div className="w-full sm:flex-1 space-y-3">
                             <div className="flex items-center justify-between gap-4">
                                 <h3 className="text-[9px] font-black text-foreground/50 uppercase tracking-[0.4em]">{t('filter_categories')}</h3>
-                                {(selectedCategories.length > 0 || searchQuery || priceRange.min > 0 || priceRange.max < maxProductPrice) && (
+                                {(selectedCategories.length > 0 || searchQuery || priceRange.min > 0 || priceRange.max < globalMaxPrice) && (
                                     <button 
                                         onClick={resetFilters} 
                                         className="text-[9px] font-bold text-primary uppercase tracking-widest hover:underline"
@@ -497,7 +546,7 @@ export default function ProductListing({ initialProducts = [], allCategories = [
                                     min={priceRange.min}
                                     max={priceRange.max}
                                     minLimit={0}
-                                    maxLimit={maxProductPrice}
+                                    maxLimit={globalMaxPrice}
                                     onChange={(vals) => setPriceRange(vals)}
                                 />
                             </div>
