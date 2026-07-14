@@ -3,7 +3,7 @@ import CategoryGrid from "@/components/home/CategoryGrid"
 import HeroSlider from "@/components/home/HeroSlider"
 import SectionHeading from "@/components/common/SectionHeading"
 import HomeSections from "@/components/home/HomeSections"
-import { getProductsAction, getBannersAction, getPreBuiltSystemsAction } from "@/lib/actions/product.actions"
+import { getProductsAction, getBannersAction, getPreBuiltSystemsAction, getProductsByIdsAction } from "@/lib/actions/product.actions"
 import { getFlashDealsSettingsAction } from "@/lib/actions/flash-deals.actions"
 
 export const revalidate = 60; // Sahifani har 60 soniyada keshlaydi, shunda tez ochiladi
@@ -27,11 +27,17 @@ export default async function HomePage() {
 
         // Flash deals
         const flashSettings = await getFlashDealsSettingsAction().catch(() => null);
-        if (flashSettings) {
-            const discountedProducts = allProducts.filter(p => p.discount > 0);
+        if (flashSettings && flashSettings.productIds && flashSettings.productIds.length > 0) {
+            const flashProds = await getProductsByIdsAction(flashSettings.productIds).catch(() => []);
+            // Apply the discount to these products for the UI
+            const discountedProducts = flashProds.map(p => ({
+                ...p,
+                discount: flashSettings.discountPercentage || 15
+            }));
+            
             flashDeals = {
                 settings: flashSettings,
-                products: discountedProducts // Only show products that actually have a discount assigned by admin
+                products: discountedProducts
             };
         }
     } catch (error) {

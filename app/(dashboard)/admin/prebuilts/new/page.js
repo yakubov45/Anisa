@@ -4,11 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPreBuiltSystemAction } from "@/lib/actions/product.actions";
 import { uploadService } from "@/lib/services/upload.service";
-import toast from "react-hot-toast";
+import useUIStore from "@/store/useUIStore";
 
 export default function NewPrebuiltPage() {
     const [loading, setLoading] = useState(false);
     const [file, setFile] = useState(null);
+    const { addToast } = useUIStore();
     const [form, setForm] = useState({ 
         name: "", 
         price: "", 
@@ -93,15 +94,15 @@ export default function NewPrebuiltPage() {
             const res = await createPreBuiltSystemAction(data);
             
             if (res.success) {
-                toast.success("Tayyor kompyuter muvaffaqiyatli qo'shildi!");
+                addToast("Tayyor kompyuter muvaffaqiyatli qo'shildi!", "success");
                 router.push("/prebuilts");
             } else {
-                toast.error("Xatolik: " + res.error);
+                addToast("Xatolik: " + res.error, "error");
             }
 
         } catch (error) {
             console.error("Failed to create prebuilt:", error);
-            toast.error("Xatolik yuz berdi");
+            addToast("Xatolik yuz berdi", "error");
         } finally {
             setLoading(false);
         }

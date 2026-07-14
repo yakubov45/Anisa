@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { formatPrice } from "@/lib/utils";
 import { deletePreBuiltSystemAction } from "@/lib/actions/product.actions";
-import toast from "react-hot-toast";
+import useUIStore from "@/store/useUIStore";
 
 export default function PrebuiltsListClient({ initialData }) {
     const [prebuilts, setPrebuilts] = useState(initialData || []);
     const [deletingId, setDeletingId] = useState(null);
+    const { addToast } = useUIStore();
 
     const handleDelete = async (id, name) => {
         if (!confirm(`Haqiqatan ham "${name}" kompyuterini o'chirib tashlamoqchimisiz?`)) {
@@ -15,19 +16,18 @@ export default function PrebuiltsListClient({ initialData }) {
         }
 
         setDeletingId(id);
-        const loadingToast = toast.loading("Kompyuter o'chirilmoqda...");
 
         try {
             const res = await deletePreBuiltSystemAction(id);
             if (res.success) {
-                toast.success("Kompyuter muvaffaqiyatli o'chirildi!", { id: loadingToast });
+                addToast("Kompyuter muvaffaqiyatli o'chirildi!", "success");
                 setPrebuilts(prebuilts.filter(pc => pc.id !== id));
             } else {
-                toast.error(`Xatolik yuz berdi: ${res.error}`, { id: loadingToast });
+                addToast(`Xatolik yuz berdi: ${res.error}`, "error");
             }
         } catch (error) {
             console.error("Delete failed:", error);
-            toast.error("Tizim xatoligi yuz berdi", { id: loadingToast });
+            addToast("Tizim xatoligi yuz berdi", "error");
         } finally {
             setDeletingId(null);
         }

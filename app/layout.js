@@ -50,7 +50,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
     return (
         <html lang="en" className={`${inter.variable} ${outfit.variable} font-sans`}>
-            <body className="bg-surface text-surface-900 selection:bg-primary/10">
+            <body className="bg-surface text-surface-900 selection:bg-primary/10" suppressHydrationWarning>
                 <LanguageProvider>
                     <UserProvider>
                         <CartSyncProvider>

@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react"
 import { getCurrencySettingsAction, updateCurrencyRateAction } from "@/lib/actions/currency.actions"
-import toast from "react-hot-toast"
+import useUIStore from "@/store/useUIStore"
 
 export default function CurrencyAdmin() {
     const [rate, setRate] = useState(12800)
     const [lastUpdated, setLastUpdated] = useState("")
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
+    const { addToast } = useUIStore()
 
     useEffect(() => {
         async function load() {
@@ -26,10 +27,10 @@ export default function CurrencyAdmin() {
         setSaving(true)
         const success = await updateCurrencyRateAction(rate)
         if (success) {
-            toast.success("Kurs muvaffaqiyatli yangilandi!")
+            addToast("Kurs muvaffaqiyatli yangilandi!", "success")
             setLastUpdated(new Date().toISOString())
         } else {
-            toast.error("Xatolik yuz berdi")
+            addToast("Xatolik yuz berdi", "error")
         }
         setSaving(false)
     }

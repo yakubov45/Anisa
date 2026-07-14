@@ -52,34 +52,28 @@ export default function BrandStrip() {
     const loopBrands = [...brands, ...brands, ...brands, ...brands];
 
     return (
-        <section className="py-8 md:py-12 relative overflow-hidden bg-[#050505]">
+        <section className="py-8 md:py-12 relative overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none blur-3xl opacity-50" />
             
             <div className="text-center mb-10 relative z-10">
-                <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tighter text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tighter text-surface-900 dark:text-white drop-shadow-[0_0_15px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
                     <span className="text-primary drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]">{t('brand_elite')}</span> {t('brand_brands')}
                 </h2>
-                <p className="text-white/40 text-[10px] md:text-xs uppercase tracking-widest mt-1.5 font-bold">
+                <p className="text-surface-500 dark:text-white/40 text-[10px] md:text-xs uppercase tracking-widest mt-1.5 font-bold">
                     {t('brand_choose_weapon')}
                 </p>
             </div>
 
-            <div className="w-full pb-12 pt-4 relative z-10 overflow-hidden">
-                {/* ─── DESKTOP (FaQat 15 tadan ko'p bo'lsa loop) ─── */}
-                <div className={`hidden md:flex group/list w-full ${brands.length > 15 ? '' : 'justify-center'}`}>
-                    {brands.length > 15 ? (
-                        <motion.div
-                            className="flex min-w-max items-center"
-                            animate={{ x: ["0%", "-25%"] }}
-                            transition={{ repeat: Infinity, ease: "linear", duration: 50 }}
-                        >
-                            <BrandItems brands={loopBrands} polygonUp={polygonUp} polygonDown={polygonDown} />
-                        </motion.div>
-                    ) : (
-                        <div className="flex min-w-max items-center flex-wrap justify-center">
-                            <BrandItems brands={brands} polygonUp={polygonUp} polygonDown={polygonDown} />
-                        </div>
-                    )}
+            <div className="w-full pb-20 pt-12 relative z-10">
+                {/* ─── DESKTOP (Always loop) ─── */}
+                <div className="hidden md:flex group/list w-full">
+                    <motion.div
+                        className="flex min-w-max items-center"
+                        animate={{ x: ["0%", "-25%"] }}
+                        transition={{ repeat: Infinity, ease: "linear", duration: 25 }}
+                    >
+                        <BrandItems brands={loopBrands} polygonUp={polygonUp} polygonDown={polygonDown} />
+                    </motion.div>
                 </div>
 
                 {/* ─── MOBILE (Har doim loop) ─── */}
@@ -87,7 +81,7 @@ export default function BrandStrip() {
                     <motion.div
                         className="flex min-w-max items-center"
                         animate={{ x: ["0%", "-25%"] }}
-                        transition={{ repeat: Infinity, ease: "linear", duration: 30 }}
+                        transition={{ repeat: Infinity, ease: "linear", duration: 35 }}
                     >
                         <BrandItems brands={loopBrands} polygonUp={polygonUp} polygonDown={polygonDown} />
                     </motion.div>

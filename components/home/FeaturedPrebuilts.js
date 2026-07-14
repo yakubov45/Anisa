@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
-import toast from "react-hot-toast";
 import useStore from "@/store/useStore";
+import useUIStore from "@/store/useUIStore";
 import { useTranslation } from "@/lib/LanguageContext";
 
 export default function FeaturedPrebuilts({ prebuilts }) {
@@ -96,6 +96,7 @@ export default function FeaturedPrebuilts({ prebuilts }) {
 
 function PrebuiltCard({ pc, index = 0, t, language }) {
     const { addToCart, currency, exchangeRate, compareList, toggleCompare } = useStore();
+    const { addToast } = useUIStore();
     const images = pc.images?.length > 0 ? pc.images : ['https://via.placeholder.com/400x300?text=No+Image'];
     const hasSecondImage = images.length > 1;
     const inCompare = compareList?.some(item => item.id === pc.id);
@@ -109,7 +110,7 @@ function PrebuiltCard({ pc, index = 0, t, language }) {
             category: 'prebuilt',
             quantity: 1
         });
-        toast.success(language === 'ru' ? `${pc.name} добавлен в корзину!` : language === 'en' ? `${pc.name} added to cart!` : `${pc.name} savatchaga qo'shildi!`);
+        addToast(language === 'ru' ? `${pc.name} добавлен в корзину!` : language === 'en' ? `${pc.name} added to cart!` : `${pc.name} savatchaga qo'shildi!`);
     };
 
     const price = formatPrice(pc.price, currency || 'UZS', exchangeRate);
@@ -165,7 +166,7 @@ function PrebuiltCard({ pc, index = 0, t, language }) {
                     onClick={(e) => {
                         e.preventDefault();
                         toggleCompare(pc);
-                        if (!inCompare) toast.success(language === 'ru' ? 'Добавлено к сравнению!' : language === 'en' ? 'Added to compare!' : "Taqqoslashga qo'shildi!");
+                        if (!inCompare) addToast(language === 'ru' ? 'Добавлено к сравнению!' : language === 'en' ? 'Added to compare!' : "Taqqoslashga qo'shildi!");
                     }}
                     className={`absolute top-4 right-4 z-20 w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-md ${inCompare ? 'bg-blue-500 text-white shadow-blue-500/20' : 'bg-white dark:bg-zinc-800 text-foreground hover:bg-blue-500 hover:text-white'}`}
                     title="Taqqoslash"

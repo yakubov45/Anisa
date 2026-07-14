@@ -34,7 +34,8 @@ export default function FlashDealsAdmin() {
                 if (cat !== "all") p = p.filter(prod => prod.category === cat);
                 setHasMore(false);
             } else {
-                p = await getAdminProductsAction(currentPage, 10);
+                const res = await getAdminProductsAction(currentPage, 10);
+                p = res.products || [];
                 if (p.length < 10) setHasMore(false);
                 else setHasMore(true);
             }

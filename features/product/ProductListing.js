@@ -345,10 +345,18 @@ export default function ProductListing({ initialProducts = [], allCategories = [
 
     const sortedProducts = useMemo(() => {
         return [...filteredProducts].sort((a, b) => {
+            if (sortBy === "discount") {
+                const aDiscount = a.oldPrice > a.price ? ((a.oldPrice - a.price) / a.oldPrice) : 0;
+                const bDiscount = b.oldPrice > b.price ? ((b.oldPrice - b.price) / b.oldPrice) : 0;
+                return bDiscount - aDiscount;
+            }
             if (sortBy === "price-low") return a.price - b.price
             if (sortBy === "price-high") return b.price - a.price
             if (sortBy === "newest") return new Date(b.createdAt) - new Date(a.createdAt)
             return 0
+        }).filter(p => {
+            if (sortBy === "discount") return p.oldPrice > p.price;
+            return true;
         })
     }, [filteredProducts, sortBy])
 
@@ -566,6 +574,7 @@ export default function ProductListing({ initialProducts = [], allCategories = [
                         <div className="flex items-center p-1 bg-surface-100/50 dark:bg-white/5 rounded-xl border border-white/5 overflow-x-auto">
                             {[
                                 { id: 'newest', label: t('sort_newest') },
+                                { id: 'discount', label: t('sort_discount') },
                                 { id: 'price-low', label: t('sort_price_low') },
                                 { id: 'price-high', label: t('sort_price_high') }
                             ].map((option) => (

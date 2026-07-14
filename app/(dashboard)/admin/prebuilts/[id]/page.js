@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getPreBuiltByIdAction, updatePreBuiltSystemAction } from "@/lib/actions/product.actions";
 import { uploadService } from "@/lib/services/upload.service";
-import toast from "react-hot-toast";
+import useUIStore from "@/store/useUIStore";
 
 export default function EditPrebuiltPage({ params }) {
     const { id } = params;
@@ -12,6 +12,7 @@ export default function EditPrebuiltPage({ params }) {
     const [fetching, setFetching] = useState(true);
     const [file, setFile] = useState(null);
     const [existingImage, setExistingImage] = useState("");
+    const { addToast } = useUIStore();
     const [form, setForm] = useState({ 
         name: "", 
         price: "", 
@@ -60,7 +61,7 @@ export default function EditPrebuiltPage({ params }) {
                     setExistingImage(data.images[0]);
                 }
             } else {
-                toast.error("Topilmadi!");
+                addToast("Topilmadi!", "error");
             }
             setFetching(false);
         }
@@ -128,15 +129,15 @@ export default function EditPrebuiltPage({ params }) {
             const res = await updatePreBuiltSystemAction(id, data);
             
             if (res.success) {
-                toast.success("Tayyor kompyuter muvaffaqiyatli saqlandi!");
+                addToast("Tayyor kompyuter muvaffaqiyatli saqlandi!", "success");
                 router.push("/admin/prebuilts");
             } else {
-                toast.error("Xatolik: " + res.error);
+                addToast("Xatolik: " + res.error, "error");
             }
 
         } catch (error) {
             console.error("Failed to update prebuilt:", error);
-            toast.error("Xatolik yuz berdi");
+            addToast("Xatolik yuz berdi", "error");
         } finally {
             setLoading(false);
         }

@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatPrice } from "@/lib/utils";
-import toast from "react-hot-toast";
 import useStore from "@/store/useStore";
+import useUIStore from "@/store/useUIStore";
 import { CatalogCard } from "../PrebuiltsClient";
 import { useTranslation } from "@/lib/LanguageContext";
 import { translateSpec } from "@/lib/utils/translateSpec";
@@ -26,6 +26,7 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
     }, [pc.images]);
     const [quantity, setQuantity] = useState(1);
     const { currency, exchangeRate, addToCart } = useStore();
+    const { addToast } = useUIStore();
     
     // Fix hydration issue for currency
     const [mounted, setMounted] = useState(false);
@@ -55,7 +56,7 @@ export default function PrebuiltDetailClient({ pc, otherPrebuilts = [] }) {
             category: 'prebuilt',
             quantity: quantity
         });
-        toast.success(`${finalName} savatchaga qo'shildi!`);
+        addToast(`${finalName} savatchaga qo'shildi!`);
     };
 
     const specifications = pc.specifications || [];

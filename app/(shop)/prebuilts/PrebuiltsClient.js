@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
 import { formatPrice } from "@/lib/utils";
-import toast from "react-hot-toast";
 import useStore from "@/store/useStore";
+import useUIStore from "@/store/useUIStore";
 import { useTranslation } from "@/lib/LanguageContext";
 
 import { useSearchParams } from "next/navigation";
@@ -249,6 +249,7 @@ export default function PrebuiltsClient({ initialData }) {
 export function CatalogCard({ pc, currency = "UZS", exchangeRate, layout = "row" }) {
     const { t } = useTranslation();
     const { addToCart, compareList, toggleCompare } = useStore();
+    const { addToast } = useUIStore();
     const inCompare = compareList?.some(item => item.id === pc.id);
 
     const handleAddToCart = () => {
@@ -260,7 +261,7 @@ export function CatalogCard({ pc, currency = "UZS", exchangeRate, layout = "row"
             category: 'prebuilt',
             quantity: 1
         });
-        toast.success(t("cart_added_msg") ? t("cart_added_msg").replace("{name}", pc.name) : `"${pc.name}" savatga qo'shildi!`);
+        addToast(t("cart_added_msg") ? t("cart_added_msg").replace("{name}", pc.name) : `"${pc.name}" savatga qo'shildi!`);
     };
 
     const price = formatPrice(pc.price, currency, exchangeRate);
@@ -316,7 +317,7 @@ export function CatalogCard({ pc, currency = "UZS", exchangeRate, layout = "row"
                     onClick={(e) => {
                         e.preventDefault();
                         toggleCompare(pc);
-                        if (!inCompare) toast.success("Taqqoslashga qo'shildi!");
+                        if (!inCompare) addToast("Taqqoslashga qo'shildi!");
                     }}
                     className={`absolute top-4 right-4 z-20 w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-md ${inCompare ? 'bg-blue-500 text-white shadow-blue-500/20' : 'bg-white dark:bg-zinc-800 text-foreground hover:bg-blue-500 hover:text-white'}`}
                     title="Taqqoslash"

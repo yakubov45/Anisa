@@ -1,192 +1,145 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import Image from "next/image"
-import { auth } from "@/lib/firebase/client"
+import { useState, useEffect } from "react";
+import { getBrandsAction, createBrandAction, deleteBrandAction } from "@/lib/actions/product.actions";
+import { useTranslation } from "@/lib/LanguageContext";
+import useUIStore from "@/store/useUIStore";
 
 export default function AdminBrandsPage() {
+    const { t } = useTranslation();
+    const { addToast } = useUIStore();
     const [brands, setBrands] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [uploading, setUploading] = useState(false);
-    const [newBrand, setNewBrand] = useState({ name: "", logo: "" });
+    const [showModal, setShowModal] = useState(false);
+    const [formData, setFormData] = useState({ name: "" });
+    const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
         fetchBrands();
     }, []);
 
     const fetchBrands = async () => {
-        const res = await fetch("/api/brands");
-        const data = await res.json();
-        setBrands(data);
-        setLoading(false);
-    };
-
-    const handleUpload = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        setUploading(true);
-        const formData = new FormData();
-        formData.append("file", file);
-
+        setLoading(true);
         try {
-            const token = await auth.currentUser?.getIdToken();
-            const res = await fetch("/api/upload", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                },
-                body: formData
-            });
-            const data = await res.json();
-            if (data.url) {
-                setNewBrand({ ...newBrand, logo: data.url });
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setUploading(false);
+            const data = await getBrandsAction();
+            setBrands(data || []);
+        } catch (error) {
+            console.error(error);
+            addToast("Brendlarni yuklashda xatolik yuz berdi", "error");
         }
+        setLoading(false);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!newBrand.name || !newBrand.logo) return;
-
-        const token = await auth.currentUser?.getIdToken();
-        const res = await fetch("/api/brands", {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify(newBrand)
-        });
-
-        if (res.ok) {
-            setNewBrand({ name: "", logo: "" });
+        setSubmitting(true);
+        const res = await createBrandAction(formData);
+        if (res.success) {
+            addToast("Brend muvaffaqiyatli qo'shildi!", "success");
+            setShowModal(false);
+            setFormData({ name: "" });
             fetchBrands();
         } else {
-            const data = await res.json();
-            alert(data.error);
+            addToast(`Xatolik: ${res.error}`, "error");
         }
+        setSubmitting(false);
     };
 
     const handleDelete = async (id) => {
-        if (!confirm("Are you sure?")) return;
-        const res = await fetch(`/api/brands?id=${id}`, { method: "DELETE" });
-        if (res.ok) fetchBrands();
+        if (confirm("Haqiqatan ham bu brendni o'chirmoqchimisiz?")) {
+            const res = await deleteBrandAction(id);
+            if (res.success) {
+                addToast("Brend o'chirildi", "success");
+                fetchBrands();
+            } else {
+                addToast(`Xatolik: ${res.error}`, "error");
+            }
+        }
     };
 
     return (
-        <div className="space-y-12 pb-20">
-            <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-1 bg-primary rounded-full" />
-                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">Brand_Matrix</span>
+        <div className="space-y-10 pb-20 animate-fade-in p-4 md:p-10 max-w-7xl mx-auto">
+            <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-4">
+                <div className="space-y-1">
+                    <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tighter uppercase">Brendlar Boshqaruvi</h1>
+                    <p className="text-surface-500 font-bold uppercase tracking-widest text-xs">Do'kondagi brendlarni boshqarish</p>
                 </div>
-                <h1 className="text-4xl font-black text-white tracking-tighter uppercase">Brand Management</h1>
-                <p className="text-white/40 text-xs font-bold uppercase tracking-widest max-w-xl">
-                    Deploy brand identities to the global matrix. Maximum capacity: 14 active brands.
-                </p>
+                <button 
+                    onClick={() => { setFormData({ name: "" }); setShowModal(true); }}
+                    className="bg-primary text-white font-black px-8 py-4 rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 transition-all uppercase tracking-widest text-xs self-start md:self-auto"
+                >
+                    Yangi Brend
+                </button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                {/* Add Brand Form */}
-                <div className="bg-[#0A0A0B] border border-white/5 p-10 rounded-[3rem] space-y-10">
-                    <h3 className="text-xl font-black text-white uppercase tracking-tight">New Deployment</h3>
-                    
-                    <form onSubmit={handleSubmit} className="space-y-8">
-                        <div className="space-y-4">
-                            <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Brand Name</label>
-                            <input 
-                                type="text"
-                                value={newBrand.name}
-                                onChange={(e) => setNewBrand({ ...newBrand, name: e.target.value })}
-                                placeholder="Enter Brand Name"
-                                className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:ring-2 focus:ring-primary/40 transition-all uppercase text-xs tracking-widest"
-                            />
-                        </div>
-
-                        <div className="space-y-4">
-                            <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Identity Logo</label>
-                            <div className="relative group">
-                                <input 
-                                    type="file"
-                                    onChange={handleUpload}
-                                    className="hidden"
-                                    id="logo-upload"
-                                    accept="image/*"
-                                />
-                                <label 
-                                    htmlFor="logo-upload"
-                                    className="flex flex-col items-center justify-center gap-4 border-2 border-dashed border-white/10 rounded-[2rem] p-12 hover:border-primary/40 transition-all cursor-pointer bg-white/[0.02]"
-                                >
-                                    {newBrand.logo ? (
-                                        <div className="relative w-24 h-24">
-                                            <img src={newBrand.logo} alt="Preview" className="w-full h-full object-contain" />
-                                        </div>
-                                    ) : (
-                                        <>
-                                            <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-white/40">
-                                                {uploading ? (
-                                                    <div className="w-6 h-6 border-2 border-primary border-t-transparent animate-spin rounded-full" />
-                                                ) : (
-                                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" /></svg>
-                                                )}
-                                            </div>
-                                            <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Click to Upload Identity</span>
-                                        </>
-                                    )}
-                                </label>
-                            </div>
-                        </div>
-
-                        <button 
-                            type="submit"
-                            disabled={brands.length >= 14}
-                            className="w-full bg-primary text-white font-black py-5 rounded-2xl uppercase text-[10px] tracking-widest hover:bg-white hover:text-black transition-all shadow-xl shadow-primary/20 disabled:opacity-30 disabled:hover:bg-primary"
-                        >
-                            {brands.length >= 14 ? "LIMIT REACHED" : "DEPLOY BRAND"}
-                        </button>
-                    </form>
-                </div>
-
-                {/* Brands Grid */}
-                <div className="lg:col-span-2 space-y-10">
-                    <div className="flex items-center justify-between">
-                        <h3 className="text-xl font-black text-white uppercase tracking-tight">Active Matrix</h3>
-                        <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">{brands.length} / 14 DEPLOYED</span>
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
-                        <AnimatePresence>
-                            {brands.map((brand) => (
-                                <motion.div 
-                                    key={brand.id || brand._id}
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.9 }}
-                                    className="group relative bg-[#0A0A0B] border border-white/5 p-8 rounded-[2.5rem] flex flex-col items-center gap-6"
-                                >
-                                    <div className="relative w-20 h-20">
-                                        <img src={brand.logo} alt={brand.name} className="w-full h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-500" />
-                                    </div>
-                                    <span className="text-[10px] font-black text-white/40 uppercase tracking-widest group-hover:text-white transition-colors">{brand.name}</span>
-                                    
-                                    <button 
-                                        onClick={() => handleDelete(brand.id || brand._id)}
-                                        className="absolute -top-2 -right-2 w-10 h-10 bg-red-500 text-white rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-95 shadow-xl shadow-red-500/20"
-                                    >
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {loading ? (
+                    <div className="col-span-full py-20 text-center text-surface-300 italic animate-pulse uppercase tracking-widest text-xs">Yuklanmoqda...</div>
+                ) : brands.length === 0 ? (
+                    <div className="col-span-full py-20 text-center text-surface-400 font-black uppercase tracking-widest text-sm">Hozircha brendlar yo'q</div>
+                ) : (
+                    brands.map((brand) => (
+                        <div key={brand.id} className="bg-surface border border-border-alpha dark:border-white/5 p-8 rounded-[2rem] shadow-premium group hover:border-primary/50 transition-all relative">
+                            <div className="flex justify-between items-start mb-6">
+                                <div className="text-2xl bg-surface-50 dark:bg-white/5 w-16 h-16 flex items-center justify-center rounded-2xl group-hover:scale-110 transition-transform font-black uppercase tracking-tighter text-primary">
+                                    {brand.name.charAt(0)}
+                                </div>
+                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onClick={() => handleDelete(brand.id)} className="w-8 h-8 rounded-lg bg-surface-50 dark:bg-white/10 flex items-center justify-center text-surface-400 hover:text-red-500 transition-colors">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                     </button>
-                                </motion.div>
-                            ))}
-                        </AnimatePresence>
+                                </div>
+                            </div>
+                            <h3 className="text-lg font-black text-foreground capitalize tracking-tight">
+                                {brand.name}
+                            </h3>
+                            <p className="text-[10px] text-surface-400 font-bold uppercase tracking-[0.2em] mt-1">ID: {brand.id}</p>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            {/* Modal */}
+            {showModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-md animate-in fade-in duration-200">
+                    <div className="bg-surface dark:bg-surface-50 w-full max-w-md p-10 rounded-[2.5rem] shadow-2xl border border-surface-100 dark:border-white/5 animate-in zoom-in-95 duration-200">
+                        <h2 className="text-2xl font-black text-foreground uppercase tracking-tight mb-8">
+                            Yangi Brend Qo'shish
+                        </h2>
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-surface-400 dark:text-surface-500 uppercase tracking-widest pl-1">Brend Nomi</label>
+                                <input 
+                                    type="text" 
+                                    value={formData.name}
+                                    onChange={e => setFormData({...formData, name: e.target.value})}
+                                    className="w-full bg-surface-50 dark:bg-white/5 border border-border-alpha dark:border-white/10 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-2 focus:ring-primary outline-none transition-all text-foreground"
+                                    placeholder="Masalan: ASUS"
+                                    required
+                                    autoFocus
+                                />
+                            </div>
+                            
+                            <div className="flex gap-4 pt-4">
+                                <button 
+                                    type="submit"
+                                    disabled={submitting}
+                                    className="flex-1 bg-primary text-white font-black py-5 rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-widest text-xs disabled:opacity-50"
+                                >
+                                    {submitting ? "Saqlanmoqda..." : "Saqlash"}
+                                </button>
+                                <button 
+                                    type="button"
+                                    onClick={() => setShowModal(false)}
+                                    className="bg-surface-50 dark:bg-white/5 text-foreground font-black px-8 py-5 rounded-2xl hover:bg-surface-100 dark:hover:bg-white/10 transition-all uppercase tracking-widest text-xs"
+                                >
+                                    Bekor qilish
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }
