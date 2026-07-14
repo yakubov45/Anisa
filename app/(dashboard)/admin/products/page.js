@@ -15,18 +15,29 @@ export default function AdminProductsPage() {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
     const limit = 10;
+
+    // Debounce search query
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearch(searchQuery);
+            setPage(1); // Reset to first page on new search
+        }, 500);
+        return () => clearTimeout(handler);
+    }, [searchQuery]);
 
     useEffect(() => {
         const fetch = async () => {
             setLoading(true);
-            const data = await getAdminProductsAction(page, limit);
+            const data = await getAdminProductsAction(page, limit, debouncedSearch);
             setProducts(data?.products || []);
             setTotalPages(Math.ceil((data?.total || 0) / limit) || 1);
             setLoading(false);
         };
         fetch();
-    }, [page]);
+    }, [page, debouncedSearch]);
 
     const handleDelete = async (id) => {
         if (confirm(t('prod_confirm_delete'))) {
@@ -91,6 +102,21 @@ export default function AdminProductsPage() {
                     <Link href="/admin/products/new" className="bg-primary text-white font-black px-10 py-5 rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 transition-all uppercase tracking-widest text-xs flex items-center justify-center">
                         {t('prod_add_new')}
                     </Link>
+                </div>
+            </div>
+
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-6">
+                <div className="w-full md:w-1/3 relative">
+                    <input
+                        type="text"
+                        placeholder="Mahsulot yoki kategoriya qidiring..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full bg-surface-50 border border-surface-200 dark:border-surface-700 rounded-2xl pl-12 pr-4 py-3 text-sm font-bold focus:ring-2 focus:ring-primary transition-all text-surface-900"
+                    />
+                    <svg className="w-5 h-5 text-surface-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
                 </div>
             </div>
 

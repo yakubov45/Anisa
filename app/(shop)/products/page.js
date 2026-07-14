@@ -9,7 +9,7 @@ import {
 } from "@/lib/actions/product.actions";
 
 export default async function ProductsPage({ searchParams }) {
-    const { category, brand, page = "1", search, minPrice, maxPrice } = await searchParams;
+    const { category, brand, page = "1", search, minPrice, maxPrice, sort = "newest" } = await searchParams;
     const currentPage = parseInt(page);
     const minP = minPrice ? parseInt(minPrice) : undefined;
     const maxP = maxPrice ? parseInt(maxPrice) : undefined;
@@ -20,14 +20,12 @@ export default async function ProductsPage({ searchParams }) {
     if (search) {
         productsPromise = getSearchProductsAction(search, 12);
         countPromise = Promise.resolve(null); // Count search natijasidan olinadi
-    } else if (category || brand || minP !== undefined || maxP !== undefined) {
-        productsPromise = getFilteredProductsAction({ categoryId: category, brand, minPrice: minP, maxPrice: maxP, page: currentPage, pageSize: 12 });
-        // NOTE: Count logic for price filtering isn't perfectly exact in getProductsCountAction 
-        // without JS filtering if fetching all, but we will leave it as is for UI simplicity.
-        countPromise = getProductsCountAction(category, brand);
+    } else if (category || brand || minP !== undefined || maxP !== undefined || sort !== "newest") {
+        productsPromise = getFilteredProductsAction({ categoryId: category, brand, minPrice: minP, maxPrice: maxP, sortBy: sort, page: currentPage, pageSize: 12 });
+        countPromise = getProductsCountAction({ categoryId: category, brand, sortBy: sort, minPrice: minP, maxPrice: maxP });
     } else {
         productsPromise = getProductsAction(currentPage, 12);
-        countPromise = getProductsCountAction();
+        countPromise = getProductsCountAction({});
     }
 
     const [products, allCategories, totalCount, globalMaxPrice] = await Promise.all([

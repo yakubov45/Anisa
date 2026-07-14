@@ -237,7 +237,8 @@ export default function ProductListing({ initialProducts = [], allCategories = [
         min: minPriceQuery ? parseInt(minPriceQuery) : 0, 
         max: maxPriceQuery ? parseInt(maxPriceQuery) : globalMaxPrice 
     })
-    const [sortBy, setSortBy] = useState("newest")
+    const sortQuery = searchParams.get("sort") || "newest";
+    const [sortBy, setSortBy] = useState(sortQuery);
     const [isCatOpen, setIsCatOpen] = useState(false)
     const itemsPerPage = 12
 
@@ -346,8 +347,8 @@ export default function ProductListing({ initialProducts = [], allCategories = [
     const sortedProducts = useMemo(() => {
         return [...filteredProducts].sort((a, b) => {
             if (sortBy === "discount") {
-                const aDiscount = a.oldPrice > a.price ? ((a.oldPrice - a.price) / a.oldPrice) : 0;
-                const bDiscount = b.oldPrice > b.price ? ((b.oldPrice - b.price) / b.oldPrice) : 0;
+                const aDiscount = a.discount || 0;
+                const bDiscount = b.discount || 0;
                 return bDiscount - aDiscount;
             }
             if (sortBy === "price-low") return a.price - b.price
@@ -355,7 +356,7 @@ export default function ProductListing({ initialProducts = [], allCategories = [
             if (sortBy === "newest") return new Date(b.createdAt) - new Date(a.createdAt)
             return 0
         }).filter(p => {
-            if (sortBy === "discount") return p.oldPrice > p.price;
+            if (sortBy === "discount") return (p.discount || 0) > 0;
             return true;
         })
     }, [filteredProducts, sortBy])
@@ -580,7 +581,13 @@ export default function ProductListing({ initialProducts = [], allCategories = [
                             ].map((option) => (
                                 <button
                                     key={option.id}
-                                    onClick={() => setSortBy(option.id)}
+                                    onClick={() => {
+                                        setSortBy(option.id);
+                                        const params = new URLSearchParams(searchParams.toString());
+                                        params.set("sort", option.id);
+                                        params.set("page", "1");
+                                        router.push(`/products?${params.toString()}`, { scroll: false });
+                                    }}
                                     className={`relative px-3 md:px-4 py-2 text-[9px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${sortBy === option.id ? 'text-white' : 'text-foreground/40 hover:text-foreground'
                                         }`}
                                 >
