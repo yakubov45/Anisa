@@ -43,7 +43,14 @@ const useUIStore = create((set) => ({
     },
     hideConfirm: () => {
         set({ confirmModal: { isOpen: false, message: "", onConfirm: null, title: "" } });
-    }
+    },
+
+    // Drawer States
+    cartDrawerOpen: false,
+    setCartDrawerOpen: (isOpen) => set({ cartDrawerOpen: isOpen }),
+
+    notificationsDrawerOpen: false,
+    setNotificationsDrawerOpen: (isOpen) => set({ notificationsDrawerOpen: isOpen })
 }))
 
 export default useUIStore

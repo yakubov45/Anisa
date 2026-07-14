@@ -19,8 +19,8 @@ export default function Navbar() {
     const router = useRouter();
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const dropdownRef = useRef(null);
-    const { cart, currency, setCurrency, setCartDrawerOpen, setNotificationsDrawerOpen, notifications } = useStore()
-    const { cartAnimation } = useUIStore()
+    const { cart, currency, setCurrency, notifications } = useStore()
+    const { cartAnimation, setCartDrawerOpen, setNotificationsDrawerOpen } = useUIStore()
     const [mounted, setMounted] = useState(false)
     const [isScrolled, setIsScrolled] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")

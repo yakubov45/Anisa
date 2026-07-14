@@ -4,11 +4,13 @@ import { useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "@/lib/LanguageContext";
 import useStore from "@/store/useStore";
+import useUIStore from "@/store/useUIStore";
 import Link from "next/link";
 import PriceDisplay from "@/components/common/PriceDisplay";
 
 export default function CartDrawer() {
-    const { cart, cartDrawerOpen, setCartDrawerOpen, removeFromCart, updateQuantity } = useStore();
+    const { cart, removeFromCart, updateQuantity } = useStore();
+    const { cartDrawerOpen, setCartDrawerOpen } = useUIStore();
     const { t } = useTranslation();
     const drawerRef = useRef(null);
 

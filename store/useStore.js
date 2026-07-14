@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
+import useUIStore from './useUIStore'
 
 const useStore = create(
     persist(
@@ -9,8 +10,6 @@ const useStore = create(
             currency: 'USD',
             exchangeRate: 12800,
 
-            cartDrawerOpen: false,
-            notificationsDrawerOpen: false,
             notifications: [
                 {
                     id: 'welcome_bot',
@@ -29,20 +28,6 @@ const useStore = create(
                     }
                 }
             ],
-            setCartDrawerOpen: (isOpen) => set({ cartDrawerOpen: isOpen }),
-            setNotificationsDrawerOpen: (isOpen) => set((state) => {
-                // If opening the drawer, we don't auto-read. User must click "Mark all as read". 
-                // But wait, user requested: "qizil o'chsin user kirib chiqgandan kegin" (red dot disappears after user goes in and out). 
-                // So if isOpen is false (closing), we can mark all as read. Or we can just let them click the button. 
-                // Let's implement markAll as a separate function.
-                if (!isOpen) {
-                    return { 
-                        notificationsDrawerOpen: isOpen,
-                        notifications: state.notifications.map(n => ({ ...n, isRead: true }))
-                    }
-                }
-                return { notificationsDrawerOpen: isOpen }
-            }),
             addNotification: (notification) => set((state) => {
                 // Check if identical notification already exists to prevent duplicates on strict mode
                 if (notification.id && state.notifications.some(n => n.id === notification.id)) return state;
@@ -71,9 +56,12 @@ const useStore = create(
                         item.id === product.id ? { ...item, quantity: (item.quantity || 1) + 1 } : item
                       )
                     : [...state.cart, { ...product, quantity: 1 }];
+                
+                // Open the cart drawer using the UI store
+                useUIStore.getState().setCartDrawerOpen(true);
+
                 return { 
-                    cart: nextCart,
-                    cartDrawerOpen: true
+                    cart: nextCart
                 };
             }),
 

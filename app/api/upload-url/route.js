@@ -1,6 +1,7 @@
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/firebase/serverAuth";
 
 const s3Client = new S3Client({
     region: "auto",
@@ -14,6 +15,15 @@ const s3Client = new S3Client({
 
 export async function POST(req) {
     try {
+        // Auth: Faqat admin rasm yuklashi mumkin
+        const authResult = await requireAdmin(req);
+        if (authResult.error) {
+            return NextResponse.json(
+                { error: authResult.error },
+                { status: authResult.status }
+            );
+        }
+
         const { filename, contentType, folder = "products" } = await req.json();
 
         if (!filename) {

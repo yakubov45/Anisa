@@ -2,17 +2,20 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import useStore from "@/store/useStore";
+import useUIStore from "@/store/useUIStore";
 import { useEffect, useState } from "react";
 import { useTranslation } from "@/lib/LanguageContext";
 
 export default function NotificationsDrawer() {
     const { 
-        notificationsDrawerOpen, 
-        setNotificationsDrawerOpen,
         notifications,
         markAllNotificationsAsRead,
         markNotificationAsRead
     } = useStore();
+    const {
+        notificationsDrawerOpen,
+        setNotificationsDrawerOpen
+    } = useUIStore();
     const { t, lang } = useTranslation();
     const [mounted, setMounted] = useState(false);
     const [expandedId, setExpandedId] = useState(null);
@@ -21,18 +24,21 @@ export default function NotificationsDrawer() {
         setMounted(true);
     }, []);
 
-    // Prevent scrolling when drawer is open
+    // Prevent scrolling when drawer is open and mark all read on close
     useEffect(() => {
         if (notificationsDrawerOpen) {
             document.body.style.overflow = "hidden";
         } else {
             document.body.style.overflow = "";
             setExpandedId(null);
+            if (mounted) {
+                markAllNotificationsAsRead();
+            }
         }
         return () => {
             document.body.style.overflow = "";
         };
-    }, [notificationsDrawerOpen]);
+    }, [notificationsDrawerOpen, mounted]);
 
     if (!mounted) return null;
 

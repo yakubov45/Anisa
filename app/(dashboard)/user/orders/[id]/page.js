@@ -33,7 +33,7 @@ export default function UserOrderDetails() {
     if (!order) return (
         <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-6">
             <h1 className="text-2xl font-black uppercase">{t('det_not_found')}</h1>
-            <Link href="/dashboard/user/orders" className="text-primary font-black uppercase text-xs tracking-widest underline">{t('det_back_registry')}</Link>
+            <Link href="/user/orders" className="text-primary font-black uppercase text-xs tracking-widest underline">{t('det_back_registry')}</Link>
         </div>
     );
 
@@ -52,7 +52,7 @@ export default function UserOrderDetails() {
                     <p className="text-surface-500 font-bold uppercase text-[10px] tracking-widest">{t('ord_global_desc')}</p>
                 </div>
                 
-                <Link href="/dashboard/user/orders" className="bg-surface-100 dark:bg-white/5 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-surface-200 transition-all">
+                <Link href="/user/orders" className="bg-surface-100 dark:bg-white/5 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-surface-200 transition-all">
                     {t('det_back_history')}
                 </Link>
             </div>
