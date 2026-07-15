@@ -5,6 +5,7 @@ import useStore from "@/store/useStore";
 import useUIStore from "@/store/useUIStore";
 import { useEffect, useState } from "react";
 import { useTranslation } from "@/lib/LanguageContext";
+import { useRouter } from "next/navigation";
 
 export default function NotificationsDrawer() {
     const { 
@@ -19,6 +20,7 @@ export default function NotificationsDrawer() {
     const { t, lang } = useTranslation();
     const [mounted, setMounted] = useState(false);
     const [expandedId, setExpandedId] = useState(null);
+    const router = useRouter();
 
     useEffect(() => {
         setMounted(true);
@@ -205,7 +207,9 @@ export default function NotificationsDrawer() {
                                                 </p>
                                                 {notification.orderId && (
                                                     <div className="mt-3 bg-surface-100 dark:bg-zinc-800 p-2 rounded-lg inline-block">
-                                                        <span className="text-[9px] font-black uppercase text-surface-500 tracking-widest block mb-1">Buyurtma raqami:</span>
+                                                        <span className="text-[9px] font-black uppercase text-surface-500 tracking-widest block mb-1">
+                                                            {lang === 'uz' ? "Buyurtma raqami:" : lang === 'ru' ? "Номер заказа:" : "Order Number:"}
+                                                        </span>
                                                         <span className="text-xs font-mono font-black text-foreground">{notification.orderId}</span>
                                                     </div>
                                                 )}
@@ -219,7 +223,23 @@ export default function NotificationsDrawer() {
                                                             className="w-full flex items-center justify-center gap-2 bg-[#229ED9]/10 text-[#229ED9] hover:bg-[#229ED9]/20 transition-colors py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest"
                                                         >
                                                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.892-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-                                                            Foydalanish qo'llanmasi
+                                                            {lang === 'uz' ? "Foydalanish qo'llanmasi" : lang === 'ru' ? "Руководство пользователя" : "User Guide"}
+                                                        </button>
+                                                    </div>
+                                                )}
+
+                                                {notification.actionLink && (
+                                                    <div className="mt-4 border-t border-surface-200 dark:border-white/5 pt-3">
+                                                        <button 
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setNotificationsDrawerOpen(false);
+                                                                router.push(notification.actionLink);
+                                                            }}
+                                                            className="w-full flex items-center justify-center gap-2 bg-primary/10 text-primary hover:bg-primary/20 transition-colors py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm"
+                                                        >
+                                                            {lang === 'uz' ? "Ko'rish" : lang === 'ru' ? "Посмотреть" : "View"}
+                                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                                                         </button>
                                                     </div>
                                                 )}

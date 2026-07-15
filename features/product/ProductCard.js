@@ -136,7 +136,7 @@ function ProductCard({ product, badge = null, rating = null }) {
                                     }}
                                     className={`w-8 h-8 rounded-md cursor-pointer overflow-hidden border-2 transition-all ${hoverImageIndex === idx ? 'border-primary' : 'border-transparent opacity-70 hover:opacity-100'}`}
                                 >
-                                    <img src={img} className="w-full h-full object-cover" alt="" />
+                                    <img src={img} className="w-full h-full object-cover select-none pointer-events-none" draggable={false} onContextMenu={(e) => e.preventDefault()} alt="" />
                                 </div>
                             ))}
                         </div>

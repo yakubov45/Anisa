@@ -12,10 +12,44 @@ const useStore = create(
 
             notifications: [
                 {
+                    id: 'summer_sale_2026',
+                    type: 'promo',
+                    isRead: false,
+                    date: new Date().toISOString(),
+                    title: {
+                        uz: "🔥 Katta yozgi chegirmalar boshlandi!",
+                        ru: "🔥 Начались большие летние скидки!",
+                        en: "🔥 Huge summer sale has started!"
+                    },
+                    message: {
+                        uz: "Tanlangan mahsulotlarga 30% gacha chegirmalar e'lon qilindi. Shoshiling, mahsulotlar soni cheklangan!",
+                        ru: "Объявлены скидки до 30% на выбранные товары. Спешите, количество товара ограничено!",
+                        en: "Discounts up to 30% on selected products. Hurry up, limited stock!"
+                    },
+                    actionLink: "/products?sort=discount"
+                },
+                {
+                    id: 'new_arrival_rtx',
+                    type: 'update',
+                    isRead: false,
+                    date: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+                    title: {
+                        uz: "🚀 Yangi mahsulotlar yetib keldi!",
+                        ru: "🚀 Прибыли новые товары!",
+                        en: "🚀 New arrivals are here!"
+                    },
+                    message: {
+                        uz: "Eng so'nggi avlod RTX 40 seriyali video kartalar va yangi mexanik klaviaturalar omborimizga qo'shildi. Birinchilardan bo'lib xarid qiling.",
+                        ru: "Видеокарты серии RTX 40 последнего поколения и новые механические клавиатуры добавлены на склад. Покупайте первыми.",
+                        en: "The latest generation RTX 40 series graphics cards and new mechanical keyboards have been added to our stock. Be the first to buy."
+                    },
+                    actionLink: "/products?sort=newest"
+                },
+                {
                     id: 'welcome_bot',
                     type: 'info',
                     isRead: false,
-                    date: new Date().toISOString(),
+                    date: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
                     title: {
                         uz: "Telegram bot qo'shildi!",
                         ru: "Добавлен Telegram бот!",

@@ -25,19 +25,10 @@ export default function AboutPage() {
     return (
         <div className="space-y-16 md:space-y-32 py-10 px-4 sm:px-0">
             {/* Hero Section */}
-            <section className="relative h-[60vh] md:h-[70vh] rounded-[2.5rem] md:rounded-[4rem] overflow-hidden group mx-2 md:mx-0">
-                <video
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    disablePictureInPicture
-                    disableRemotePlayback
-                    className="absolute inset-0 object-cover w-full h-full transition-all duration-1000 scale-100 md:scale-110 group-hover:scale-100"
-                >
-                    <source src="/videos/A_hyper_realistic_macro_animat.mp4" type="video/mp4" />
-                </video>
-                <div className="absolute inset-0 bg-black/60 pointer-events-none transform-gpu" />
+            <section className="relative h-[60vh] md:h-[70vh] rounded-[2.5rem] md:rounded-[4rem] overflow-hidden group mx-2 md:mx-0 bg-zinc-950 dark:bg-black">
+                {/* Decorative background instead of video */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.15)_0%,transparent_70%)] pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent pointer-events-none" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 text-white">
                     <motion.h1

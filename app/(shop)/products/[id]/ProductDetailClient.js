@@ -104,7 +104,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-20 px-4 md:px-0">
 
                 {/* IMAGE GALLERY WITH ZOOM */}
-                <div className="space-y-4 md:space-y-6 max-w-[450px] mx-auto lg:mx-0 w-full">
+                <div className="space-y-4 md:space-y-6 max-w-[600px] lg:max-w-none mx-auto lg:mx-0 w-full lg:pr-8">
                     {/* Show selected color name above the image */}
                     {validVariants.length > 0 && (
                         <div className="flex items-center gap-2">
@@ -114,31 +114,24 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                     )}
                     
                     <div 
-                        className="w-full aspect-square relative bg-surface-100 rounded-[1.5rem] md:rounded-[2rem] overflow-hidden border border-surface-200 dark:border-white/10 group shadow-xl cursor-crosshair"
+                        className="w-full aspect-[4/3] lg:aspect-square relative bg-surface-100 rounded-[1.5rem] md:rounded-[2rem] overflow-hidden border border-surface-200 dark:border-white/10 group shadow-xl cursor-crosshair"
                         onMouseEnter={() => setIsZooming(true)}
                         onMouseLeave={() => setIsZooming(false)}
                         onMouseMove={handleImageMouseMove}
                     >
-                        {/* Video Background behind Image */}
-                        <video
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                            className="absolute inset-0 w-full h-full object-cover opacity-30"
-                        >
-                            <source src="/videos/ProductAnimation.mp4" type="video/mp4" />
-                        </video>
+
                         <div className="absolute inset-0 bg-gradient-to-tr from-surface/80 to-transparent backdrop-blur-[2px] z-0" />
 
-                        <div className="absolute inset-0 z-10 p-8 md:p-12 overflow-hidden">
+                        <div className="absolute inset-0 z-10 p-4 md:p-6 overflow-hidden">
                             <Image
                                 src={activeImage}
                                 alt={productName}
                                 fill
                                 priority
+                                draggable={false}
+                                onContextMenu={(e) => e.preventDefault()}
                                 sizes="(max-width: 768px) 100vw, 50vw"
-                                className="object-contain p-8 md:p-12 transition-transform duration-200 ease-out"
+                                className="object-contain p-2 transition-transform duration-200 ease-out select-none pointer-events-auto"
                                 style={{
                                     transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
                                     transform: isZooming ? 'scale(2.5)' : 'scale(1)'
@@ -164,7 +157,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                                     onClick={() => setActiveImage(img)}
                                     className={`w-16 h-16 md:w-20 md:h-20 flex-shrink-0 bg-surface-100 rounded-xl cursor-pointer border transition-all overflow-hidden p-1.5 md:p-2 relative group ${activeImage === img ? 'border-primary shadow-[0_0_15px_rgba(var(--primary),0.3)]' : 'border-surface-200 dark:border-white/5 hover:border-primary/50'}`}
                                 >
-                                    <img src={img} className="w-full h-full object-cover rounded-lg group-hover:scale-110 transition-transform duration-500" />
+                                    <img src={img} draggable={false} onContextMenu={(e) => e.preventDefault()} className="w-full h-full object-cover rounded-lg group-hover:scale-110 transition-transform duration-500 select-none pointer-events-none" />
                                 </div>
                             ))}
                         </div>
@@ -186,7 +179,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                         </h1>
                         
                         <div className="bg-surface-50 dark:bg-zinc-900/50 backdrop-blur-xl p-6 md:p-8 rounded-2xl border border-surface-200 dark:border-white/5 shadow-inner">
-                            <p className="text-surface-600 dark:text-surface-300 text-sm md:text-base font-medium leading-relaxed">
+                            <p className="text-surface-600 dark:text-white/90 text-sm md:text-base font-medium leading-relaxed">
                                 {productDesc}
                             </p>
                         </div>
