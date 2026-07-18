@@ -22,6 +22,7 @@ export default function NewProductPage() {
         brand: "",
         description: "",
         discount: 0,
+        etaDays: 0,
         specs: {}
     });
 
@@ -37,6 +38,7 @@ export default function NewProductPage() {
         colorHex: "#000000",
         price: 0,
         stock: 10,
+        etaDays: 0,
         sku: "",
         images: [] // Array of URLs
     });
@@ -74,11 +76,12 @@ export default function NewProductPage() {
         setForm(prev => ({
             ...prev,
             name: item.name || "",
-            basePrice: item.price || "",
+            basePrice: item.basePrice !== undefined ? item.basePrice : (item.price || ""),
             category: item.category || "other",
             brand: item.brand || "",
             description: item.description || "",
             discount: item.discount || 0,
+            etaDays: item.etaDays || 0,
             specs: item.specs || {}
         }));
         
@@ -91,9 +94,14 @@ export default function NewProductPage() {
             })));
         } else {
             setEnableVariants(false);
-            setStandardStock(item.stock || item.countInStock || 0);
+            setStandardStock(item.stock !== undefined ? item.stock : (item.countInStock || 0));
+            setForm(prev => ({ ...prev, etaDays: item.etaDays || 0 }));
             if (item.image) {
                 setStandardImages([item.image]);
+            } else if (item.images && item.images.length > 0) {
+                setStandardImages(item.images);
+            } else {
+                setStandardImages([]);
             }
         }
     };
@@ -190,6 +198,7 @@ export default function NewProductPage() {
             colorHex: "#000000",
             price: form.basePrice || 0,
             stock: 10,
+            etaDays: 0,
             sku: "",
             images: []
         });
@@ -242,8 +251,12 @@ export default function NewProductPage() {
             const productData = {
                 ...form,
                 price: Number(form.basePrice) || 0,
-                variants: enableVariants ? variants : [],
+                variants: enableVariants ? variants.map(v => ({
+                    ...v,
+                    etaDate: v.stock <= 0 && v.etaDays > 0 ? new Date(Date.now() + v.etaDays * 24 * 60 * 60 * 1000).toISOString() : null
+                })) : [],
                 countInStock: enableVariants ? variants.reduce((acc, v) => acc + (v.stock||0), 0) : standardStock,
+                etaDate: enableVariants ? null : (standardStock <= 0 && form.etaDays > 0 ? new Date(Date.now() + form.etaDays * 24 * 60 * 60 * 1000).toISOString() : null),
                 image: !enableVariants && standardImages.length > 0 ? standardImages[0] : (enableVariants && variants[0]?.images?.[0] ? variants[0].images[0] : '/images/placeholder.webp'),
                 images: !enableVariants ? standardImages : []
             };
@@ -523,7 +536,7 @@ export default function NewProductPage() {
                                 value={form.basePrice}
                                 onChange={e => setForm({ ...form, basePrice: Number(e.target.value) })} 
                                 className="w-full bg-surface-50 border border-surface-200 dark:border-surface-700 rounded-2xl px-6 py-4 text-sm font-black text-primary focus:ring-2 focus:ring-primary transition-all" 
-                                required 
+                                required={!enableVariants} 
                             />
                         </div>
                         
@@ -597,6 +610,12 @@ export default function NewProductPage() {
                                         <label className="text-[9px] font-black text-surface-400 uppercase tracking-widest">Stock</label>
                                         <input type="number" value={variantForm.stock} onChange={e => setVariantForm({...variantForm, stock: Number(e.target.value)})} className="w-full bg-white/5 dark:bg-black/60 border border-surface-200 dark:border-surface-700 text-foreground rounded-lg px-3 py-2 text-xs font-bold focus:ring-1 focus:ring-primary outline-none" />
                                     </div>
+                                    {variantForm.stock <= 0 && (
+                                        <div className="space-y-1">
+                                            <label className="text-[9px] font-black text-orange-400 uppercase tracking-widest">Necha kunda keladi (kun)</label>
+                                            <input type="number" value={variantForm.etaDays || 0} onChange={e => setVariantForm({...variantForm, etaDays: Number(e.target.value)})} className="w-full bg-orange-500/10 border border-orange-500/50 text-orange-400 rounded-lg px-3 py-2 text-xs font-bold focus:ring-1 focus:ring-orange-500 outline-none" placeholder="Masalan: 5" />
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="space-y-2 pt-2 border-t border-surface-200">
@@ -657,6 +676,18 @@ export default function NewProductPage() {
                                         className="w-full bg-surface-50 border border-surface-200 dark:border-surface-700 rounded-2xl px-6 py-4 text-sm font-black focus:ring-2 focus:ring-primary transition-all" 
                                     />
                                 </div>
+                                {standardStock <= 0 && (
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-orange-400 uppercase tracking-widest pl-1">Necha kunda keladi (kun)</label>
+                                        <input 
+                                            type="number" 
+                                            value={form.etaDays || 0}
+                                            onChange={e => setForm({ ...form, etaDays: Number(e.target.value) })} 
+                                            className="w-full bg-orange-500/10 border border-orange-500/30 text-orange-400 rounded-2xl px-6 py-4 text-sm font-black focus:ring-2 focus:ring-orange-500 transition-all" 
+                                            placeholder="Masalan: 5"
+                                        />
+                                    </div>
+                                )}
                                 <div className="space-y-4">
                                     <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest">Product Images</label>
                                     

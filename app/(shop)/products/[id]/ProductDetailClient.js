@@ -42,6 +42,47 @@ export default function ProductDetailClient({ product, relatedProducts }) {
     const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
     const [isZooming, setIsZooming] = useState(false);
 
+    // ETA Countdown Logic
+    const etaDate = selectedVariant?.etaDate ?? product.etaDate;
+    const [timeRemaining, setTimeRemaining] = useState("");
+
+    useEffect(() => {
+        if (!isOutOfStock || !etaDate) {
+            setTimeRemaining("");
+            return;
+        }
+
+        const updateCountdown = () => {
+            const now = new Date();
+            const target = new Date(etaDate);
+            const diff = target - now;
+
+            if (diff <= 0) {
+                setTimeRemaining(lang === 'ru' ? 'Скоро в наличии' : lang === 'en' ? 'Arriving soon' : 'Tez orada keladi');
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / 1000 / 60) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+
+            let txt = '';
+            if (lang === 'ru') {
+                txt = `Ожидается через: ${days}д ${hours}ч ${minutes}м ${seconds}с`;
+            } else if (lang === 'en') {
+                txt = `Expected in: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+            } else {
+                txt = `Kutilmoqda: ${days}k ${hours}s ${minutes}m ${seconds}s`;
+            }
+            setTimeRemaining(txt);
+        };
+
+        updateCountdown();
+        const timer = setInterval(updateCountdown, 1000);
+        return () => clearInterval(timer);
+    }, [isOutOfStock, etaDate, lang]);
+
 
 
     // Review States
@@ -140,10 +181,15 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                         </div>
 
                         {isOutOfStock && (
-                            <div className="absolute inset-0 bg-surface-900/60 backdrop-blur-md flex items-center justify-center z-20">
+                            <div className="absolute inset-0 bg-surface-900/60 backdrop-blur-md flex flex-col items-center justify-center z-20 space-y-4">
                                 <span className="bg-red-500 text-white font-black px-6 py-3 rounded-xl uppercase tracking-[0.3em] text-[10px] shadow-[0_0_20px_rgba(239,68,68,0.5)]">
                                     {t('out_of_stock') || "OUT OF STOCK"}
                                 </span>
+                                {timeRemaining && (
+                                    <span className="bg-orange-500/90 text-white font-black px-4 py-2 rounded-lg uppercase tracking-widest text-[10px] animate-pulse whitespace-nowrap">
+                                        {timeRemaining}
+                                    </span>
+                                )}
                             </div>
                         )}
                     </div>
@@ -172,6 +218,11 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                             <span className={`text-[10px] font-bold uppercase tracking-[0.3em] font-mono ${displayStock > 0 ? 'text-green-500' : 'text-red-500'}`}>
                                 Status: {(displayStock > 0 ? (t('stock') || "In Stock") : (t('out_of_stock') || "Out of Stock"))}
                             </span>
+                            {isOutOfStock && timeRemaining && (
+                                <span className="text-[10px] font-bold text-orange-500 uppercase tracking-widest font-mono">
+                                    {timeRemaining}
+                                </span>
+                            )}
                         </div>
                         
                         <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tight leading-[1.2] uppercase drop-shadow-sm">

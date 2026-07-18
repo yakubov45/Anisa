@@ -20,6 +20,7 @@ export default function EditProductPage() {
         brand: "",
         description: "",
         discount: 0,
+        etaDays: 0,
         specs: {}
     });
 
@@ -33,6 +34,7 @@ export default function EditProductPage() {
         colorHex: "#000000",
         price: 0,
         stock: 10,
+        etaDays: 0,
         sku: "",
         images: []
     });
@@ -90,6 +92,7 @@ export default function EditProductPage() {
                         brand: product.brand || "",
                         description: product.description || "",
                         discount: product.discount || 0,
+                        etaDays: product.etaDays || 0,
                         specs: product.specs || {}
                     });
                 } else {
@@ -127,13 +130,18 @@ export default function EditProductPage() {
             };
 
             if (enableVariants) {
-                productData.variants = variants;
+                productData.variants = variants.map(v => ({
+                    ...v,
+                    etaDate: v.stock <= 0 && v.etaDays > 0 ? new Date(Date.now() + v.etaDays * 24 * 60 * 60 * 1000).toISOString() : null
+                }));
                 productData.countInStock = variants.reduce((acc, v) => acc + v.stock, 0); // Aggregate stock
+                productData.etaDate = null;
                 productData.image = variants[0]?.images[0] || null; // fallback main image
                 productData.images = variants[0]?.images || [];
             } else {
                 productData.variants = []; // Clear variants if turning off
                 productData.countInStock = standardStock;
+                productData.etaDate = standardStock <= 0 && form.etaDays > 0 ? new Date(Date.now() + form.etaDays * 24 * 60 * 60 * 1000).toISOString() : null;
                 productData.image = standardImages[0] || null;
                 productData.images = standardImages;
             }
@@ -233,6 +241,7 @@ export default function EditProductPage() {
             colorHex: "#000000",
             price: form.basePrice || 0,
             stock: 10,
+            etaDays: 0,
             sku: "",
             images: []
         });
@@ -506,7 +515,7 @@ export default function EditProductPage() {
                                 value={form.basePrice}
                                 onChange={e => setForm({ ...form, basePrice: Number(e.target.value) })} 
                                 className="w-full bg-surface-50 border border-surface-200 dark:border-surface-700 rounded-2xl px-6 py-4 text-sm font-black text-primary focus:ring-2 focus:ring-primary transition-all" 
-                                required 
+                                required={!enableVariants} 
                             />
                         </div>
                         
@@ -580,6 +589,12 @@ export default function EditProductPage() {
                                         <label className="text-[9px] font-black text-surface-400 uppercase tracking-widest">Stock</label>
                                         <input type="number" value={variantForm.stock} onChange={e => setVariantForm({...variantForm, stock: Number(e.target.value)})} className="w-full bg-white/5 dark:bg-black/60 border border-surface-200 dark:border-surface-700 text-foreground rounded-lg px-3 py-2 text-xs font-bold focus:ring-1 focus:ring-primary outline-none" />
                                     </div>
+                                    {variantForm.stock <= 0 && (
+                                        <div className="space-y-1">
+                                            <label className="text-[9px] font-black text-orange-400 uppercase tracking-widest">Necha kunda keladi (kun)</label>
+                                            <input type="number" value={variantForm.etaDays || 0} onChange={e => setVariantForm({...variantForm, etaDays: Number(e.target.value)})} className="w-full bg-orange-500/10 border border-orange-500/50 text-orange-400 rounded-lg px-3 py-2 text-xs font-bold focus:ring-1 focus:ring-orange-500 outline-none" placeholder="Masalan: 5" />
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="space-y-2 pt-2 border-t border-surface-200">
@@ -640,6 +655,18 @@ export default function EditProductPage() {
                                         className="w-full bg-surface-50 border border-surface-200 dark:border-surface-700 rounded-2xl px-6 py-4 text-sm font-black focus:ring-2 focus:ring-primary transition-all" 
                                     />
                                 </div>
+                                {standardStock <= 0 && (
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-orange-400 uppercase tracking-widest pl-1">Necha kunda keladi (kun)</label>
+                                        <input 
+                                            type="number" 
+                                            value={form.etaDays || 0}
+                                            onChange={e => setForm({ ...form, etaDays: Number(e.target.value) })} 
+                                            className="w-full bg-orange-500/10 border border-orange-500/30 text-orange-400 rounded-2xl px-6 py-4 text-sm font-black focus:ring-2 focus:ring-orange-500 transition-all" 
+                                            placeholder="Masalan: 5"
+                                        />
+                                    </div>
+                                )}
                                 <div className="space-y-4">
                                     <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest">Product Images</label>
                                     
