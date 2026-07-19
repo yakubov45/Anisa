@@ -111,6 +111,34 @@ export default function PrebuiltsClient({ initialData }) {
     const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
     const paginatedData = filteredData.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
+    const getPageNumbers = () => {
+        const pages = [];
+        const maxPagesToShow = 7; 
+        
+        if (totalPages <= maxPagesToShow) {
+            for (let i = 1; i <= totalPages; i++) pages.push(i);
+        } else {
+            if (currentPage <= 4) {
+                for (let i = 1; i <= 5; i++) pages.push(i);
+                pages.push("...");
+                pages.push(totalPages);
+            } else if (currentPage >= totalPages - 3) {
+                pages.push(1);
+                pages.push("...");
+                for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+            } else {
+                pages.push(1);
+                pages.push("...");
+                pages.push(currentPage - 1);
+                pages.push(currentPage);
+                pages.push(currentPage + 1);
+                pages.push("...");
+                pages.push(totalPages);
+            }
+        }
+        return pages;
+    }
+
     return (
         <div className="w-full px-4 md:px-8 xl:px-16 py-8 text-foreground pb-24">
             {/* Header */}
@@ -216,16 +244,25 @@ export default function PrebuiltsClient({ initialData }) {
                     </button>
                     
                     <div className="flex gap-1.5">
-                        {[...Array(totalPages)].map((_, i) => (
+                        {getPageNumbers().map((num, idx) => (
                             <button
-                                key={i}
+                                key={idx}
+                                disabled={num === "..."}
                                 onClick={() => {
-                                    setCurrentPage(i + 1);
-                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                    if (num !== "...") {
+                                        setCurrentPage(num);
+                                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                                    }
                                 }}
-                                className={`w-12 h-12 flex items-center justify-center rounded-2xl font-black text-sm transition-all ${currentPage === i + 1 ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-110' : 'bg-transparent text-surface-500 hover:bg-surface-100 dark:hover:bg-white/5 border border-black/5 dark:border-white/5'}`}
+                                className={`w-12 h-12 flex items-center justify-center rounded-2xl font-black text-sm transition-all ${
+                                    currentPage === num 
+                                        ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-110' 
+                                        : num === "..."
+                                            ? 'bg-transparent text-surface-500 cursor-default pointer-events-none'
+                                            : 'bg-transparent text-surface-500 hover:bg-surface-100 dark:hover:bg-white/5 border border-black/5 dark:border-white/5'
+                                }`}
                             >
-                                {i + 1}
+                                {num}
                             </button>
                         ))}
                     </div>

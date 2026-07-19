@@ -387,9 +387,31 @@ export default function ProductListing({ initialProducts = [], allCategories = [
     }
 
     const getPageNumbers = () => {
-        const pages = []
-        for (let i = 1; i <= totalPages; i++) pages.push(i)
-        return pages
+        const pages = [];
+        const maxPagesToShow = 7; 
+        
+        if (totalPages <= maxPagesToShow) {
+            for (let i = 1; i <= totalPages; i++) pages.push(i);
+        } else {
+            if (serverPage <= 4) {
+                for (let i = 1; i <= 5; i++) pages.push(i);
+                pages.push("...");
+                pages.push(totalPages);
+            } else if (serverPage >= totalPages - 3) {
+                pages.push(1);
+                pages.push("...");
+                for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+            } else {
+                pages.push(1);
+                pages.push("...");
+                pages.push(serverPage - 1);
+                pages.push(serverPage);
+                pages.push(serverPage + 1);
+                pages.push("...");
+                pages.push(totalPages);
+            }
+        }
+        return pages;
     }
 
     return (
@@ -627,14 +649,17 @@ export default function ProductListing({ initialProducts = [], allCategories = [
                     {/* Pagination */}
                     {totalPages > 1 && (
                         <div className="flex justify-center gap-2 pt-12 border-t border-border-alpha">
-                            {getPageNumbers().map(num => (
+                            {getPageNumbers().map((num, idx) => (
                                 <button
-                                    key={num}
-                                    onClick={() => handlePageChange(num)}
-                                    className={`w-12 h-12 rounded-xl text-xs font-black transition-all ${
+                                    key={idx}
+                                    onClick={() => num !== "..." && handlePageChange(num)}
+                                    disabled={num === "..."}
+                                    className={`flex items-center justify-center w-12 h-12 rounded-xl text-xs font-black transition-all ${
                                         serverPage === num 
                                             ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-110' 
-                                            : 'bg-surface-100 text-surface-500 hover:bg-surface-200'
+                                            : num === "..."
+                                                ? 'bg-transparent text-surface-500 cursor-default'
+                                                : 'bg-surface-100 text-surface-500 hover:bg-surface-200'
                                     }`}
                                 >
                                     {num}
