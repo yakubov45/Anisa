@@ -4,27 +4,25 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 
 export default function IntroOverlay() {
-    // Start as true — show by default, hide if already seen
     const [visible, setVisible] = useState(true);
     const [exit, setExit] = useState(false);
-    const [checked, setChecked] = useState(false);
 
     useEffect(() => {
-        const shown = sessionStorage.getItem("onepc_intro_shown");
+        try {
+            const shown = sessionStorage.getItem("onepc_intro_shown");
 
-        if (shown) {
-            // Already seen this session — hide immediately without animation
-            setVisible(false);
-            setChecked(true);
-            return;
-        }
-
-        setChecked(true);
+            if (shown) {
+                setVisible(false);
+                return;
+            }
+        } catch (e) {}
 
         const exitTimer = setTimeout(() => setExit(true), 2200);
         const removeTimer = setTimeout(() => {
             setVisible(false);
-            sessionStorage.setItem("onepc_intro_shown", "true");
+            try {
+                sessionStorage.setItem("onepc_intro_shown", "true");
+            } catch (e) {}
         }, 3000);
 
         return () => {
@@ -33,13 +31,12 @@ export default function IntroOverlay() {
         };
     }, []);
 
-    // Don't render anything until we've checked sessionStorage
-    // (prevents flash on returning visitors)
-    if (!checked || !visible) return null;
+    if (!visible) return null;
 
     return (
         <AnimatePresence>
             <motion.div
+                id="intro-overlay"
                 key="intro"
                 initial={{ opacity: 1 }}
                 animate={{ opacity: exit ? 0 : 1 }}

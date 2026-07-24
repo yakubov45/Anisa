@@ -49,7 +49,20 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
     return (
-        <html lang="en" className={`${inter.variable} ${outfit.variable} font-sans`}>
+        <html lang="en" className={`${inter.variable} ${outfit.variable} font-sans`} suppressHydrationWarning>
+            <head>
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            try {
+                                if (sessionStorage.getItem("onepc_intro_shown")) {
+                                    document.documentElement.classList.add("no-intro");
+                                }
+                            } catch (e) {}
+                        `,
+                    }}
+                />
+            </head>
             <body className="bg-surface text-surface-900 selection:bg-primary/10" suppressHydrationWarning>
                 <LanguageProvider>
                     <UserProvider>
