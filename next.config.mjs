@@ -27,6 +27,7 @@ const securityHeaders = [
 ];
 
 const nextConfig = {
+    output: 'standalone',
     poweredByHeader: false,
     compress: true,
     outputFileTracingRoot: process.cwd(),
@@ -67,7 +68,10 @@ const nextConfig = {
 export default withSentryConfig(nextConfig, {
     org: "onepc",
     project: "onepc",
-    silent: !process.env.CI,
+    silent: true,
     widenClientFileUpload: true,
     hideSourceMaps: true,
+    disableLogger: true,
+    disableServerWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
+    disableClientWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
 });
