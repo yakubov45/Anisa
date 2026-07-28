@@ -15,6 +15,13 @@ export default function AdminOrdersPage() {
     const { currency, exchangeRate } = useStore();
 
     useEffect(() => {
+        if (typeof window !== "undefined") {
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchParam = urlParams.get("search");
+            if (searchParam) {
+                setSearchQuery(searchParam);
+            }
+        }
         const fetch = async () => {
             const result = await getDeliveryOrdersAction(null, "all");
             if (result.success) setOrders(result.orders);
