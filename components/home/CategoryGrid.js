@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import Link from 'next/link';
+import { useTranslation } from "@/lib/LanguageContext";
 import { getCategoryDisplayName } from "@/lib/constants";
 
 const categories = [
