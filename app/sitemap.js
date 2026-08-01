@@ -1,5 +1,6 @@
 import { collection, getDocs, query, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
+import { FEATURES } from "@/lib/features";
 
 export const revalidate = 3600; // 1 hour cache
 
@@ -26,11 +27,12 @@ export default async function sitemap() {
       priority: 0.9,
       changeFrequency: "daily",
     },
-    {
+    // PC Builder only included in sitemap when feature is enabled
+    ...(FEATURES.PC_BUILDER ? [{
       path: "/pc-builder",
       priority: 0.9,
       changeFrequency: "weekly",
-    },
+    }] : []),
     {
       path: "/about",
       priority: 0.6,

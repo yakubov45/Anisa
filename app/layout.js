@@ -13,6 +13,7 @@ import CartDrawer from "@/components/layout/CartDrawer";
 import NotificationsDrawer from "@/components/layout/NotificationsDrawer";
 import CompareWidget from "@/components/common/CompareWidget";
 import SmoothScrollProvider from "@/components/common/SmoothScroll";
+import AdminOrderListener from "@/components/common/AdminOrderListener";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
@@ -74,6 +75,7 @@ export default function RootLayout({ children }) {
                                 <CurrencyInitializer />
                                 <CartDrawer />
                                 <NotificationsDrawer />
+                                <AdminOrderListener />
                                 <CompareWidget />
                                 <div className="min-h-screen flex flex-col">
                                     <Navbar />

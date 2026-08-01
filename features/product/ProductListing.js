@@ -7,6 +7,8 @@ import { useTranslation } from "@/lib/LanguageContext"
 import { motion, AnimatePresence } from "framer-motion"
 import DualRangeSlider from "@/components/common/DualRangeSlider"
 import PriceDisplay from "@/components/common/PriceDisplay"
+import { getCategoryDisplayName } from "@/lib/constants"
+
 
 const getCategorySvg = (name) => {
     const key = name?.toLowerCase().trim();
@@ -269,10 +271,7 @@ export default function ProductListing({ initialProducts = [], allCategories = [
         if (selectedCategories.length === 0) return t('view_all') || 'All Categories';
         const activeCat = allCategories.find(c => selectedCategories.includes(c.id));
         if (!activeCat) return t('view_all') || 'All Categories';
-        
-        if (lang === 'ru' && activeCat.name_ru) return activeCat.name_ru;
-        if (lang === 'en' && activeCat.name_en) return activeCat.name_en;
-        return activeCat.name;
+        return getCategoryDisplayName(activeCat, lang);
     }, [selectedCategories, allCategories, t, lang]);
 
     // Remove the old useEffect that depended on maxProductPrice.
@@ -546,7 +545,7 @@ export default function ProductListing({ initialProducts = [], allCategories = [
                                                             <span className="flex items-center gap-2.5 truncate">
                                                                 <span className="shrink-0 opacity-80">{getCategorySvg(cat.name)}</span>
                                                                 <span className="truncate">
-                                                                    {lang === 'ru' && cat.name_ru ? cat.name_ru : lang === 'en' && cat.name_en ? cat.name_en : cat.name}
+                                                                    {getCategoryDisplayName(cat, lang)}
                                                                 </span>
                                                             </span>
                                                             {isSelected && (

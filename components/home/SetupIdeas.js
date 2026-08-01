@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { useTranslation } from "@/lib/LanguageContext";
+import { FEATURES } from "@/lib/features";
+
 
 export default function SetupIdeas() {
     const { t } = useTranslation();
@@ -37,7 +39,7 @@ export default function SetupIdeas() {
                     <div className="w-12 h-1 bg-primary rounded-full" />
                     <h2 className="text-3xl font-black text-foreground uppercase tracking-tighter">{t('setup_ideas_title')}</h2>
                 </div>
-                <Link href="/pc-builder" className="text-[10px] font-black text-primary uppercase tracking-widest hover:text-white transition-colors">{t('setup_custom_build')}</Link>
+                <Link href={FEATURES.PC_BUILDER ? "/pc-builder" : "/prebuilts"} className="text-[10px] font-black text-primary uppercase tracking-widest hover:text-white transition-colors">{t('setup_custom_build')}</Link>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-10">
@@ -105,7 +107,7 @@ export default function SetupIdeas() {
                                     {/* Action Button */}
                                     <div className="mt-8 relative z-10">
                                         <Link 
-                                            href="/pc-builder" 
+                                            href={FEATURES.PC_BUILDER ? "/pc-builder" : "/prebuilts"} 
                                             className="block w-full bg-white/5 border border-white/10 group-hover:border-primary/50 group-hover:bg-primary/10 text-white text-center py-4 font-black text-[10px] md:text-[11px] uppercase tracking-[0.3em] transition-all duration-300 relative overflow-hidden"
                                             style={{ clipPath: "polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)" }}
                                         >

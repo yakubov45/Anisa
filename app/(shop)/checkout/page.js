@@ -7,11 +7,11 @@ import PriceDisplay from "@/components/common/PriceDisplay";
 import { useRouter } from "next/navigation";
 import { createOrderAction } from "@/lib/actions/order.actions";
 import { useUser } from "@/lib/UserContext";
-import { REGIONS } from "@/lib/constants";
+import { REGIONS, getRegionDisplayName } from "@/lib/constants";
 import { useTranslation } from "@/lib/LanguageContext";
 
 export default function CheckoutPage() {
-    const { t } = useTranslation();
+    const { t, lang } = useTranslation();
     const { cart, clearCart, removeFromCart } = useStore();
     const { user, loading: userLoading } = useUser();
     const router = useRouter();
@@ -198,7 +198,7 @@ export default function CheckoutPage() {
                                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                                     </span>
                                                     <span className="text-sm font-black text-foreground uppercase tracking-tight">
-                                                        {formData.region}
+                                                        {getRegionDisplayName(formData.region, lang)}
                                                     </span>
                                                     <span className="text-[8px] bg-primary/10 text-primary px-2 py-0.5 rounded font-black uppercase tracking-widest ml-2">
                                                         {t('checkout_auto_detected') || "Auto-Detected"}
@@ -226,7 +226,7 @@ export default function CheckoutPage() {
                                                         }}
                                                         className={`text-[9px] font-black uppercase p-3 rounded-lg border transition-all ${formData.region === r ? 'bg-primary text-white border-primary' : 'bg-white dark:bg-zinc-900 border-surface-200 dark:border-white/10 text-surface-500 hover:border-primary'}`}
                                                     >
-                                                        {r}
+                                                        {getRegionDisplayName(r, lang)}
                                                     </button>
                                                 ))}
                                             </div>

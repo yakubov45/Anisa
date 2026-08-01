@@ -225,19 +225,19 @@ export default function AboutPage() {
             </section>
 
             {/* Contact Form */}
-            <section className="bg-zinc-900 text-white rounded-[2.5rem] md:rounded-[4rem] p-6 sm:p-12 md:p-24 space-y-8 md:space-y-12 relative overflow-hidden shadow-2xl mx-0.1 md:mx-6">
-                <div className="absolute right-0 top-0 w-96 h-96 bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.3)_0%,transparent_70%)] rounded-full -mr-48 -mt-48 pointer-events-none" />
+            <section className="bg-zinc-900 text-white rounded-[2rem] md:rounded-[3rem] p-6 sm:p-10 md:p-12 space-y-6 relative overflow-hidden shadow-2xl mx-0.1 md:mx-6">
+                <div className="absolute right-0 top-0 w-80 h-80 bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.25)_0%,transparent_70%)] rounded-full -mr-40 -mt-40 pointer-events-none" />
 
-                <div className="max-w-2xl space-y-6 relative">
-                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none">{t('about_contact_core')}</h2>
-                    <p className="text-zinc-400 font-medium text-sm sm:text-base leading-loose">{t('about_contact_desc')}</p>
+                <div className="max-w-2xl space-y-3 relative">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tighter leading-none">{t('about_contact_core')}</h2>
+                    <p className="text-zinc-400 font-medium text-xs sm:text-sm leading-relaxed">{t('about_contact_desc')}</p>
                 </div>
 
-                <form className="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
-                    <input type="text" placeholder={t('about_form_name')} className="bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-[10px] font-black tracking-widest text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-primary outline-none" />
-                    <input type="email" placeholder={t('about_form_email')} className="bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-[10px] font-black tracking-widest text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-primary outline-none" />
-                    <textarea placeholder={t('about_form_details')} rows="4" className="md:col-span-2 bg-white/5 border border-white/10 rounded-2xl px-8 py-5 text-[10px] font-black tracking-widest text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-primary outline-none" />
-                    <button className="md:col-span-1 bg-primary text-white font-black py-5 rounded-2xl text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition-all">
+                <form className="grid grid-cols-1 md:grid-cols-2 gap-5 relative">
+                    <input type="text" placeholder={t('about_form_name')} className="bg-white/5 border border-white/10 rounded-xl px-6 py-4 text-[10px] font-black tracking-widest text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-primary outline-none" />
+                    <input type="tel" placeholder={t('about_form_phone')} className="bg-white/5 border border-white/10 rounded-xl px-6 py-4 text-[10px] font-black tracking-widest text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-primary outline-none" />
+                    <textarea placeholder={t('about_form_details')} rows="3" className="md:col-span-2 bg-white/5 border border-white/10 rounded-xl px-6 py-4 text-[10px] font-black tracking-widest text-white placeholder:text-zinc-600 focus:ring-1 focus:ring-primary outline-none resize-none" />
+                    <button type="submit" className="md:col-span-1 bg-primary text-white font-black py-4 rounded-xl text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition-all">
                         {t('about_form_send')}
                     </button>
                 </form>

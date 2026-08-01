@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { subscriptionService } from "@/lib/services/subscription.service";
 import useUIStore from "@/store/useUIStore";
 import { useTranslation } from "@/lib/LanguageContext";
+import { FEATURES } from "@/lib/features";
+
 
 export default function Footer() {
     const { t, lang } = useTranslation();
@@ -82,7 +84,7 @@ export default function Footer() {
                             {[
                                 { name: t('nav_products') || 'BARCHA MAHSULOTLAR', url: '/products' },
                                 { name: t('nav_prebuilts') || 'TAYYOR KOMPYUTERLAR', url: '/prebuilts' },
-                                { name: t('nav_pc_builder') || 'PC BUILDER', url: '/pc-builder' }
+                                ...(FEATURES.PC_BUILDER ? [{ name: t('nav_pc_builder') || 'PC BUILDER', url: '/pc-builder' }] : [])
                             ].map(item => (
                                 <li key={item.name}>
                                     <a href={item.url} className="text-zinc-500 text-[10px] md:text-[11px] font-black uppercase tracking-widest hover:text-primary transition-colors">{item.name}</a>

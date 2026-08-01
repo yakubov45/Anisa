@@ -8,6 +8,7 @@ import { getCategoriesAction } from "@/lib/actions/product.actions"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import SearchSuggestions from "./SearchSuggestions"
+import { FEATURES } from "@/lib/features"
 
 import useStore from "@/store/useStore"
 import useUIStore from "@/store/useUIStore"
@@ -160,7 +161,7 @@ export default function Navbar() {
                                     {[
                                         { name: t('nav_products'), href: "/products" },
                                         { name: t('nav_prebuilts') || "Prebuilts", href: "/prebuilts" },
-                                        { name: t('nav_pc_builder'), href: "/pc-builder" },
+                                        ...(FEATURES.PC_BUILDER ? [{ name: t('nav_pc_builder'), href: "/pc-builder" }] : []),
                                         { name: t('nav_faq'), href: "/faq" },
                                         { name: t('nav_about'), href: "/about" }
                                     ].map((link) => (
@@ -458,7 +459,7 @@ export default function Navbar() {
                                 <div className="px-6 space-y-3">
                                     {[
                                         { href: "/prebuilts", label: t('nav_prebuilts') || "Tayyor Kompyuterlar", icon: <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg> },
-                                        { href: "/pc-builder", label: t('nav_pc_builder'), icon: <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg> },
+                                        ...(FEATURES.PC_BUILDER ? [{ href: "/pc-builder", label: t('nav_pc_builder'), icon: <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg> }] : []),
                                         { href: "/about", label: t('nav_about'), icon: <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> }
                                     ].map((link, idx) => (
                                         <motion.div

@@ -3,27 +3,27 @@ import { withSentryConfig } from "@sentry/nextjs";
 /** @type {import('next').NextConfig} */
 
 const securityHeaders = [
-  { key: 'X-DNS-Prefetch-Control', value: 'on' },
-  { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-  { key: 'X-Content-Type-Options', value: 'nosniff' },
-  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), browsing-topics=()' },
-  {
-      key: 'Content-Security-Policy',
-      value: [
-          "default-src 'self'",
-          "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com",
-          "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-          "font-src 'self' https://fonts.gstatic.com",
-          "img-src 'self' data: blob: https://firebasestorage.googleapis.com https://storage.googleapis.com https://images.unsplash.com https://api.dicebear.com https://avatars.mds.yandex.net https://i.rtings.com https://ik.imagekit.io https://pub-c2a26e8f520c4d429c0ad4534a6dc0d5.r2.dev https://*.r2.dev",
-          "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://api.telegram.org wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebasestorage.googleapis.com https://storage.googleapis.com https://upload.imagekit.io https://ik.imagekit.io https://*.r2.dev https://*.r2.cloudflarestorage.com",
-          "frame-ancestors 'none'",
-      ].join('; ')
-  },
-  {
-      key: 'Strict-Transport-Security',
-      value: 'max-age=63072000; includeSubDomains; preload'
-  }
+    { key: 'X-DNS-Prefetch-Control', value: 'on' },
+    { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+    { key: 'X-Content-Type-Options', value: 'nosniff' },
+    { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+    { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), browsing-topics=()' },
+    {
+        key: 'Content-Security-Policy',
+        value: [
+            "default-src 'self'",
+            "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com",
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+            "font-src 'self' https://fonts.gstatic.com",
+            "img-src 'self' data: blob: https://firebasestorage.googleapis.com https://storage.googleapis.com https://images.unsplash.com https://api.dicebear.com https://avatars.mds.yandex.net https://i.rtings.com https://ik.imagekit.io https://pub-c2a26e8f520c4d429c0ad4534a6dc0d5.r2.dev https://*.r2.dev",
+            "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://api.telegram.org wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebasestorage.googleapis.com https://storage.googleapis.com https://upload.imagekit.io https://ik.imagekit.io https://*.r2.dev https://*.r2.cloudflarestorage.com",
+            "frame-ancestors 'none'",
+        ].join('; ')
+    },
+    {
+        key: 'Strict-Transport-Security',
+        value: 'max-age=63072000; includeSubDomains; preload'
+    }
 ];
 
 const nextConfig = {
@@ -31,6 +31,29 @@ const nextConfig = {
     poweredByHeader: false,
     compress: true,
     outputFileTracingRoot: process.cwd(),
+
+    // ─── FEATURE FLAGS ────────────────────────────────────────────
+    // PC Builder: false = disabled (redirects to home), true = enabled
+    // To re-enable: change PC_BUILDER_ENABLED to "true" in env or set below
+    async redirects() {
+        const pcBuilderEnabled = process.env.NEXT_PUBLIC_PC_BUILDER_ENABLED === 'true';
+        if (!pcBuilderEnabled) {
+            return [
+                {
+                    source: '/pc-builder',
+                    destination: '/',
+                    permanent: false,
+                },
+                {
+                    source: '/pc-builder/:path*',
+                    destination: '/',
+                    permanent: false,
+                },
+            ];
+        }
+        return [];
+    },
+
     async headers() {
         return [
             {
