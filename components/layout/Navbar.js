@@ -9,6 +9,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import SearchSuggestions from "./SearchSuggestions"
 import { FEATURES } from "@/lib/features"
+import { getCategoryDisplayName } from "@/lib/constants"
 
 import useStore from "@/store/useStore"
 import useUIStore from "@/store/useUIStore"
@@ -542,7 +543,7 @@ export default function Navbar() {
                                                     onClick={() => setIsMobileMenuOpen(false)}
                                                     className="flex items-center justify-between py-3 border-b border-white/[0.02] group transition-all"
                                                 >
-                                                    <span className="text-[10px] font-black uppercase tracking-widest text-white/60 group-hover:text-primary transition-colors">{cat.name}</span>
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-white/60 group-hover:text-primary transition-colors">{getCategoryDisplayName(cat, lang)}</span>
                                                     <svg className="w-3 h-3 text-white/10 group-hover:text-primary group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7" /></svg>
                                                 </Link>
                                             </motion.div>
