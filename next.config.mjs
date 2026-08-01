@@ -94,7 +94,6 @@ export default withSentryConfig(nextConfig, {
     silent: true,
     widenClientFileUpload: true,
     hideSourceMaps: true,
-    disableLogger: true,
     disableServerWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
     disableClientWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
 });
