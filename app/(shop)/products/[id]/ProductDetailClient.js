@@ -5,6 +5,7 @@ import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
 import useStore from "@/store/useStore";
 import { useTranslation } from "@/lib/LanguageContext";
+import { useUser } from "@/lib/UserContext";
 import ProductCard from "@/features/product/ProductCard";
 import { reviewService } from "@/lib/services/review.service";
 import PriceDisplay from "@/components/common/PriceDisplay";
@@ -15,6 +16,8 @@ export default function ProductDetailClient({ product, relatedProducts }) {
     const { addToCart, wishlist, toggleWishlist } = useStore();
     const isFavorite = wishlist.some(item => item.id === product.id);
     const { t, lang } = useTranslation();
+    const { user } = useUser();
+    const isAdmin = user?.role === 'admin';
     const [isNotified, setIsNotified] = useState(false);
     const [activeModal, setActiveModal] = useState(null);
     
@@ -216,7 +219,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                         <div className="flex items-center gap-4">
                             <span className="text-[10px] font-black text-primary bg-primary/10 border border-primary/20 px-4 py-2 rounded-lg uppercase tracking-[0.4em]">{product.brand || 'Brand'}</span>
                             <span className={`text-[10px] font-bold uppercase tracking-[0.3em] font-mono ${displayStock > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                Status: {(displayStock > 0 ? (t('stock') || "In Stock") : (t('out_of_stock') || "Out of Stock"))}
+                                Status: {(displayStock > 0 ? (isAdmin ? `${displayStock} dona (${t('stock') || "In Stock"})` : (t('stock') || "In Stock")) : (t('out_of_stock') || "Out of Stock"))}
                             </span>
                             {isOutOfStock && timeRemaining && (
                                 <span className="text-[10px] font-bold text-orange-500 uppercase tracking-widest font-mono">
@@ -290,7 +293,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                                 ) : (
                                     <p className="text-green-500 font-black text-[10px] md:text-xs uppercase tracking-[0.3em] flex items-center gap-2">
                                         <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                        IN STOCK
+                                        {isAdmin ? `${displayStock} DONA (${t('stock') || 'IN STOCK'})` : (t('stock') || 'IN STOCK')}
                                     </p>
                                 )}
                                 <p className="text-surface-500 text-[9px] font-bold uppercase tracking-widest">Global shipping included</p>

@@ -6,6 +6,7 @@ import { formatPrice } from "@/lib/utils";
 import useStore from "@/store/useStore";
 import useUIStore from "@/store/useUIStore";
 import { useTranslation } from "@/lib/LanguageContext";
+import { useUser } from "@/lib/UserContext";
 import PriceDisplay from "@/components/common/PriceDisplay";
 
 export default function QuickView({ product, isOpen, onClose }) {
@@ -23,6 +24,8 @@ export default function QuickView({ product, isOpen, onClose }) {
         };
     }, [isOpen]);
     const { t } = useTranslation();
+    const { user } = useUser();
+    const isAdmin = user?.role === 'admin';
     const { wishlist, toggleWishlist, addToCart } = useStore();
     const { addToast, triggerCartAnimation } = useUIStore();
     const isFavorite = wishlist.some(item => item.id === product.id);
@@ -81,7 +84,7 @@ export default function QuickView({ product, isOpen, onClose }) {
                         </div>
                         <div className="flex-1 hidden sm:block">
                             <div className="text-[8px] md:text-[10px] font-black text-green-500 uppercase tracking-widest mb-2">
-                                {product.stock > 0 ? t('stock') : t('out_of_stock')}
+                                {product.stock > 0 ? (isAdmin ? `${product.stock} ${t('stock')}` : t('stock')) : t('out_of_stock')}
                             </div>
                             <div className="w-full h-1 bg-surface-100 dark:bg-surface-700 rounded-full overflow-hidden">
                                 <div className={`h-full ${product.stock > 0 ? 'w-4/5 bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]' : 'w-0 bg-red-500'}`} />

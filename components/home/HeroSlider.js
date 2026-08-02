@@ -25,8 +25,8 @@ const SLIDE_DATA = [
         descKey: 'hero_2_desc',
         // Ichki detallari ko'rinib turgan, RGB va to'q fonli Case
         image: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?auto=format&fit=crop&w=1920&h=1080&q=80",
-        link: "/pc-builder",
-        linkKey: 'hero_cta_builder'
+        link: "/prebuilts",
+        linkKey: 'hero_cta_prebuilts'
     },
     {
         id: 3,

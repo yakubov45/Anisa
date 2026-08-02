@@ -8,11 +8,14 @@ import { useState, memo, useEffect } from "react"
 import QuickView from "./QuickView"
 import PriceDisplay from "@/components/common/PriceDisplay"
 import { useTranslation } from "@/lib/LanguageContext"
+import { useUser } from "@/lib/UserContext"
 
 function ProductCard({ product, badge = null, rating = null }) {
     const { addToCart, wishlist, toggleWishlist } = useStore();
     const { addToast, triggerCartAnimation } = useUIStore();
     const { t } = useTranslation();
+    const { user } = useUser();
+    const isAdmin = user?.role === 'admin';
     const isFavorite = wishlist.some(item => item.id === product.id);
     const [isQuickViewOpen, setIsQuickViewOpen] = useState(false)
 
@@ -219,7 +222,10 @@ function ProductCard({ product, badge = null, rating = null }) {
                     <div className="flex items-center gap-1.5">
                         <span className={`w-1 h-1 md:w-1.5 md:h-1.5 rounded-full ${displayStock > 0 ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
                         <span className={`text-[8px] md:text-[9px] font-black uppercase tracking-widest ${displayStock > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                            {displayStock > 0 ? `${displayStock} ${t('stock')}` : t('out_of_stock')}
+                            {displayStock > 0 
+                                ? (isAdmin ? `${displayStock} ${t('stock')}` : t('stock')) 
+                                : t('out_of_stock')
+                            }
                         </span>
                     </div>
 

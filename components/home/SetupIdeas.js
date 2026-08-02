@@ -39,7 +39,6 @@ export default function SetupIdeas() {
                     <div className="w-12 h-1 bg-primary rounded-full" />
                     <h2 className="text-3xl font-black text-foreground uppercase tracking-tighter">{t('setup_ideas_title')}</h2>
                 </div>
-                <Link href={FEATURES.PC_BUILDER ? "/pc-builder" : "/prebuilts"} className="text-[10px] font-black text-primary uppercase tracking-widest hover:text-white transition-colors">{t('setup_custom_build')}</Link>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-10">

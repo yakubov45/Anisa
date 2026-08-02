@@ -6,6 +6,8 @@ import ProductCard from '@/features/product/ProductCard';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
+import { FEATURES } from '@/lib/features';
+
 // Data is now passed as props from the server component (app/page.js)
 export default function DiscountBanner({ flashDeals }) {
     const { t } = useTranslation();
@@ -186,13 +188,15 @@ export default function DiscountBanner({ flashDeals }) {
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                             {t('nav_prebuilts') || "Kompyuterlar"}
                         </Link>
-                        <Link
-                            href="/pc-builder"
-                            className="inline-flex items-center gap-3 bg-white/5 border border-white/10 text-white font-black px-7 py-3.5 rounded-2xl text-[11px] uppercase tracking-widest hover:bg-white/10 hover:border-white/20 transition-all active:scale-95"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>
-                            {t('nav_pc_builder') || "PC Builder"}
-                        </Link>
+                        {FEATURES.PC_BUILDER && (
+                            <Link
+                                href="/pc-builder"
+                                className="inline-flex items-center gap-3 bg-white/5 border border-white/10 text-white font-black px-7 py-3.5 rounded-2xl text-[11px] uppercase tracking-widest hover:bg-white/10 hover:border-white/20 transition-all active:scale-95"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>
+                                {t('nav_pc_builder') || "PC Builder"}
+                            </Link>
+                        )}
                     </div>
                 </div>
 
