@@ -38,7 +38,8 @@ export default function CheckoutPage() {
                 ...prev,
                 fullName: user.displayName || user.fullName || "",
                 email: user.email || "",
-                phone: user.phone || ""
+                phone: user.phone || "",
+                address: user.address || ""
             }));
         }
     }, [user]);
@@ -223,6 +224,12 @@ export default function CheckoutPage() {
                                                 className="w-full bg-surface-50 dark:bg-black border border-surface-200 dark:border-white/10 rounded-xl px-6 py-4 text-sm text-foreground focus:ring-1 focus:ring-primary outline-none transition-all resize-none" 
                                                 placeholder={t('checkout_address_placeholder')}
                                             />
+                                            {(!user || !user.address) && (
+                                                <p className="text-[9px] text-surface-500 font-bold uppercase tracking-widest mt-2 flex items-center gap-1.5">
+                                                    <svg className="w-3 h-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                    Tavsiya: {user ? "Profil sozlamalarida manzilingizni saqlab qo'ysangiz, keyingi safar avtomatik to'ldiriladi." : "Saytga kirib (Login) manzilingizni profilga saqlab qo'ysangiz, doimiy avtomatik to'ldiriladi."}
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

@@ -18,6 +18,7 @@ export default function ProfilePage() {
         phone: "",
         email: "",
         dob: "",
+        address: "",
         newPassword: ""
     });
     const [isEditing, setIsEditing] = useState(false);
@@ -37,7 +38,8 @@ export default function ProfilePage() {
                 lastName: last,
                 phone: user.phone || user.phoneNumber || "",
                 email: user.email || "",
-                dob: user.dob || ""
+                dob: user.dob || "",
+                address: user.address || ""
             }));
         }
     }, [user, isEditing]);
@@ -48,6 +50,7 @@ export default function ProfilePage() {
     if (!user?.phone) missingFieldsArr.push(t('profile_phone'));
     if (!user?.dob) missingFieldsArr.push(t('profile_dob'));
     if (!user?.email) missingFieldsArr.push(t('profile_email'));
+    if (!user?.address) missingFieldsArr.push(t('profile_address') || "Turar joy");
 
     const isMissingInfo = missingFieldsArr.length > 0;
     const missingFieldsText = missingFieldsArr.join(", ");
@@ -85,7 +88,8 @@ export default function ProfilePage() {
                 displayName: fullName,
                 phone: formData.phone,
                 dob: formData.dob,
-                email: formData.email
+                email: formData.email,
+                address: formData.address
             };
 
             await userService.updateProfile(user.uid, updateData);
@@ -336,6 +340,20 @@ export default function ProfilePage() {
                                             ))}
                                         </select>
                                     </div>
+                                </div>
+
+                                <div className="space-y-2 md:col-span-2">
+                                    <div className="flex items-center justify-between ml-1">
+                                        <label className="text-[10px] font-black text-surface-400 uppercase tracking-widest">{t('profile_address') || "Turar joy manzili"}</label>
+                                    </div>
+                                    <textarea
+                                        placeholder="Shahar, tuman, ko'cha, uy raqami va hokazo..."
+                                        value={formData.address}
+                                        readOnly={!isEditing}
+                                        onChange={(e) => setFormData({...formData, address: e.target.value})}
+                                        rows={3}
+                                        className={`w-full ${!isEditing ? 'bg-surface-100 dark:bg-white/5 cursor-not-allowed opacity-60' : 'bg-surface-50 dark:bg-black focus:ring-2 focus:ring-primary'} border border-surface-200 dark:border-white/10 rounded-xl px-6 py-4 text-sm text-foreground outline-none transition-all resize-none`}
+                                    />
                                 </div>
 
                                 <div className="space-y-2">
