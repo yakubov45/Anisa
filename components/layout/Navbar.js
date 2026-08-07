@@ -21,7 +21,7 @@ export default function Navbar() {
     const router = useRouter();
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const dropdownRef = useRef(null);
-    const { cart, currency, setCurrency, notifications } = useStore()
+    const { cart, currency, setCurrency, notifications, clearCart, clearNotifications } = useStore()
     const { cartAnimation, setCartDrawerOpen, setNotificationsDrawerOpen } = useUIStore()
     const [mounted, setMounted] = useState(false)
     const [isScrolled, setIsScrolled] = useState(false)
@@ -109,6 +109,8 @@ export default function Navbar() {
     const handleLogout = async () => {
         try {
             await authService.logout();
+            clearCart();
+            clearNotifications();
             setIsProfileOpen(false);
             router.push("/");
         } catch (error) {

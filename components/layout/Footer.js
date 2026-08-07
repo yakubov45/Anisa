@@ -95,7 +95,6 @@ export default function Footer() {
                         <h4 className="text-[10px] md:text-[11px] font-black text-white uppercase tracking-[0.4em]">{t('nav_about') || "MA'LUMOTLAR"}</h4>
                         <ul className="space-y-3 md:space-y-2">
                             {[
-                                { name: t('nav_delivery') || 'YETKAZIB BERISH', url: '/delivery' },
                                 { name: t('nav_faq') || "KO'P SO'RALADIGAN SAVOLLAR", url: '/faq' },
                                 { name: t('nav_about') || 'BIZ HAQIMIZDA', url: '/about' }
                             ].map(item => (

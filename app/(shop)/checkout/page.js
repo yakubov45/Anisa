@@ -49,10 +49,6 @@ export default function CheckoutPage() {
 
     const handleCheckout = async (e) => {
         e.preventDefault();
-        if (!user) {
-            setError(t('auth_identity_required'));
-            return;
-        }
 
         if (!formData.phone || formData.phone.length < 9) {
             setError(t('auth_invalid_phone'));
@@ -69,7 +65,7 @@ export default function CheckoutPage() {
 
         const orderPayload = {
             ...formData,
-            userId: user.uid,
+            userId: user ? user.uid : 'guest',
             paymentMethod,
             userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'Unknown',
         };
@@ -99,23 +95,6 @@ export default function CheckoutPage() {
             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
         </div>
     );
-
-    if (!user) {
-        return (
-            <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-8 animate-fade-in">
-                <div className="w-24 h-24 bg-surface-50 dark:bg-zinc-900 rounded-full flex items-center justify-center text-primary grayscale opacity-50">
-                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                </div>
-                <div className="text-center space-y-2">
-                    <h1 className="text-3xl font-black text-foreground uppercase tracking-tighter">{t('auth_identity_required')}</h1>
-                    <p className="text-surface-500 font-bold uppercase text-[10px] tracking-widest">{t('auth_sign_in_proceed')}</p>
-                </div>
-                <Link href="/login" className="bg-primary text-white font-black px-10 py-5 rounded-xl uppercase text-xs tracking-widest hover:bg-foreground transition-all shadow-xl shadow-primary/20">
-                    {t('auth_sign_in')}
-                </Link>
-            </div>
-        );
-    }
 
     if (cart.length === 0) {
         return (

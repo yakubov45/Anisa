@@ -45,23 +45,8 @@ const useStore = create(
                     },
                     actionLink: "/products?sort=newest"
                 },
-                {
-                    id: 'welcome_bot',
-                    type: 'info',
-                    isRead: false,
-                    date: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-                    title: {
-                        uz: "Telegram bot qo'shildi!",
-                        ru: "Добавлен Telegram бот!",
-                        en: "Telegram bot added!"
-                    },
-                    message: {
-                        uz: "Endilikda OnePC.uz buyurtmalaringizni Telegram bot orqali osongina kuzatishingiz mumkin. Botga kiring va xaridlaringiz holatini tekshiring.",
-                        ru: "Теперь вы можете легко отслеживать ваши заказы через Telegram бот.",
-                        en: "You can now easily track your orders via Telegram bot."
-                    }
-                }
             ],
+            clearNotifications: () => set({ notifications: [] }),
             addNotification: (notification) => set((state) => {
                 // Check if identical notification already exists to prevent duplicates on strict mode
                 if (notification.id && state.notifications.some(n => n.id === notification.id)) return state;

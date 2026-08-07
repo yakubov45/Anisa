@@ -12,7 +12,6 @@ export default function OrderSuccessPage() {
     const router = useRouter();
     const [orderId, setOrderId] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(true);
-    const [isGuideOpen, setIsGuideOpen] = useState(false);
     const { addNotification } = useStore();
 
     useEffect(() => {
@@ -30,15 +29,15 @@ export default function OrderSuccessPage() {
                 en: "Your order has been received!"
             },
             message: {
-                uz: `Buyurtmangiz muvaffaqiyatli rasmiylashtirildi. Tez orada operatorlarimiz siz bilan bog'lanishadi.\n\nSiz hozircha profil bo'limiga o'tib, buyurtmangiz holatini kuzatishingiz yoki Telegram botimizdan foydalanishingiz mumkin.`,
-                ru: `Ваш заказ успешно оформлен. Скоро наши операторы свяжутся с вами.\n\nВы можете перейти в раздел профиля для отслеживания статуса вашего заказа или воспользоваться нашим Telegram ботом.`,
-                en: `Your order has been successfully placed. Our operators will contact you shortly.\n\nYou can go to the profile section to track your order status or use our Telegram bot.`
+                uz: `Buyurtmangiz muvaffaqiyatli rasmiylashtirildi. Tez orada operatorlarimiz siz bilan bog'lanishadi.\n\nSiz hozircha profil bo'limiga o'tib, buyurtmangiz holatini kuzatishingiz mumkin.`,
+                ru: `Ваш заказ успешно оформлен. Скоро наши операторы свяжутся с вами.\n\nВы можете перейти в раздел профиля для отслеживания статуса вашего заказа.`,
+                en: `Your order has been successfully placed. Our operators will contact you shortly.\n\nYou can go to the profile section to track your order status.`
             }
         });
     }, [addNotification]);
 
     useEffect(() => {
-        if (isModalOpen || isGuideOpen) {
+        if (isModalOpen) {
             document.body.style.overflow = "hidden";
         } else {
             document.body.style.overflow = "";
@@ -46,7 +45,7 @@ export default function OrderSuccessPage() {
         return () => {
             document.body.style.overflow = "";
         };
-    }, [isModalOpen, isGuideOpen]);
+    }, [isModalOpen]);
 
     const handleOperatorClick = (e) => {
         e.preventDefault();
@@ -168,63 +167,6 @@ export default function OrderSuccessPage() {
                 )}
             </AnimatePresence>
 
-            {/* Telegram Bot Guide Modal */}
-            <AnimatePresence>
-                {isGuideOpen && (
-                    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 overflow-y-auto">
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="fixed inset-0 bg-background/95 dark:bg-black/95 backdrop-blur-xl"
-                            onClick={() => setIsGuideOpen(false)}
-                        />
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9, y: 30 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.9, y: 30 }}
-                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                            className="relative w-full max-w-lg bg-white dark:bg-[#0c0c0e] border border-black/10 dark:border-white/10 rounded-[2rem] p-6 md:p-8 shadow-2xl flex flex-col items-center text-center overflow-hidden my-auto z-10"
-                        >
-                            <div className="w-16 h-16 md:w-20 md:h-20 bg-[#229ED9]/10 rounded-[1.5rem] flex items-center justify-center mb-6 text-[#229ED9]">
-                                <svg className="w-8 h-8 md:w-10 md:h-10" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.892-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-                            </div>
-                            
-                            <h2 className="text-xl md:text-2xl font-black text-foreground uppercase tracking-tight mb-4">
-                                Telegram botdan qanday foydalaniladi?
-                            </h2>
-                            
-                            <div className="space-y-4 w-full text-left bg-surface-50 dark:bg-zinc-900/50 p-5 rounded-2xl border border-surface-200 dark:border-white/5">
-                                <div className="flex gap-4 items-start">
-                                    <div className="w-8 h-8 rounded-full bg-[#229ED9]/20 text-[#229ED9] flex items-center justify-center font-black shrink-0">1</div>
-                                    <p className="text-sm text-surface-600 dark:text-surface-400 leading-relaxed pt-1">
-                                        Botga kirgach pastdagi <b>"START"</b> tugmasini bosing
-                                    </p>
-                                </div>
-                                <div className="flex gap-4 items-start">
-                                    <div className="w-8 h-8 rounded-full bg-[#229ED9]/20 text-[#229ED9] flex items-center justify-center font-black shrink-0">2</div>
-                                    <p className="text-sm text-surface-600 dark:text-surface-400 leading-relaxed pt-1">
-                                        O'zingizga qulay <b>Tilni</b> tanlang (O'zbek yoki Rus)
-                                    </p>
-                                </div>
-                                <div className="flex gap-4 items-start">
-                                    <div className="w-8 h-8 rounded-full bg-[#229ED9]/20 text-[#229ED9] flex items-center justify-center font-black shrink-0">3</div>
-                                    <p className="text-sm text-surface-600 dark:text-surface-400 leading-relaxed pt-1">
-                                        <b>"Telefon raqamni yuborish"</b> tugmasi orqali raqamingizni tasdiqlang va xaridni boshlang!
-                                    </p>
-                                </div>
-                            </div>
-
-                            <button
-                                onClick={() => setIsGuideOpen(false)}
-                                className="w-full bg-surface-100 dark:bg-zinc-800 text-foreground dark:text-white font-black py-4 rounded-xl shadow-sm uppercase text-[10px] tracking-widest active:scale-95 mt-6 border border-surface-200 dark:border-white/5 hover:bg-surface-200 dark:hover:bg-zinc-700 transition-all"
-                            >
-                                Tushundim, yopish
-                            </button>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
         </div>
     );
 }

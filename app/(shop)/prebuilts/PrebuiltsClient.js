@@ -211,7 +211,7 @@ export default function PrebuiltsClient({ initialData }) {
                 {paginatedData.length === 0 ? (
                     <div className="bg-white/60 dark:bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-black/5 dark:border-white/10 p-16 text-center">
                         <p className="text-2xl font-black text-surface-400 uppercase tracking-wider">
-                            {t("prebuilt_no_pcs_found") || "Kompyuterlar topilmadi 😢"}
+                            {t("prebuilt_no_pcs_found") || "Ushbu bo'limda hozircha mahsulotlar mavjud emas"}
                         </p>
                     </div>
                 ) : (

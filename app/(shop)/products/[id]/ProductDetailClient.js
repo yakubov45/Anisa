@@ -152,7 +152,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                     {/* Show selected color name above the image */}
                     {validVariants.length > 0 && (
                         <div className="flex items-center gap-2">
-                            <span className="text-[11px] font-black text-surface-500 uppercase tracking-widest">{t('color') || 'Tanlangan rang'}:</span>
+                            <span className="text-[11px] font-black text-surface-500 uppercase tracking-widest">{lang === 'uz' ? 'Rang' : lang === 'ru' ? 'Цвет' : 'Color'}:</span>
                             <span className="text-sm font-black text-primary uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-md">{selectedVariant?.colorName}</span>
                         </div>
                     )}
@@ -219,7 +219,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                         <div className="flex items-center gap-4">
                             <span className="text-[10px] font-black text-primary bg-primary/10 border border-primary/20 px-4 py-2 rounded-lg uppercase tracking-[0.4em]">{product.brand || 'Brand'}</span>
                             <span className={`text-[10px] font-bold uppercase tracking-[0.3em] font-mono ${displayStock > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                Status: {(displayStock > 0 ? (isAdmin ? `${displayStock} dona (${t('stock') || "In Stock"})` : (t('stock') || "In Stock")) : (t('out_of_stock') || "Out of Stock"))}
+                                {lang === 'uz' ? 'Holati' : lang === 'ru' ? 'Статус' : 'Status'}: {(displayStock > 0 ? (isAdmin ? `${displayStock} dona (${t('stock') || "In Stock"})` : (t('stock') || "In Stock")) : (t('out_of_stock') || "Out of Stock"))}
                             </span>
                             {isOutOfStock && timeRemaining && (
                                 <span className="text-[10px] font-bold text-orange-500 uppercase tracking-widest font-mono">
@@ -243,7 +243,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                     {validVariants.length > 1 && (
                         <div className="space-y-3">
                             <p className="text-[10px] font-black text-surface-500 uppercase tracking-widest">
-                                {t('color') || 'Color'}: <span className="text-foreground">{selectedVariant?.colorName}</span>
+                                {lang === 'uz' ? 'Rang' : lang === 'ru' ? 'Цвет' : 'Color'}: <span className="text-foreground">{selectedVariant?.colorName}</span>
                             </p>
                             <div className="flex flex-wrap gap-4">
                                 {validVariants.map((v) => {
@@ -265,7 +265,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                                             )}
                                             {/* Tooltip */}
                                             <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-1.5 bg-black text-white text-[10px] font-bold whitespace-nowrap rounded-lg opacity-0 group-hover/swatch:opacity-100 pointer-events-none transition-opacity z-30 shadow-xl">
-                                                {isVOutOfStock ? "Tez orada yangi mahsulotlar keladi" : v.colorName}
+                                                {isVOutOfStock ? (lang === 'uz' ? "Tez orada yangi mahsulotlar keladi" : lang === 'ru' ? "Скоро поступят новые товары" : "New items arriving soon") : v.colorName}
                                             </span>
                                         </button>
                                     );
@@ -296,7 +296,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                                         {isAdmin ? `${displayStock} DONA (${t('stock') || 'IN STOCK'})` : (t('stock') || 'IN STOCK')}
                                     </p>
                                 )}
-                                <p className="text-surface-500 text-[9px] font-bold uppercase tracking-widest">Global shipping included</p>
+                                <p className="text-surface-500 text-[9px] font-bold uppercase tracking-widest">{lang === 'uz' ? 'Global yetkazib berish mavjud' : lang === 'ru' ? 'Глобальная доставка включена' : 'Global shipping included'}</p>
                             </div>
                         </div>
                     </div>

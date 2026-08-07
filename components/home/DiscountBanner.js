@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 import { FEATURES } from '@/lib/features';
 
 // Data is now passed as props from the server component (app/page.js)
-export default function DiscountBanner({ flashDeals }) {
+export default function DiscountBanner({ flashDeals, totalProducts = 500 }) {
     const { t } = useTranslation();
     const scrollRef = useRef(null);
     const ticking = useRef(false);
@@ -203,7 +203,7 @@ export default function DiscountBanner({ flashDeals }) {
                 {/* Right: Stats grid */}
                 <div className="grid grid-cols-2 gap-3 md:gap-4 shrink-0">
                     {[
-                        { value: "500+", label: t('promo_stat_products') || "Mahsulotlar" },
+                        { value: `${totalProducts}+`, label: t('promo_stat_products') || "Mahsulotlar" },
                         { value: "1 YIL", label: t('promo_stat_warranty') || "Kafolat" },
                         { value: "24/7", label: t('promo_stat_support') || "Qo'llab-quvvatlash" },
                         { value: "100%", label: t('promo_stat_quality') || "Sifat kafolati" },

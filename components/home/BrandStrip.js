@@ -124,19 +124,32 @@ function BrandItems({ brands, polygonUp, polygonDown }) {
                             `}
                             style={{ clipPath: polygon }}
                         >
-                            <div 
-                                className="absolute inset-[1px] md:inset-[2px] bg-[#0c0c0e]/95 hover:bg-primary/95 transition-colors duration-500 flex items-center justify-center"
+                            <div
+                                className="absolute inset-[1px] md:inset-[2px] bg-[#0c0c0e]/95 hover:bg-primary/10 transition-colors duration-500 flex items-center justify-center"
                                 style={{ clipPath: polygon }}
                             >
-                                <span 
-                                    className={`
-                                        text-white/60 font-black tracking-widest uppercase text-[10px] md:text-sm
-                                        transition-all duration-300
-                                        ${isUp ? 'mt-6 md:mt-10' : 'mb-6 md:mb-10'}
-                                    `}
-                                >
-                                    {brand.name}
-                                </span>
+                                {brand.logo ? (
+                                    <img
+                                        src={brand.logo}
+                                        alt={brand.name}
+                                        className={`
+                                            w-[55%] h-[55%] object-contain
+                                            brightness-0 invert opacity-60 group-hover:opacity-100
+                                            transition-all duration-300
+                                            ${isUp ? 'mt-4 md:mt-8' : 'mb-4 md:mb-8'}
+                                        `}
+                                    />
+                                ) : (
+                                    <span
+                                        className={`
+                                            text-white/60 font-black tracking-widest uppercase text-[10px] md:text-sm
+                                            transition-all duration-300
+                                            ${isUp ? 'mt-6 md:mt-10' : 'mb-6 md:mb-10'}
+                                        `}
+                                    >
+                                        {brand.name}
+                                    </span>
+                                )}
                             </div>
                         </motion.div>
                     </Link>

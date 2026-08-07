@@ -14,7 +14,7 @@ const PCFinderQuiz = dynamic(() => import("@/components/home/PCFinderQuiz"), { s
 const JoinOnePCBanner = dynamic(() => import("@/components/home/JoinOnePCBanner"), { ssr: false })
 const ProductGrid = dynamic(() => import("@/features/product/ProductGrid"), { ssr: false })
 
-export default function HomeSections({ featuredPrebuilts, flashDeals, topSelling, promoSlides }) {
+export default function HomeSections({ featuredPrebuilts, flashDeals, topSelling, promoSlides, totalProducts = 500 }) {
     return (
         <>
             {/* Featured Prebuilts */}
@@ -49,7 +49,7 @@ export default function HomeSections({ featuredPrebuilts, flashDeals, topSelling
             )}
 
             {/* Flash Deals Banner */}
-            <DiscountBanner flashDeals={flashDeals} />
+            <DiscountBanner flashDeals={flashDeals} totalProducts={totalProducts} />
 
             {/* Setup Ideas */}
             <SetupIdeas />

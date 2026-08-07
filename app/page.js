@@ -3,7 +3,7 @@ import CategoryGrid from "@/components/home/CategoryGrid"
 import HeroSlider from "@/components/home/HeroSlider"
 import SectionHeading from "@/components/common/SectionHeading"
 import HomeSections from "@/components/home/HomeSections"
-import { getProductsAction, getBannersAction, getPreBuiltSystemsAction, getProductsByIdsAction } from "@/lib/actions/product.actions"
+import { getProductsAction, getBannersAction, getPreBuiltSystemsAction, getProductsByIdsAction, getProductsCountAction } from "@/lib/actions/product.actions"
 import { getFlashDealsSettingsAction } from "@/lib/actions/flash-deals.actions"
 
 export const revalidate = 60; // Sahifani har 60 soniyada keshlaydi, shunda tez ochiladi
@@ -13,17 +13,20 @@ export default async function HomePage() {
     let banners = [];
     let featuredPrebuilts = [];
     let flashDeals = null;
+    let totalProducts = 500;
 
     try {
-        const [productsResult, bannersResult, prebuiltsResult] = await Promise.allSettled([
+        const [productsResult, bannersResult, prebuiltsResult, countResult] = await Promise.allSettled([
             getProductsAction(1, 20),
             getBannersAction(),
             getPreBuiltSystemsAction({ isFeatured: true, limit: 9 }),
+            getProductsCountAction()
         ]);
 
         allProducts = productsResult.status === 'fulfilled' ? productsResult.value ?? [] : [];
         banners = bannersResult.status === 'fulfilled' ? bannersResult.value ?? [] : [];
         featuredPrebuilts = prebuiltsResult.status === 'fulfilled' ? prebuiltsResult.value ?? [] : [];
+        totalProducts = countResult.status === 'fulfilled' ? countResult.value ?? 500 : 500;
 
         // Flash deals
         const flashSettings = await getFlashDealsSettingsAction().catch(() => null);
@@ -76,8 +79,9 @@ export default async function HomePage() {
                 flashDeals={flashDeals}
                 topSelling={topSelling}
                 promoSlides={promoSlides}
+                totalProducts={totalProducts}
             />
 
         </div>
-    )
+    );
 }
