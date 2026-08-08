@@ -138,6 +138,9 @@ function BrandItems({ brands, polygonUp, polygonDown }) {
                                             transition-all duration-300
                                             ${isUp ? 'mt-4 md:mt-8' : 'mb-4 md:mb-8'}
                                         `}
+                                        style={brand.logoConfig ? {
+                                            transform: `scale(${brand.logoConfig.scale || 1}) translate(${brand.logoConfig.x || 0}px, ${brand.logoConfig.y || 0}px)`
+                                        } : undefined}
                                     />
                                 ) : (
                                     <span
