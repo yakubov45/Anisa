@@ -172,7 +172,7 @@ export default function Navbar() {
  
                             {/* ACTIONS */}
                             <div className="flex items-center gap-3 lg:gap-5 shrink-0">
-                                <div className="flex items-center gap-3 lg:gap-4 border-r border-white/10 pr-3 lg:pr-5 hidden sm:flex">
+                                <div className="flex items-center gap-3 lg:gap-4 border-r border-white/10 pr-3 lg:pr-5 hidden lg:flex">
                                     {[
                                         { name: t('nav_products'), href: "/products" },
                                         { name: t('nav_prebuilts') || "Prebuilts", href: "/prebuilts" },
@@ -193,7 +193,7 @@ export default function Navbar() {
  
                                 <div className="flex items-center gap-3 lg:gap-5">
                                     {/* Language Switcher */}
-                                    <div className="relative group hidden md:block">
+                                    <div className="relative group hidden lg:block">
                                         <button aria-label="Toggle language menu" className="h-10 px-4 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2 hover:bg-white/10 hover:border-primary/30 hover:scale-105 transition-all text-white duration-300">
                                             <span className="text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5">
                                                 {lang === 'uz' ? '🇺🇿 UZ' : lang === 'ru' ? '🇷🇺 RU' : '🇬🇧 EN'}
@@ -222,7 +222,7 @@ export default function Navbar() {
                                     <button
                                         aria-label="Toggle currency"
                                         onClick={() => setCurrency(activeCurrency === 'USD' ? 'UZS' : 'USD')}
-                                        className="hidden md:flex h-10 px-4 rounded-xl bg-white/5 border border-white/10 items-center gap-1.5 hover:bg-white/10 hover:border-primary/30 hover:scale-105 transition-all text-white group duration-300"
+                                        className="hidden lg:flex h-10 px-4 rounded-xl bg-white/5 border border-white/10 items-center gap-1.5 hover:bg-white/10 hover:border-primary/30 hover:scale-105 transition-all text-white group duration-300"
                                     >
                                         <span className="text-[11px] font-black tracking-wider">{activeCurrency}</span>
                                     </button>
@@ -242,7 +242,7 @@ export default function Navbar() {
                                             <button
                                                 aria-label="Toggle dark mode"
                                                 onClick={toggleDarkMode}
-                                                className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 hidden md:flex items-center justify-center hover:bg-primary hover:border-primary/45 hover:text-white hover:scale-105 transition-all group duration-300"
+                                                className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 hidden lg:flex items-center justify-center hover:bg-primary hover:border-primary/45 hover:text-white hover:scale-105 transition-all group duration-300"
                                             >
                                                 {isDarkMode ? (
                                                     <svg className="w-4 h-4 text-yellow-500 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" /></svg>

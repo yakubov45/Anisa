@@ -13,6 +13,7 @@ const FeaturedPrebuilts = dynamic(() => import("@/components/home/FeaturedPrebui
 const PCFinderQuiz = dynamic(() => import("@/components/home/PCFinderQuiz"), { ssr: false })
 const JoinOnePCBanner = dynamic(() => import("@/components/home/JoinOnePCBanner"), { ssr: false })
 const ProductGrid = dynamic(() => import("@/features/product/ProductGrid"), { ssr: false })
+const KeyboardScroll = dynamic(() => import("@/components/KeyboardScroll"), { ssr: false })
 
 export default function HomeSections({ featuredPrebuilts, flashDeals, topSelling, promoSlides, totalProducts = 500 }) {
     return (
@@ -32,6 +33,9 @@ export default function HomeSections({ featuredPrebuilts, flashDeals, topSelling
 
             {/* Why Choose Us */}
             <TrustSection />
+
+            {/* Keyboard Scrollytelling Animation */}
+            <KeyboardScroll />
 
             {/* Join OnePC Banner */}
             <JoinOnePCBanner />
