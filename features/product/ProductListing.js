@@ -1,673 +1,485 @@
-"use client"
+"use client";
 
-import { useState, useMemo, useEffect } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
-import ProductGrid from "./ProductGrid"
-import { useTranslation } from "@/lib/LanguageContext"
-import { motion, AnimatePresence } from "framer-motion"
-import DualRangeSlider from "@/components/common/DualRangeSlider"
-import PriceDisplay from "@/components/common/PriceDisplay"
-import { getCategoryDisplayName } from "@/lib/constants"
+import { useState, useMemo } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import useStore from "@/store/useStore";
+import useUIStore from "@/store/useUIStore";
 
+export default function ProductListing({
+  initialProducts = [],
+  totalProducts = 48,
+  currentPage = 1,
+}) {
+  const { addToCart, wishlist, toggleWishlist } = useStore();
+  const { setCartDrawerOpen, addToast, triggerCartAnimation } = useUIStore();
 
-const getCategorySvg = (name) => {
-    const key = name?.toLowerCase().trim();
-    
-    // Default fallback icon
-    const fallback = (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-        </svg>
+  // Filter States
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [maxPrice, setMaxPrice] = useState(750);
+  const [selectedMaterials, setSelectedMaterials] = useState(["Damascus Steel"]);
+  const [inStockOnly, setInStockOnly] = useState(true);
+  const [sortBy, setSortBy] = useState("featured");
+  const [page, setPage] = useState(currentPage);
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+
+  const categoriesList = [
+    { id: "all", label: "All Products", count: 48 },
+    { id: "cookware", label: "Cookware", count: 18 },
+    { id: "knives", label: "Knives & Cutlery", count: 12 },
+    { id: "tableware", label: "Tableware", count: 10 },
+    { id: "appliances", label: "Appliances", count: 8 },
+  ];
+
+  const materialsList = ["Cast Iron", "Damascus Steel", "Copper", "Stoneware", "Walnut"];
+
+  const handleResetFilters = () => {
+    setSelectedCategory("all");
+    setMaxPrice(750);
+    setSelectedMaterials([]);
+    setInStockOnly(false);
+    setSortBy("featured");
+  };
+
+  const toggleMaterial = (mat) => {
+    setSelectedMaterials((prev) =>
+      prev.includes(mat) ? prev.filter((m) => m !== mat) : [...prev, mat]
     );
+  };
 
-    const icons = {
-        'monitors': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="2" y="3" width="20" height="14" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <line x1="8" y1="21" x2="16" y2="21" strokeLinecap="round" strokeLinejoin="round" />
-                <line x1="12" y1="17" x2="12" y2="21" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-        ),
-        'monitorlar': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="2" y="3" width="20" height="14" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <line x1="8" y1="21" x2="16" y2="21" strokeLinecap="round" strokeLinejoin="round" />
-                <line x1="12" y1="17" x2="12" y2="21" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-        ),
-        'graphics': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="2" y="6" width="20" height="12" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="8" cy="12" r="3" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="16" cy="12" r="3" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-        ),
-        'video kartalar': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="2" y="6" width="20" height="12" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="8" cy="12" r="3" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="16" cy="12" r="3" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-        ),
-        'processors': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="4" y="4" width="16" height="16" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <rect x="9" y="9" width="6" height="6" rx="1" strokeLinecap="round" strokeLinejoin="round" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3" />
-            </svg>
-        ),
-        'markaziy protsessorlar': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="4" y="4" width="16" height="16" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <rect x="9" y="9" width="6" height="6" rx="1" strokeLinecap="round" strokeLinejoin="round" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3" />
-            </svg>
-        ),
-        'motherboards': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="2" y="2" width="20" height="20" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h4v4H6zm8 0h4v2h-4zm0 6h4v6h-4zm-8 2h4v4H6z" />
-            </svg>
-        ),
-        'ona platalar': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="2" y="2" width="20" height="20" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h4v4H6zm8 0h4v2h-4zm0 6h4v6h-4zm-8 2h4v4H6z" />
-            </svg>
-        ),
-        'ram': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M2 8h20v8H2zM6 16v2M10 16v2M14 16v2M18 16v2M2 12h20" />
-            </svg>
-        ),
-        'tezkor xotira': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M2 8h20v8H2zM6 16v2M10 16v2M14 16v2M18 16v2M2 12h20" />
-            </svg>
-        ),
-        'tezkor xotira (ram)': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M2 8h20v8H2zM6 16v2M10 16v2M14 16v2M18 16v2M2 12h20" />
-            </svg>
-        ),
-        'memory': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="3" y="3" width="18" height="18" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="17" cy="7" r="1" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7 11h10M7 15h10" />
-            </svg>
-        ),
-        'storage': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="3" y="3" width="18" height="18" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="17" cy="7" r="1" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7 11h10M7 15h10" />
-            </svg>
-        ),
-        'ssd / hdd xotira': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="3" y="3" width="18" height="18" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="17" cy="7" r="1" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7 11h10M7 15h10" />
-            </svg>
-        ),
-        'psus': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="3" y="3" width="18" height="18" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l-4 6h4l-2 4" />
-            </svg>
-        ),
-        'quvvat bloklari': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="3" y="3" width="18" height="18" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l-4 6h4l-2 4" />
-            </svg>
-        ),
-        'cases': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 3h16l2 4v14H2V7l2-4zM2 7h20M6 12h12M6 16h12" />
-            </svg>
-        ),
-        'korpuslar': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 3h16l2 4v14H2V7l2-4zM2 7h20M6 12h12M6 16h12" />
-            </svg>
-        ),
-        'cooling': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="12" cy="12" r="3" strokeLinecap="round" strokeLinejoin="round" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 2v7M12 15v7M2 12h7M15 12h7" />
-            </svg>
-        ),
-        'sovutish tizimlari': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="12" cy="12" r="3" strokeLinecap="round" strokeLinejoin="round" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 2v7M12 15v7M2 12h7M15 12h7" />
-            </svg>
-        ),
-        'keyboards': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="2" y="6" width="20" height="12" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 10h2M11 10h2M16 10h2M6 14h12" />
-            </svg>
-        ),
-        'klaviaturalar': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="2" y="6" width="20" height="12" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 10h2M11 10h2M16 10h2M6 14h12" />
-            </svg>
-        ),
-        'mice': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="6" y="2" width="12" height="20" rx="6" strokeLinecap="round" strokeLinejoin="round" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 2v10M6 10h12" />
-            </svg>
-        ),
-        'sichqonchalar': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="6" y="2" width="12" height="20" rx="6" strokeLinecap="round" strokeLinejoin="round" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 2v10M6 10h12" />
-            </svg>
-        ),
-        'accessories': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 14c0-4.97 4.03-9 9-9s9 4.03 9 9" />
-                <rect x="2" y="13" width="4" height="6" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <rect x="18" y="13" width="4" height="6" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-        ),
-        'aksessuarlar': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 14c0-4.97 4.03-9 9-9s9 4.03 9 9" />
-                <rect x="2" y="13" width="4" height="6" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <rect x="18" y="13" width="4" height="6" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-        ),
-        'prebuilts': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="2" y="3" width="20" height="14" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 21h12M12 17v4M6 7h12M6 11h12" />
-            </svg>
-        ),
-        'tayyor kompyuterlar': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="2" y="3" width="20" height="14" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 21h12M12 17v4M6 7h12M6 11h12" />
-            </svg>
-        ),
-        'laptops': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="3" y="4" width="18" height="12" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M2 18h20M12 16v2" />
-            </svg>
-        ),
-        'noutbuklar': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="3" y="4" width="18" height="12" rx="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M2 18h20M12 16v2" />
-            </svg>
-        ),
-        'desks': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 18v3M20 18v3M4 10h16M4 14h16M2 6h20" />
-            </svg>
-        ),
-        'chairs': (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 18v3M20 18v3M4 10h16M4 14h16M2 6h20" />
-            </svg>
-        )
-    };
-    
-    return icons[key] || fallback;
-};
+  // Filter and Sort Products
+  const displayedProducts = useMemo(() => {
+    let result = [...initialProducts];
 
-export default function ProductListing({ initialProducts = [], allCategories = [], totalProducts = 0, currentPage: serverPage = 1, globalMaxPrice = 5000 }) {
-    const { t, lang } = useTranslation()
-    const searchParams = useSearchParams()
-    const router = useRouter()
-    
-    const searchQuery = searchParams.get("search")
-    const categoryQuery = searchParams.get("category")
-    const minPriceQuery = searchParams.get("minPrice")
-    const maxPriceQuery = searchParams.get("maxPrice")
-
-    const [selectedCategories, setSelectedCategories] = useState([])
-    const [priceRange, setPriceRange] = useState({ 
-        min: minPriceQuery ? parseInt(minPriceQuery) : 0, 
-        max: maxPriceQuery ? parseInt(maxPriceQuery) : globalMaxPrice 
-    })
-    const sortQuery = searchParams.get("sort") || "newest";
-    const [sortBy, setSortBy] = useState(sortQuery);
-    const [isCatOpen, setIsCatOpen] = useState(false)
-    const itemsPerPage = 12
-
-    // Sync categories from URL
-    useEffect(() => {
-        if (categoryQuery) {
-            setSelectedCategories([categoryQuery])
-        } else {
-            setSelectedCategories([])
-        }
-    }, [categoryQuery])
-
-    useEffect(() => {
-        // Sync url params to state when they change externally (like back button or clear filters)
-        const newMin = minPriceQuery ? parseInt(minPriceQuery) : 0;
-        const newMax = maxPriceQuery ? parseInt(maxPriceQuery) : globalMaxPrice;
-        
-        // Only update if they differ from current state to prevent infinite loops
-        setPriceRange(prev => {
-            if (prev.min !== newMin || prev.max !== newMax) {
-                return { min: newMin, max: newMax };
-            }
-            return prev;
-        });
-    }, [minPriceQuery, maxPriceQuery, globalMaxPrice])
-
-    const activeCategoryName = useMemo(() => {
-        if (selectedCategories.length === 0) return t('view_all') || 'All Categories';
-        const activeCat = allCategories.find(c => selectedCategories.includes(c.id));
-        if (!activeCat) return t('view_all') || 'All Categories';
-        return getCategoryDisplayName(activeCat, lang);
-    }, [selectedCategories, allCategories, t, lang]);
-
-    // Remove the old useEffect that depended on maxProductPrice.
-    // Instead, we add a debounced effect to push priceRange changes to URL.
-    useEffect(() => {
-        // We only want to push to URL if the state differs from the URL parameters
-        // meaning the user changed it via the slider.
-        const currentUrlMin = minPriceQuery ? parseInt(minPriceQuery) : 0;
-        const currentUrlMax = maxPriceQuery ? parseInt(maxPriceQuery) : globalMaxPrice;
-
-        if (priceRange.min === currentUrlMin && priceRange.max === currentUrlMax) {
-            return; // No change needed
-        }
-
-        const timeout = setTimeout(() => {
-            const params = new URLSearchParams(searchParams.toString())
-            let changed = false;
-            
-            if (priceRange.min > 0) {
-                params.set("minPrice", priceRange.min.toString());
-                changed = true;
-            } else if (params.has("minPrice")) {
-                params.delete("minPrice");
-                changed = true;
-            }
-
-            if (priceRange.max < globalMaxPrice) {
-                params.set("maxPrice", priceRange.max.toString());
-                changed = true;
-            } else if (params.has("maxPrice")) {
-                params.delete("maxPrice");
-                changed = true;
-            }
-
-            if (changed) {
-                params.set("page", "1");
-                router.push(`/products?${params.toString()}`, { scroll: false });
-            }
-        }, 500);
-
-        return () => clearTimeout(timeout);
-    }, [priceRange.min, priceRange.max, globalMaxPrice, searchParams, router, minPriceQuery, maxPriceQuery])
-
-    // Lock body scroll when filter dropdown is open
-    useEffect(() => {
-        if (isCatOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = '';
-        }
-        return () => {
-            document.body.style.overflow = '';
-        };
-    }, [isCatOpen])
-
-    const filteredProducts = useMemo(() => {
-        return initialProducts.filter(product => {
-            const matchesSearch = !searchQuery || 
-                product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                product.category?.toLowerCase().includes(searchQuery.toLowerCase())
-            
-            const matchesCategory = selectedCategories.length === 0 || 
-                selectedCategories.includes(product.categoryId) || 
-                selectedCategories.some(c => c?.toLowerCase() === product.category?.toLowerCase())
-            
-            const matchesPrice = product.price >= priceRange.min && product.price <= priceRange.max
-
-            return matchesSearch && matchesCategory && matchesPrice
-        })
-    }, [initialProducts, searchQuery, selectedCategories, priceRange])
-
-    const sortedProducts = useMemo(() => {
-        return [...filteredProducts].sort((a, b) => {
-            if (sortBy === "discount") {
-                const aDiscount = a.discount || 0;
-                const bDiscount = b.discount || 0;
-                return bDiscount - aDiscount;
-            }
-            if (sortBy === "price-low") return a.price - b.price
-            if (sortBy === "price-high") return b.price - a.price
-            if (sortBy === "newest") return new Date(b.createdAt) - new Date(a.createdAt)
-            return 0
-        }).filter(p => {
-            if (sortBy === "discount") return (p.discount || 0) > 0;
-            return true;
-        })
-    }, [filteredProducts, sortBy])
-
-    const totalPages = Math.ceil(totalProducts / itemsPerPage)
-
-    const handlePageChange = (pageNum) => {
-        const params = new URLSearchParams(searchParams.toString())
-        params.set("page", pageNum.toString())
-        router.push(`/products?${params.toString()}`, { scroll: true })
+    // Category filter
+    if (selectedCategory !== "all") {
+      result = result.filter((p) => {
+        const cat = (p.category || "").toLowerCase();
+        return cat.includes(selectedCategory);
+      });
     }
 
-    const toggleCategory = (categoryId) => {
-        const params = new URLSearchParams(searchParams.toString())
-        if (params.get("category") === categoryId) {
-            params.delete("category")
-        } else {
-            params.set("category", categoryId)
-        }
-        params.set("page", "1") // Reset to page 1 on filter change
-        router.push(`/products?${params.toString()}`)
+    // Price filter
+    result = result.filter((p) => {
+      const price = Number(p.price || p.basePrice || 0);
+      return price <= maxPrice;
+    });
+
+    // Material filter
+    if (selectedMaterials.length > 0) {
+      result = result.filter((p) => {
+        if (!p.material) return true;
+        return selectedMaterials.some((m) =>
+          p.material.toLowerCase().includes(m.toLowerCase())
+        );
+      });
     }
 
-    const resetFilters = () => {
-        setSelectedCategories([]);
-        setPriceRange({ min: 0, max: globalMaxPrice });
-        router.push('/products');
+    // In Stock filter
+    if (inStockOnly) {
+      result = result.filter((p) => p.inStock !== false);
     }
 
-    const getPageNumbers = () => {
-        const pages = [];
-        const maxPagesToShow = 7; 
-        
-        if (totalPages <= maxPagesToShow) {
-            for (let i = 1; i <= totalPages; i++) pages.push(i);
-        } else {
-            if (serverPage <= 4) {
-                for (let i = 1; i <= 5; i++) pages.push(i);
-                pages.push("...");
-                pages.push(totalPages);
-            } else if (serverPage >= totalPages - 3) {
-                pages.push(1);
-                pages.push("...");
-                for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
-            } else {
-                pages.push(1);
-                pages.push("...");
-                pages.push(serverPage - 1);
-                pages.push(serverPage);
-                pages.push(serverPage + 1);
-                pages.push("...");
-                pages.push(totalPages);
-            }
-        }
-        return pages;
+    // Sorting
+    if (sortBy === "price-asc") {
+      result.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
+    } else if (sortBy === "price-desc") {
+      result.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
+    } else if (sortBy === "rating") {
+      result.sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0));
+    } else {
+      // Featured
+      result.sort((a, b) => (a.sortOrder || 99) - (b.sortOrder || 99));
     }
 
-    return (
-        <div className="space-y-12">
-            {/* GLOBAL HEADER (Localizable) */}
-            <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-1 bg-primary rounded-full" />
-                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">{t('shop_title')}</span>
-                    {searchQuery && (
-                        <span className="text-[10px] font-bold text-surface-400 uppercase tracking-widest">
-                            / {t('filter_search_results')}: "{searchQuery}"
-                        </span>
-                    )}
-                </div>
-                <h1 className="text-4xl md:text-6xl font-black text-foreground tracking-tighter uppercase leading-[1.1]">
-                    {t('shop_products')}
-                </h1>
-                <p className="text-foreground/60 font-medium max-w-2xl text-sm md:text-base leading-relaxed">
-                    {t('shop_desc')}
-                </p>
-            </div>
+    return result;
+  }, [initialProducts, selectedCategory, maxPrice, selectedMaterials, inStockOnly, sortBy]);
 
-            <div className="flex flex-col gap-12">
-                {/* HORIZONTAL FILTERS BAR */}
-                <div className="flex flex-col gap-5 bg-surface-50/50 p-4 md:p-6 rounded-3xl border border-border-alpha">
-                    <div className="flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between">
-                        {/* Categories Dropdown Section */}
-                        <div className="w-full sm:flex-1 space-y-3">
-                            <div className="flex items-center justify-between gap-4">
-                                <h3 className="text-[9px] font-black text-foreground/50 uppercase tracking-[0.4em]">{t('filter_categories')}</h3>
-                                {(selectedCategories.length > 0 || searchQuery || priceRange.min > 0 || priceRange.max < globalMaxPrice) && (
-                                    <button 
-                                        onClick={resetFilters} 
-                                        className="text-[9px] font-bold text-primary uppercase tracking-widest hover:underline"
-                                    >
-                                        {t('cart_clear_btn')}
-                                    </button>
-                                )}
-                            </div>
-                        
-                        <div className="relative w-full sm:w-80">
-                            <button
-                                onClick={() => setIsCatOpen(!isCatOpen)}
-                                className="w-full flex items-center justify-between px-5 py-3.5 bg-[#0d1117]/80 backdrop-blur-xl border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white hover:bg-white/10 hover:border-primary/50 transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_8px_30px_rgb(0,0,0,0.5)]"
-                            >
-                                <span className="flex items-center gap-2.5 truncate">
-                                    <span className="text-primary shrink-0">
-                                        {selectedCategories.length === 0 ? (
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                                                <circle cx="12" cy="12" r="10" />
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10M12 2a15.3 15.3 0 00-4 10 15.3 15.3 0 004 10" />
-                                            </svg>
-                                        ) : (
-                                            getCategorySvg(activeCategoryName)
-                                        )}
-                                    </span>
-                                    <span className="text-white/40">{t('filter_categories')}:</span>
-                                    <span className="text-primary truncate">{activeCategoryName}</span>
-                                </span>
-                                <svg 
-                                    className={`w-4 h-4 text-white/60 transition-transform duration-300 ${isCatOpen ? 'rotate-180 text-primary' : ''}`} 
-                                    fill="none" 
-                                    stroke="currentColor" 
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
+  const handleQuickAdd = (product) => {
+    if (addToCart) {
+      addToCart({
+        id: product.id,
+        name: product.name || product.title,
+        price: Number(product.price || product.basePrice || 240),
+        image: product.image || "/images/editorial/cat-prod-skillet.png",
+        quantity: 1,
+      });
+    }
+    if (triggerCartAnimation) triggerCartAnimation();
+    if (addToast) addToast(`${product.name || product.title} added to cart`);
+    if (setCartDrawerOpen) setCartDrawerOpen(true);
+  };
 
-                            <AnimatePresence>
-                                {isCatOpen && (
-                                    <>
-                                        {/* Click outside backdrop */}
-                                        <div className="fixed inset-0 z-30" onClick={() => setIsCatOpen(false)} />
-                                        
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 15, scale: 0.95 }}
-                                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                                            exit={{ opacity: 0, y: 15, scale: 0.95 }}
-                                            transition={{ type: "spring", stiffness: 350, damping: 26 }}
-                                            className="absolute top-full left-0 mt-3 w-full sm:w-[480px] bg-[#0d1117]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8),_inset_0_1px_1px_rgba(255,255,255,0.05)] overflow-hidden z-40 p-4"
-                                        >
-                                            <div className="grid grid-cols-2 gap-2 max-h-80 overflow-y-auto scrollbar-thin pr-1">
-                                                {/* All Categories Option */}
-                                                <button
-                                                    onClick={() => {
-                                                        const params = new URLSearchParams(searchParams.toString())
-                                                        params.delete("category")
-                                                        params.set("page", "1")
-                                                        router.push(`/products?${params.toString()}`)
-                                                        setIsCatOpen(false)
-                                                    }}
-                                                    className={`col-span-2 text-left px-4 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-between border ${
-                                                        selectedCategories.length === 0 
-                                                            ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' 
-                                                            : 'bg-white/5 border-white/5 text-white/60 hover:text-white hover:bg-white/10 hover:border-white/10'
-                                                    }`}
-                                                >
-                                                    <span className="flex items-center gap-2">
-                                                        <span className="shrink-0 text-white/70">
-                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                                                                <circle cx="12" cy="12" r="10" />
-                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10M12 2a15.3 15.3 0 00-4 10 15.3 15.3 0 004 10" />
-                                                            </svg>
-                                                        </span>
-                                                        <span>{t('view_all') || 'All Categories'}</span>
-                                                    </span>
-                                                    {selectedCategories.length === 0 && (
-                                                        <span className="w-1.5 h-1.5 bg-white rounded-full" />
-                                                    )}
-                                                </button>
-
-                                                {allCategories.map((cat) => {
-                                                    const catFilterId = cat.slug || cat.id;
-                                                    const isSelected = selectedCategories.includes(catFilterId);
-                                                    return (
-                                                        <motion.button
-                                                            key={cat.id}
-                                                            whileHover={{ scale: 1.02, x: 2 }}
-                                                            whileTap={{ scale: 0.98 }}
-                                                            onClick={() => {
-                                                                toggleCategory(catFilterId)
-                                                                setIsCatOpen(false)
-                                                            }}
-                                                            className={`text-left px-4 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-between border ${
-                                                                isSelected 
-                                                                    ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' 
-                                                                    : 'bg-white/5 border-white/5 text-white/60 hover:text-white hover:bg-white/10 hover:border-white/10'
-                                                            }`}
-                                                        >
-                                                            <span className="flex items-center gap-2.5 truncate">
-                                                                <span className="shrink-0 opacity-80">{getCategorySvg(cat.name)}</span>
-                                                                <span className="truncate">
-                                                                    {getCategoryDisplayName(cat, lang)}
-                                                                </span>
-                                                            </span>
-                                                            {isSelected && (
-                                                                <span className="w-1.5 h-1.5 bg-white rounded-full" />
-                                                            )}
-                                                        </motion.button>
-                                                    );
-                                                })}
-                                            </div>
-                                        </motion.div>
-                                    </>
-                                )}
-                            </AnimatePresence>
-                        </div>
-                        </div>
-
-                        {/* Price Range Section */}
-                        <div className="w-full sm:w-72 flex flex-col justify-center">
-                            <div className="flex items-center justify-between mb-2">
-                                <h3 className="text-[9px] font-black text-foreground/50 uppercase tracking-[0.4em]">{t('filter_price_range')}</h3>
-                                <div className="text-[10px] font-mono font-black text-primary bg-primary/10 border border-primary/20 px-2.5 py-0.5 rounded-md shadow-md shadow-primary/5 flex items-center gap-1.5">
-                                    <PriceDisplay price={priceRange.min} /> — <PriceDisplay price={priceRange.max} />
-                                </div>
-                            </div>
-                            
-                            <div className="px-1 py-1">
-                                <DualRangeSlider 
-                                    min={priceRange.min}
-                                    max={priceRange.max}
-                                    minLimit={0}
-                                    maxLimit={globalMaxPrice}
-                                    onChange={(vals) => setPriceRange(vals)}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* MAIN CONTENT AREA */}
-                <div className="space-y-12">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0 justify-between border-b border-border-alpha pb-5">
-                        <span className="text-[10px] font-black text-surface-500 uppercase tracking-[0.3em]">
-                            {t('showing_results_count')
-                                .replace('{count}', sortedProducts.length)
-                                .replace('{total}', totalProducts)}
-                        </span>
-
-                        <div className="flex items-center p-1 bg-surface-100/50 dark:bg-white/5 rounded-xl border border-white/5 overflow-x-auto">
-                            {[
-                                { id: 'newest', label: t('sort_newest') },
-                                { id: 'discount', label: t('sort_discount') },
-                                { id: 'price-low', label: t('sort_price_low') },
-                                { id: 'price-high', label: t('sort_price_high') }
-                            ].map((option) => (
-                                <button
-                                    key={option.id}
-                                    onClick={() => {
-                                        setSortBy(option.id);
-                                        const params = new URLSearchParams(searchParams.toString());
-                                        params.set("sort", option.id);
-                                        params.set("page", "1");
-                                        router.push(`/products?${params.toString()}`, { scroll: false });
-                                    }}
-                                    className={`relative px-3 md:px-4 py-2 text-[9px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${sortBy === option.id ? 'text-white' : 'text-foreground/40 hover:text-foreground'
-                                        }`}
-                                >
-                                    {sortBy === option.id && (
-                                        <motion.div
-                                            layoutId="activeSort"
-                                            className="absolute inset-0 bg-primary rounded-lg -z-10 shadow-lg shadow-primary/20"
-                                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                        />
-                                    )}
-                                    <span className="relative z-10">{option.label}</span>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {sortedProducts.length > 0 ? (
-                        <ProductGrid products={sortedProducts} />
-                    ) : (
-                        <div className="flex flex-col items-center justify-center py-32 text-center space-y-6 animate-fade-in">
-                            <div className="w-20 h-20 bg-surface-100 rounded-full flex items-center justify-center border border-border-alpha">
-                                <svg className="w-10 h-10 text-foreground/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            </div>
-                            <div className="space-y-2">
-                                <h2 className="text-2xl font-black text-foreground uppercase tracking-tight">{t('filter_no_products')}</h2>
-                                <p className="text-foreground/60 text-sm max-w-xs mx-auto">{t('cart_empty_desc')}</p>
-                            </div>
-                            <button 
-                                onClick={resetFilters}
-                                className="bg-foreground text-background font-black text-[10px] uppercase tracking-[0.2em] px-8 py-4 rounded-xl hover:bg-primary hover:text-white transition-all active:scale-95 shadow-xl"
-                            >
-                                {t('cart_clear_btn')}
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Pagination */}
-                    {totalPages > 1 && (
-                        <div className="flex justify-center gap-2 pt-12 border-t border-border-alpha">
-                            {getPageNumbers().map((num, idx) => (
-                                <button
-                                    key={idx}
-                                    onClick={() => num !== "..." && handlePageChange(num)}
-                                    disabled={num === "..."}
-                                    className={`flex items-center justify-center w-12 h-12 rounded-xl text-xs font-black transition-all ${
-                                        serverPage === num 
-                                            ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-110' 
-                                            : num === "..."
-                                                ? 'bg-transparent text-surface-500 cursor-default'
-                                                : 'bg-surface-100 text-surface-500 hover:bg-surface-200'
-                                    }`}
-                                >
-                                    {num}
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            </div>
+  return (
+    <div className="space-y-8 animate-fade-in bg-[#FBF9F5] pt-20 md:pt-28 pb-16">
+      {/* 1. HEADER & BREADCRUMB */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-[#EAE5DC]">
+        <div>
+          <div className="flex items-center gap-2 text-[10px] md:text-[11px] font-semibold tracking-[0.2em] text-[#71717A] uppercase mb-2">
+            <span>CATALOG</span>
+            <span>/</span>
+            <span className="text-[#1C1C1E]">ALL COLLECTIONS</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-normal text-[#1C1C1E] tracking-tight">
+            Curated Culinary Artifacts
+          </h1>
         </div>
-    )
+        <p className="text-xs md:text-sm text-[#52525B] max-w-md leading-relaxed">
+          Explore our complete range of professional-grade cookware, hand-forged Japanese steel, and artisanal tableware crafted for daily mastery.
+        </p>
+      </div>
+
+      {/* Mobile Filter Toggle */}
+      <div className="lg:hidden flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => setIsMobileFiltersOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-[#D9D3C7] text-xs font-semibold text-[#1C1C1E] shadow-xs"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+          </svg>
+          <span>Filters</span>
+        </button>
+        <span className="text-xs text-[#71717A]">
+          Showing {displayedProducts.length} products
+        </span>
+      </div>
+
+      {/* 2. MAIN LAYOUT: SIDEBAR FILTERS + PRODUCTS GRID */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        {/* LEFT SIDEBAR FILTERS (DESKTOP) */}
+        <aside className="hidden lg:block lg:col-span-3 space-y-8 bg-white/70 p-6 rounded-3xl border border-[#EAE5DC] shadow-xs sticky top-28">
+          {/* Filters Title & Reset */}
+          <div className="flex items-center justify-between pb-4 border-b border-[#F4F1EA]">
+            <h3 className="font-serif text-lg font-normal text-[#1C1C1E]">
+              Filters
+            </h3>
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="text-xs text-[#71717A] hover:text-[#1C1C1E] transition-colors"
+            >
+              Reset All
+            </button>
+          </div>
+
+          {/* Category Checklist */}
+          <div className="space-y-3">
+            <h4 className="text-[11px] font-bold tracking-[0.18em] uppercase text-[#1C1C1E]">
+              CATEGORY
+            </h4>
+            <div className="space-y-2.5">
+              {categoriesList.map((cat) => {
+                const isSelected = selectedCategory === cat.id;
+                return (
+                  <label
+                    key={cat.id}
+                    className="flex items-center justify-between cursor-pointer group select-none text-xs text-[#3F3F46] hover:text-[#1C1C1E]"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <input
+                        type="radio"
+                        name="category"
+                        checked={isSelected}
+                        onChange={() => setSelectedCategory(cat.id)}
+                        className="w-4 h-4 accent-[#1B3B18] rounded cursor-pointer"
+                      />
+                      <span className={isSelected ? "font-semibold text-[#1C1C1E]" : ""}>
+                        {cat.label}
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-[#71717A]">({cat.count})</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Price Range */}
+          <div className="space-y-3">
+            <h4 className="text-[11px] font-bold tracking-[0.18em] uppercase text-[#1C1C1E]">
+              PRICE RANGE
+            </h4>
+            <div className="space-y-2">
+              <input
+                type="range"
+                min="20"
+                max="750"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(Number(e.target.value))}
+                className="w-full h-1.5 bg-[#E8E3D9] rounded-lg appearance-none cursor-pointer accent-[#1B3B18]"
+              />
+              <div className="flex items-center justify-between text-xs text-[#71717A] font-mono">
+                <span>$20</span>
+                <span>${maxPrice} max</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Material Pills */}
+          <div className="space-y-3">
+            <h4 className="text-[11px] font-bold tracking-[0.18em] uppercase text-[#1C1C1E]">
+              MATERIAL
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {materialsList.map((mat) => {
+                const isSelected = selectedMaterials.includes(mat);
+                return (
+                  <button
+                    key={mat}
+                    type="button"
+                    onClick={() => toggleMaterial(mat)}
+                    className={`px-3 py-1.5 rounded-full text-xs transition-all ${
+                      isSelected
+                        ? "bg-[#1B3B18] text-white font-semibold shadow-xs"
+                        : "bg-[#F4F1EA] text-[#52525B] hover:bg-[#EAE5DC]"
+                    }`}
+                  >
+                    {mat}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* In Stock Only Checkbox */}
+          <div className="pt-2 border-t border-[#F4F1EA]">
+            <label className="flex items-center justify-between cursor-pointer select-none text-xs font-bold tracking-[0.15em] uppercase text-[#1C1C1E]">
+              <span>IN STOCK ONLY</span>
+              <input
+                type="checkbox"
+                checked={inStockOnly}
+                onChange={(e) => setInStockOnly(e.target.checked)}
+                className="w-4.5 h-4.5 accent-[#1B3B18] rounded cursor-pointer"
+              />
+            </label>
+          </div>
+        </aside>
+
+        {/* RIGHT MAIN CATALOG */}
+        <div className="lg:col-span-9 space-y-6">
+          {/* Top Bar: Count & Sort Dropdown */}
+          <div className="flex items-center justify-between pb-3 border-b border-[#EAE5DC]">
+            <span className="text-xs md:text-sm text-[#71717A]">
+              Showing <strong className="text-[#1C1C1E]">1–{displayedProducts.length}</strong> of{" "}
+              {totalProducts} products
+            </span>
+
+            {/* Sort Dropdown */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-[#71717A] hidden sm:inline">Sort by:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="bg-white border border-[#D9D3C7] rounded-xl px-3 py-1.5 text-xs text-[#1C1C1E] outline-none shadow-xs cursor-pointer"
+              >
+                <option value="featured">Featured Highlights</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="rating">Highest Rated</option>
+              </select>
+            </div>
+          </div>
+
+          {/* 3-Column Product Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {displayedProducts.map((product) => {
+              const isFavorite = wishlist.some((item) => item.id === product.id);
+              const badge = product.badge;
+              const isGreenBadge = product.badgeType === "green";
+
+              return (
+                <div
+                  key={product.id}
+                  className="bg-white rounded-3xl border border-[#EAE5DC] overflow-hidden flex flex-col justify-between shadow-xs hover:shadow-card-hover transition-all duration-300 group"
+                >
+                  {/* Image Box */}
+                  <div className="relative aspect-square w-full bg-[#F7F5F0] overflow-hidden flex items-center justify-center p-4">
+                    {/* Badge */}
+                    {badge && (
+                      <div className="absolute top-3.5 left-3.5 z-10">
+                        <span
+                          className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase shadow-xs ${
+                            isGreenBadge
+                              ? "bg-[#2D5A27] text-white"
+                              : "bg-[#8C5930] text-white"
+                          }`}
+                        >
+                          {badge}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Wishlist Button */}
+                    <button
+                      type="button"
+                      onClick={() => toggleWishlist(product)}
+                      aria-label="Save to Wishlist"
+                      className="absolute top-3.5 right-3.5 z-10 w-7 h-7 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-xs transition-transform active:scale-90"
+                    >
+                      <svg
+                        className={`w-4 h-4 transition-colors ${
+                          isFavorite ? "fill-red-500 text-red-500" : "text-[#71717A] hover:text-[#1C1C1E]"
+                        }`}
+                        fill={isFavorite ? "currentColor" : "none"}
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+                        />
+                      </svg>
+                    </button>
+
+                    {/* Product Photo */}
+                    <Image
+                      src={product.image || "/images/editorial/cat-prod-skillet.png"}
+                      alt={product.name || product.title}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover object-center transform transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+
+                  {/* Card Body */}
+                  <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
+                    <div>
+                      {/* Subcategory & Rating */}
+                      <div className="flex items-center justify-between text-[11px] mb-1">
+                        <span className="text-[10px] font-semibold tracking-wider text-[#71717A] uppercase">
+                          {product.subcategory || product.category?.toUpperCase() || "COOKWARE"}
+                        </span>
+                        <span className="text-[#D48B38] font-medium flex items-center gap-1">
+                          ★ {Number(product.rating || 4.9).toFixed(1)}
+                        </span>
+                      </div>
+
+                      {/* Title */}
+                      <h3 className="font-serif text-base md:text-lg font-medium text-[#1C1C1E] leading-snug group-hover:text-[#2D5A27] transition-colors line-clamp-1">
+                        {product.name || product.title}
+                      </h3>
+
+                      {/* Description */}
+                      <p className="text-xs text-[#71717A] line-clamp-2 leading-relaxed mt-1">
+                        {product.description}
+                      </p>
+                    </div>
+
+                    {/* Footer Row: Price & Quick Add */}
+                    <div className="pt-3 border-t border-[#F4F1EA] flex items-center justify-between">
+                      <span className="font-serif text-base md:text-lg font-semibold text-[#1C1C1E]">
+                        ${Number(product.price || product.basePrice || 240)}
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() => handleQuickAdd(product)}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#1B3B18] hover:bg-[#244B20] text-white text-xs font-semibold shadow-xs active:scale-95 transition-all"
+                      >
+                        <svg
+                          className="w-3.5 h-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25c-.669 0-1.189-.578-1.119-1.243l1.263-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                          />
+                        </svg>
+                        <span>Quick Add</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* 3. PAGINATION (Screenshot 3) */}
+          <div className="pt-10 flex items-center justify-center gap-2">
+            {/* Prev */}
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="w-9 h-9 rounded-lg border border-[#D9D3C7] bg-white text-[#1C1C1E] text-sm flex items-center justify-center hover:bg-[#F4F1EA] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              &lt;
+            </button>
+
+            {/* Page 1 */}
+            <button
+              type="button"
+              onClick={() => setPage(1)}
+              className={`w-9 h-9 rounded-lg text-sm font-semibold flex items-center justify-center transition-colors ${
+                page === 1
+                  ? "bg-[#1B3B18] text-white shadow-xs"
+                  : "bg-white border border-[#D9D3C7] text-[#1C1C1E] hover:bg-[#F4F1EA]"
+              }`}
+            >
+              1
+            </button>
+
+            {/* Page 2 */}
+            <button
+              type="button"
+              onClick={() => setPage(2)}
+              className={`w-9 h-9 rounded-lg text-sm font-semibold flex items-center justify-center transition-colors ${
+                page === 2
+                  ? "bg-[#1B3B18] text-white shadow-xs"
+                  : "bg-white border border-[#D9D3C7] text-[#1C1C1E] hover:bg-[#F4F1EA]"
+              }`}
+            >
+              2
+            </button>
+
+            {/* Page 3 */}
+            <button
+              type="button"
+              onClick={() => setPage(3)}
+              className={`w-9 h-9 rounded-lg text-sm font-semibold flex items-center justify-center transition-colors ${
+                page === 3
+                  ? "bg-[#1B3B18] text-white shadow-xs"
+                  : "bg-white border border-[#D9D3C7] text-[#1C1C1E] hover:bg-[#F4F1EA]"
+              }`}
+            >
+              3
+            </button>
+
+            <span className="px-1 text-[#71717A] text-sm">...</span>
+
+            {/* Page 6 */}
+            <button
+              type="button"
+              onClick={() => setPage(6)}
+              className={`w-9 h-9 rounded-lg text-sm font-semibold flex items-center justify-center transition-colors ${
+                page === 6
+                  ? "bg-[#1B3B18] text-white shadow-xs"
+                  : "bg-white border border-[#D9D3C7] text-[#1C1C1E] hover:bg-[#F4F1EA]"
+              }`}
+            >
+              6
+            </button>
+
+            {/* Next */}
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.min(6, p + 1))}
+              disabled={page === 6}
+              className="w-9 h-9 rounded-lg border border-[#D9D3C7] bg-white text-[#1C1C1E] text-sm flex items-center justify-center hover:bg-[#F4F1EA] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              &gt;
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

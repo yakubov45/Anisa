@@ -1,4 +1,4 @@
-import { Inter, Oxygen, Outfit } from "next/font/google";
+import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -15,21 +15,21 @@ import CompareWidget from "@/components/common/CompareWidget";
 import SmoothScrollProvider from "@/components/common/SmoothScroll";
 import AdminOrderListener from "@/components/common/AdminOrderListener";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
+const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair', display: 'swap' });
+const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-jakarta', display: 'swap' });
 
 export const metadata = {
-    metadataBase: new URL('https://onepc.uz'),
+    metadataBase: new URL('https://cucinastudio.com'),
     title: {
-        template: '%s | OnePC',
-        default: 'OnePC | Premium Hardware & Gaming Setup',
+        template: '%s | Cucina Studio',
+        default: 'Cucina Studio | Premium Kitchenware & Culinary Goods',
     },
-    description: "Elite PC systems, custom builds, hardware components and gaming setups for professionals. Top quality hardware acquisition ecosystem.",
+    description: "Discover premium cookware, artisan knives, elegant tableware, and professional kitchen appliances. Curated for the discerning home chef.",
     openGraph: {
-        title: 'OnePC | Premium Hardware Store',
-        description: 'Elite PC systems and hardware for professionals.',
-        url: 'https://onepc.uz',
-        siteName: 'OnePC',
+        title: 'Cucina Studio | Premium Kitchenware & Culinary Goods',
+        description: 'Premium cookware, knives, and kitchen essentials for the discerning chef.',
+        url: 'https://cucinastudio.com',
+        siteName: 'Cucina Studio',
         images: [
             {
                 url: '/videos/og-banner.jpg', // Placeholder for now
@@ -37,7 +37,7 @@ export const metadata = {
                 height: 630,
             },
         ],
-        locale: 'uz_UZ',
+        locale: 'en_US',
         type: 'website',
     },
     manifest: "/manifest.json",
@@ -50,13 +50,13 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
     return (
-        <html lang="en" className={`${inter.variable} ${outfit.variable} font-sans`} suppressHydrationWarning>
+        <html lang="en" className={`${playfair.variable} ${jakarta.variable} font-sans`} suppressHydrationWarning>
             <head>
                 <script
                     dangerouslySetInnerHTML={{
                         __html: `
                             try {
-                                if (sessionStorage.getItem("onepc_intro_shown")) {
+                                if (sessionStorage.getItem("cucina_intro_shown")) {
                                     document.documentElement.classList.add("no-intro");
                                 }
                             } catch (e) {}
@@ -64,7 +64,7 @@ export default function RootLayout({ children }) {
                     }}
                 />
             </head>
-            <body className="bg-surface text-surface-900 selection:bg-primary/10" suppressHydrationWarning>
+            <body className="bg-background text-foreground selection:bg-primary/10" suppressHydrationWarning>
                 <LanguageProvider>
                     <UserProvider>
                         <CartSyncProvider>
@@ -79,7 +79,7 @@ export default function RootLayout({ children }) {
                                 <CompareWidget />
                                 <div className="min-h-screen flex flex-col">
                                     <Navbar />
-                                    <main className="flex-1 max-w-[1600px] mx-auto w-full px-6 md:px-12 pt-16 md:pt-24 pb-12">
+                                    <main className="flex-1 w-full bg-[#FBF9F5]">
                                         {children}
                                     </main>
                                     <Footer />

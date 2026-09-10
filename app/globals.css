@@ -3,122 +3,158 @@
 @tailwind utilities;
 
 :root {
-  /* LIGHT MODE - Premium Silver & Carbon */
-  --background: #DDE1E7; /* Darker bg so white cards pop clearly */
-  --foreground: #0B0B0C;
+  --background: #FBF9F5;
+  --foreground: #1C1C1E;
+  --card: #FFFFFF;
+  --muted: #71717A;
+  --border: #E5E0D8;
+  --primary: #2D5A27;
+  --primary-light: #F0F5EF;
+  --accent: #C88A58;
+  --accent-light: #FBF4ED;
 
-  --surface: #FFFFFF;
-  --surface-50: #FFFFFF; /* Cards are pure white */
-  --surface-100: #F1F3F5;
-  --surface-200: #E2E6EA;
-  --surface-300: #CDD2D8;
-  --surface-400: #64748B;
-  --surface-500: #475569;
-  --surface-600: #334155;
-  --surface-700: #1E293B;
-  --surface-800: #0F172A;
-  --surface-900: #020617;
-
-  --primary-glow: rgba(227, 30, 36, 0.08);
-  --border-alpha: rgba(0, 0, 0, 0.10);
-  --shadow-strength: 0.10;
-  /* Card-specific shadow for light mode */
-  --card-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06);
-  --card-shadow-hover: 0 8px 24px rgba(0,0,0,0.14), 0 20px 40px rgba(0,0,0,0.10);
-  --card-border: rgba(0, 0, 0, 0.10);
-}
-
-.dark {
-  /* DARK MODE - Obsidian & Carbon */
-  --background: #0A0A0B;
-  --foreground: #FFFFFF;
-
-  --surface: #0B0B0C;
-  --surface-50: #111113;
-  --surface-100: #1A1A1D;
-  --surface-200: #27272A;
-  --surface-300: #3F3F46;
-  --surface-400: #71717A;
-  --surface-500: #A1A1AA;
-  --surface-600: #D4D4D8;
-  --surface-700: #E4E4E7;
-  --surface-800: #F4F4F5;
-  --surface-900: #FFFFFF;
-
-  --primary-glow: rgba(227, 30, 36, 0.03);
-  --border-alpha: rgba(255, 255, 255, 0.05);
-  --shadow-strength: 0.4;
-  --card-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  --card-shadow-hover: 0 8px 40px rgba(227,30,36,0.15), 0 20px 50px rgba(0,0,0,0.4);
-  --card-border: rgba(255, 255, 255, 0.05);
+  --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 2px 8px -2px rgba(0, 0, 0, 0.04);
+  --card-shadow-hover: 0 12px 35px -5px rgba(0, 0, 0, 0.10), 0 4px 15px -3px rgba(0, 0, 0, 0.06);
 }
 
 @layer base {
   body {
     @apply bg-background text-foreground antialiased;
-    background-image:
-      radial-gradient(at 0% 0%, var(--primary-glow) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, var(--primary-glow) 0px, transparent 50%);
-    transition: background-color 0.5s ease, color 0.5s ease;
+    font-family: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, sans-serif;
     overscroll-behavior-y: none;
   }
 
-  select, .scrollable-dropdown {
-    overscroll-behavior: contain;
-  }
-
-  /* Custom Scrollbar */
+  /* Warm Scrollbar */
   ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-background;
+    background: #F4F1EA;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #E31E24;
-    border-radius: 5px;
-    border: 3px solid transparent;
-    background-clip: content-box;
+    background: #C4BEB4;
+    border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #B91C1C;
-    background-clip: content-box;
+    background: #9E978D;
   }
 
   /* Firefox */
   * {
     scrollbar-width: thin;
-    scrollbar-color: #E31E24 transparent;
+    scrollbar-color: #C4BEB4 #F4F1EA;
+  }
+
+  /* Selection */
+  ::selection {
+    background-color: rgba(45, 90, 39, 0.12);
+    color: #1C1C1E;
   }
 }
 
 @layer components {
-  .glass-panel {
-    @apply bg-surface/80 backdrop-blur-xl border border-border-alpha shadow-industrial;
-  }
-
-  .tech-border {
-    @apply border border-surface-200 hover:border-primary/30 transition-all duration-500;
-  }
-
-  .interactive-card {
-    @apply bg-surface-50 border border-surface-200 rounded-2xl p-6 hover:bg-surface-100 transition-all duration-300;
-  }
-
-  /* Product card — ajralib turadi (light & dark) */
+  /* Product Card */
   .product-card {
-    background: var(--surface);
-    border: 1px solid var(--card-border);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 1.25rem;
     box-shadow: var(--card-shadow);
     transition: box-shadow 0.4s ease, transform 0.4s ease;
   }
+
   .product-card:hover {
     box-shadow: var(--card-shadow-hover);
-    transform: translateY(-6px);
+    transform: translateY(-4px);
+  }
+
+  /* Glass Panel - Warm variant */
+  .glass-panel {
+    @apply bg-white/80 backdrop-blur-xl border border-border;
+  }
+
+  /* Interactive Card */
+  .interactive-card {
+    @apply bg-white border border-border rounded-2xl p-6 hover:shadow-card-hover transition-all duration-300;
+  }
+
+  /* Premium Buttons - Sage variant */
+  .btn-premium {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    isolation: isolate;
+  }
+
+  .btn-premium::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 250%;
+    padding-bottom: 250%;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 40%;
+    transform: translate(-50%, 0) rotate(0deg);
+    z-index: -1;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .btn-premium:hover::before {
+    transform: translate(-50%, -60%) rotate(180deg);
+  }
+
+  .btn-premium:hover {
+    transform: translateY(-1px);
+  }
+
+  .btn-premium:active {
+    transform: translateY(1px) scale(0.98);
+  }
+
+  /* Sage CTA Button */
+  .btn-sage {
+    @apply bg-primary text-white font-semibold rounded-xl;
+    transition: all 0.3s ease;
+  }
+
+  .btn-sage:hover {
+    @apply bg-primary-600;
+    box-shadow: 0 8px 25px -5px rgba(45, 90, 39, 0.3);
+  }
+
+  /* Terracotta CTA Button */
+  .btn-terracotta {
+    @apply bg-accent text-white font-semibold rounded-xl;
+    transition: all 0.3s ease;
+  }
+
+  .btn-terracotta:hover {
+    @apply bg-accent-500;
+    box-shadow: 0 8px 25px -5px rgba(200, 138, 88, 0.3);
+  }
+
+  /* Outlined Button */
+  .btn-outlined {
+    @apply border-2 border-accent text-accent font-semibold rounded-xl bg-transparent;
+    transition: all 0.3s ease;
+  }
+
+  .btn-outlined:hover {
+    @apply bg-accent text-white;
+  }
+
+  /* Material Badge */
+  .material-badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 bg-surface-100 text-surface-700 text-xs font-medium rounded-full border border-border;
+  }
+
+  /* Compatibility Badge */
+  .compat-badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 text-primary bg-primary-50 text-[11px] font-semibold rounded-full;
   }
 }
 
@@ -144,96 +180,3 @@ html.no-intro #intro-overlay {
 .animate-progress-loading {
   animation: progress-loading 2s ease-in-out infinite;
 }
-
-/* Premium interactive button hover sweep & scale effect */
-.btn-premium {
-  position: relative;
-  overflow: hidden;
-  transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
-  isolation: isolate;
-}
-
-/* Bottom-to-Top Wave Fill Effect */
-.btn-premium::before {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  width: 250%;
-  padding-bottom: 250%;
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 40%;
-  transform: translate(-50%, 0) rotate(0deg);
-  z-index: -1;
-  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.btn-premium:hover::before {
-  transform: translate(-50%, -60%) rotate(180deg);
-}
-
-.btn-premium::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -150%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.35),
-    transparent
-  );
-  transform: skewX(-25deg);
-  z-index: 10;
-  transition: none;
-}
-
-.btn-premium:hover::after {
-  left: 150%;
-  transition: left 0.85s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-.btn-premium:hover {
-  transform: translateY(-2px) scale(1.03);
-}
-
-.btn-premium:active {
-  transform: translateY(1px) scale(0.97);
-}
-
-/* Specific glows for different button variants */
-.btn-premium-red {
-  background-color: #E31E24 !important;
-  color: #ffffff !important;
-}
-
-.btn-premium-red:hover {
-  box-shadow: 0 0 25px rgba(227, 30, 36, 0.55), 0 0 10px rgba(227, 30, 36, 0.35);
-}
-
-.btn-premium-white {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-}
-
-.btn-premium-white::before {
-  background-color: rgba(0, 0, 0, 0.08);
-}
-
-.btn-premium-white:hover {
-  box-shadow: 0 10px 25px rgba(255, 255, 255, 0.2), 0 0 15px rgba(255, 255, 255, 0.15);
-}
-
-.btn-premium-dark {
-  background-color: #111113 !important; /* Fixed dark background for visibility in light mode */
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  color: #ffffff !important;
-}
-
-.btn-premium-dark:hover {
-  background-color: #1A1A1D !important;
-  border-color: rgba(227, 30, 36, 0.5) !important;
-  box-shadow: 0 0 20px rgba(227, 30, 36, 0.25);
-}

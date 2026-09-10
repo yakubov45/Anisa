@@ -1,175 +1,131 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react";
-import { subscriptionService } from "@/lib/services/subscription.service";
+import { useState } from "react";
+import Link from "next/link";
 import useUIStore from "@/store/useUIStore";
-import { useTranslation } from "@/lib/LanguageContext";
-import { FEATURES } from "@/lib/features";
-
 
 export default function Footer() {
-    const { t, lang } = useTranslation();
-    const [email, setEmail] = useState("");
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const { addToast } = useUIStore();
-    useEffect(() => {
-        // Obunachilar hisobi o'chirildi
-    }, []);
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+  const { addToast } = useUIStore();
 
-    const socialPlatforms = [
-        {
-            name: 'YouTube',
-            url: 'https://www.youtube.com/@onepcuz',
-            icon: <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 md:w-6 md:h-6"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" /></svg>,
-            color: 'hover:text-[#FF0000]'
-        },
-        {
-            name: 'Telegram',
-            url: 'https://t.me/OnePcuz',
-            icon: <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 md:w-6 md:h-6"><path d="M11.944 0C5.346 0 0 5.346 0 11.944c0 6.598 5.346 11.944 11.944 11.944 6.598 0 11.944-5.346 11.944-11.944C23.888 5.346 18.542 0 11.944 0zm5.206 8.19l-1.802 8.473c-.135.61-.497.76-.99.48l-2.744-2.023-1.324 1.275c-.147.147-.27.27-.554.27l.198-2.796 5.093-4.598c.22-.196-.048-.304-.342-.11L8.33 13.064l-2.715-.847c-.59-.186-.6-.59.124-.874l10.605-4.087c.49-.18.92.112.748.934z" /></svg>,
-            color: 'hover:text-[#26A5E4]'
-        },
-        {
-            name: 'Instagram',
-            url: 'https://www.instagram.com/onepcuz',
-            icon: <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 md:w-6 md:h-6"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4.162 4.162 0 1 1 0-8.324A4.162 4.162 0 0 1 12 16zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z" /></svg>,
-            color: 'hover:text-[#E4405F]'
-        }
-    ];
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    if (!email || !email.includes("@")) return;
+    setSubscribed(true);
+    if (addToast) addToast("Thank you for subscribing to our culinary journal!");
+    setEmail("");
+  };
 
-    const handleSubscribe = async (e) => {
-        if (e) e.preventDefault();
-        if (isSubmitting) return;
+  return (
+    <footer className="w-full bg-[#FBF9F5] border-t border-[#EAE5DC] text-[#1C1C1E] pt-14 md:pt-16 pb-12">
+      <div className="max-w-[1440px] mx-auto px-6 md:px-12">
+        {/* 4 Columns Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 mb-14">
+          {/* Col 1: Brand */}
+          <div className="space-y-4">
+            <h3 className="font-serif text-lg md:text-xl font-medium tracking-tight text-[#1C1C1E]">
+              Anisa Studio
+            </h3>
+            <p className="text-xs md:text-sm text-[#71717A] leading-relaxed max-w-xs">
+              Bridging the gap between professional gastronomy and domestic tranquility through exceptional artisanal kitchenware.
+            </p>
+          </div>
 
-        setIsSubmitting(true);
-        try {
-            await subscriptionService.subscribe(email);
-            addToast("IDENTITY SYNCHRONIZED SUCCESSFULLY!");
-            setEmail("");
-        } catch (error) {
-            addToast(error.message.toUpperCase(), "error");
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
+          {/* Col 2: Customer Care */}
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold tracking-[0.18em] uppercase text-[#1C1C1E]">
+              CUSTOMER CARE
+            </h4>
+            <ul className="space-y-2.5 text-xs md:text-sm text-[#71717A]">
+              <li>
+                <Link href="/shipping" className="hover:text-[#2D5A27] transition-colors">
+                  Shipping & Returns
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" className="hover:text-[#2D5A27] transition-colors">
+                  Warranty & Care
+                </Link>
+              </li>
+              <li>
+                <Link href="/about" className="hover:text-[#2D5A27] transition-colors">
+                  Store Locator
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="hover:text-[#2D5A27] transition-colors">
+                  Contact Us
+                </Link>
+              </li>
+            </ul>
+          </div>
 
-    const getLangLabel = () => {
-        if (lang === 'uz') return "O'zbekcha";
-        if (lang === 'ru') return "Русский";
-        return "English";
-    };
+          {/* Col 3: Newsletter */}
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold tracking-[0.18em] uppercase text-[#1C1C1E]">
+              NEWSLETTER
+            </h4>
+            <p className="text-xs md:text-sm text-[#71717A] leading-relaxed">
+              Subscribe to receive private sales, culinary notes, and new releases.
+            </p>
+            <form onSubmit={handleSubscribe} className="flex items-center gap-2 pt-1">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="w-full bg-white border border-[#D9D3C7] rounded-lg px-3.5 py-2 text-xs text-[#1C1C1E] outline-none focus:border-[#2D5A27] transition-colors placeholder:text-gray-400"
+              />
+              <button
+                type="submit"
+                className="px-5 py-2 rounded-lg bg-[#1B3B18] hover:bg-[#244B20] text-white text-xs font-semibold shrink-0 transition-colors shadow-xs active:scale-95"
+              >
+                {subscribed ? "Done" : "Join"}
+              </button>
+            </form>
+          </div>
 
-    return (
-        <footer className="mt-auto bg-[#111113] border-t border-white/5 relative overflow-hidden">
-            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03]" />
-
-            <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 py-8 md:py-10">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-8 md:gap-12 mb-8">
-
-                    <div className="col-span-2 md:col-span-1 space-y-4">
-                        <div className="flex flex-col gap-1">
-                            <img src="/icons/footer-logo.svg" alt="OnePC" className="h-6 md:h-7 w-auto brightness-0 invert" />
-                            <span className="text-[10px] md:text-[11px] font-black text-zinc-500 uppercase tracking-[0.4em] leading-none mt-2 md:mt-1">{t('footer_tagline')}</span>
-                        </div>
-                        <p className="text-zinc-400 text-xs md:text-xs font-medium leading-relaxed max-w-xs opacity-60">
-                            {t('footer_desc')}
-                        </p>
-                    </div>
-
-                    <div className="col-span-1 space-y-4">
-                        <h4 className="text-[10px] md:text-[11px] font-black text-white uppercase tracking-[0.4em]">{t('nav_categories') || 'KATEGORIYALAR'}</h4>
-                        <ul className="space-y-3 md:space-y-2">
-                            {[
-                                { name: t('nav_products') || 'BARCHA MAHSULOTLAR', url: '/products' },
-                                { name: t('nav_prebuilts') || 'TAYYOR KOMPYUTERLAR', url: '/prebuilts' },
-                                ...(FEATURES.PC_BUILDER ? [{ name: t('nav_pc_builder') || 'PC BUILDER', url: '/pc-builder' }] : [])
-                            ].map(item => (
-                                <li key={item.name}>
-                                    <a href={item.url} className="text-zinc-500 text-[10px] md:text-[11px] font-black uppercase tracking-widest hover:text-primary transition-colors">{item.name}</a>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    <div className="col-span-1 space-y-4">
-                        <h4 className="text-[10px] md:text-[11px] font-black text-white uppercase tracking-[0.4em]">{t('nav_about') || "MA'LUMOTLAR"}</h4>
-                        <ul className="space-y-3 md:space-y-2">
-                            {[
-                                { name: t('nav_faq') || "KO'P SO'RALADIGAN SAVOLLAR", url: '/faq' },
-                                { name: t('nav_about') || 'BIZ HAQIMIZDA', url: '/about' }
-                            ].map(item => (
-                                <li key={item.name}>
-                                    <a href={item.url} className="text-zinc-500 text-[10px] md:text-[11px] font-black uppercase tracking-widest hover:text-primary transition-colors">{item.name}</a>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    <div className="col-span-2 md:col-span-1 space-y-5">
-                        <form onSubmit={handleSubscribe} className="space-y-2">
-                            <h4 className="text-[10px] md:text-[11px] font-black text-white uppercase tracking-[0.4em]">{t('footer_broadcast_system')}</h4>
-                            <p className="text-zinc-400 text-[9px] md:text-[10px] leading-relaxed font-bold uppercase tracking-widest">{t('footer_subscribe_text')}</p>
-                            <div className="relative group">
-                                <input
-                                    type="email"
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder={t('newsletter_placeholder')}
-                                    className="w-full bg-white/5 border border-white/5 rounded-xl px-4 py-3 md:py-2.5 text-[10px] md:text-[11px] font-mono tracking-widest focus:ring-1 focus:ring-primary/40 transition-all text-white placeholder:text-zinc-600 outline-none"
-                                />
-                                <button 
-                                    type="submit"
-                                    disabled={isSubmitting}
-                                    className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-primary text-white text-[9px] font-black px-3 py-1.5 md:px-2.5 md:py-1 rounded-lg hover:bg-white hover:text-black transition-all uppercase tracking-widest disabled:opacity-50"
-                                >
-                                    {isSubmitting ? '...' : 'SYNC'}
-                                </button>
-                            </div>
-                        </form>
-
-                        <div className="pt-1">
-                            <div className="flex flex-wrap items-center gap-4 md:gap-3 opacity-60">
-                                {['click', 'payme', 'uzcard', 'humo', 'visa', 'mastercard'].map(p => (
-                                    <img key={p} src={`/icons/main-${p}.webp`} alt={p} className="h-5 md:h-4 w-auto grayscale hover:grayscale-0 transition-all cursor-pointer brightness-125" />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                {/* Social Hub Row */}
-                <div className="pt-8 border-t border-white/5">
-                    <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
-                        {socialPlatforms.map((platform) => (
-                            <a 
-                                key={platform.name} 
-                                href={platform.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-4 md:gap-5 group cursor-pointer"
-                            >
-                                <div className={`text-zinc-600 transition-all duration-300 group-hover:scale-110 ${platform.color}`}>
-                                    {platform.icon}
-                                </div>
-                                <div className="flex flex-col items-center justify-center">
-                                    <span className="text-[10px] md:text-[10px] font-black text-white uppercase tracking-[0.3em] leading-none mb-1.5">{platform.name}</span>
-                                </div>
-                            </a>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="mt-8 md:mt-6 pt-6 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
-                    <p className="text-zinc-600 text-[10px] md:text-[10px] font-black uppercase tracking-[0.4em]">
-                        &copy; 2026 ONEPC ENTERPRISE. {t('footer_rights')}
-                    </p>
-                    <div className="flex gap-6 md:gap-5">
-                        <span className="text-zinc-600 text-[10px] md:text-[10px] font-black uppercase tracking-[0.4em] opacity-30">{getLangLabel()}</span>
-                    </div>
-                </div>
+          {/* Col 4: Secure Shopping */}
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold tracking-[0.18em] uppercase text-[#1C1C1E]">
+              SECURE SHOPPING
+            </h4>
+            <p className="text-xs md:text-sm text-[#71717A] leading-relaxed">
+              All transactions are encrypted and secured with industry-standard protocols.
+            </p>
+            {/* Security Icons */}
+            <div className="flex items-center gap-3 text-[#71717A] pt-1">
+              {/* Lock Icon */}
+              <div className="p-2 rounded-md bg-[#F4F1EA] border border-[#E8E3D9]" title="SSL Encrypted">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+              </div>
+              {/* Shield Icon */}
+              <div className="p-2 rounded-md bg-[#F4F1EA] border border-[#E8E3D9]" title="Verified Protection">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                </svg>
+              </div>
+              {/* Credit Card Icon */}
+              <div className="p-2 rounded-md bg-[#F4F1EA] border border-[#E8E3D9]" title="Secure Payments">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-6-10.5A2.25 2.25 0 002.25 8v8a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 16V8a2.25 2.25 0 00-2.25-2.25H3.75z" />
+                </svg>
+              </div>
             </div>
-        </footer>
-    )
+          </div>
+        </div>
+
+        {/* Copyright */}
+        <div className="pt-8 border-t border-[#EAE5DC] text-center">
+          <p className="text-xs text-[#71717A]">
+            &copy; {new Date().getFullYear()} Anisa Studio. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
 }

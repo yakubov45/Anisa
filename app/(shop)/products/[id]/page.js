@@ -1,5 +1,8 @@
 import { getProducts, getProductById } from "@/features/product/api"
 import ProductDetailClient from "./ProductDetailClient"
+import ProductDetailHero from "@/components/product/ProductDetailHero"
+import CraftsmanshipSection from "@/components/product/CraftsmanshipSection"
+import CareAndReviews from "@/components/product/CareAndReviews"
 import { notFound } from "next/navigation"
 
 export async function generateMetadata({ params }) {
@@ -74,13 +77,42 @@ export default async function ProductPage({ params }) {
         }
     }
 
+    const isKitchenProduct =
+      product.category === "cookware" ||
+      product.category === "tableware" ||
+      product.category === "knives" ||
+      product.category === "appliances" ||
+      product.id?.includes("dutch") ||
+      product.id?.includes("skillet") ||
+      product.id?.includes("santoku") ||
+      product.id?.includes("stoneware") ||
+      product.id?.includes("copper") ||
+      product.id?.includes("butcher") ||
+      product.id?.includes("juicer") ||
+      product.id?.includes("matcha") ||
+      product.id?.includes("stockpot") ||
+      product.id?.includes("kitchen");
+
     return (
-        <>
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-            />
-            <ProductDetailClient product={product} relatedProducts={relatedProducts} />
-        </>
-    )
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        {isKitchenProduct ? (
+          <div className="bg-[#FBF9F5] min-h-screen">
+            <div className="max-w-[1440px] mx-auto px-6 md:px-12">
+              <ProductDetailHero product={product} />
+              <CraftsmanshipSection />
+              <CareAndReviews />
+            </div>
+          </div>
+        ) : (
+          <ProductDetailClient
+            product={product}
+            relatedProducts={relatedProducts}
+          />
+        )}
+      </>
+    );
 }
